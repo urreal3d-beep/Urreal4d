@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>Urreal3D – 3D Clothing Animation Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --black:#06040f;--deep:#0a0718;--card:#0f0b1e;
+  --purple:#7c3aed;--pm:#8b46f0;--pl:#a78bfa;
+  --pb:rgba(124,58,237,0.2);--pg:rgba(124,58,237,0.12);
+  --white:#f0ebff;--gray:#b0a0cc;--gdim:#6a5880;--gold:#c9a46a;
+  --green:#22c55e;--yellow:#eab308;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--white);font-family:'Plus Jakarta Sans',sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:var(--black);}::-webkit-scrollbar-thumb{background:var(--purple);}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;justify-content:space-between;align-items:center;padding:16px 28px;background:rgba(6,4,15,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--pb);}
+.logo{font-family:'Fraunces',serif;font-size:24px;font-weight:700;color:var(--white);letter-spacing:0.02em;cursor:pointer;}
+.logo em{color:var(--pl);font-style:normal;}
+.nav-links{display:flex;gap:28px;list-style:none;}
+.nav-links a{color:var(--gray);text-decoration:none;font-size:13px;font-weight:500;letter-spacing:0.04em;transition:color 0.2s;}
+.nav-links a:hover,.nav-links a.active{color:var(--white);}
+.hbg{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:6px;z-index:400;}
+.hbg span{display:block;width:22px;height:2px;background:var(--white);border-radius:2px;transition:all 0.28s;}
+.hbg.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px);}
+.hbg.open span:nth-child(2){opacity:0;transform:translateX(-8px);}
+.hbg.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px);}
+
+/* slide-in drawer */
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:350;opacity:0;pointer-events:none;transition:opacity 0.28s;}
+.drawer-overlay.open{opacity:1;pointer-events:all;}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:260px;background:var(--deep);border-right:1px solid var(--pb);z-index:360;transform:translateX(-100%);transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);padding:72px 0 40px;display:flex;flex-direction:column;}
+.drawer.open{transform:translateX(0);}
+.drawer a{color:var(--gray);text-decoration:none;font-size:16px;font-weight:600;padding:16px 28px;border-bottom:1px solid rgba(124,58,237,0.08);transition:all 0.2s;display:block;}
+.drawer a:hover,.drawer a.active{color:var(--white);background:rgba(124,58,237,0.1);border-left:3px solid var(--pl);}
+.drawer-logo{padding:0 28px 24px;font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:var(--white);border-bottom:1px solid var(--pb);margin-bottom:8px;}
+.drawer-logo em{color:var(--pl);font-style:normal;}
+
+/* ── PAGES ── */
+.page{display:none;min-height:100vh;}
+.page.active{display:block;animation:fadeUp 0.3s ease both;}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;align-items:center;padding:110px 28px 80px;position:relative;overflow:hidden;}
+.orb1{position:absolute;top:0;right:-5%;width:min(700px,140vw);height:min(700px,140vw);border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,0.15),transparent 60%);pointer-events:none;}
+.orb2{position:absolute;bottom:-10%;left:-10%;width:min(450px,100vw);height:min(450px,100vw);border-radius:50%;background:radial-gradient(circle,rgba(139,70,240,0.09),transparent 60%);pointer-events:none;}
+.gridlines{position:absolute;inset:0;opacity:0.025;background-image:linear-gradient(var(--pl) 1px,transparent 1px),linear-gradient(90deg,var(--pl) 1px,transparent 1px);background-size:48px 48px;}
+.hero-content{position:relative;z-index:1;max-width:680px;width:100%;}
+.tag{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--pb);border-radius:100px;padding:5px 16px;margin-bottom:24px;font-size:11px;font-weight:600;letter-spacing:0.1em;color:var(--pl);animation:fadeUp 0.5s ease both;}
+.tdot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 2s infinite;flex-shrink:0;}
+.hero h1{font-family:'Fraunces',serif;font-size:clamp(46px,11vw,100px);font-weight:700;line-height:0.95;margin-bottom:26px;animation:fadeUp 0.5s 0.08s ease both;opacity:0;animation-fill-mode:both;}
+.hero h1 .it{font-style:italic;font-weight:300;color:var(--pl);display:block;}
+.hero-sub{font-size:16px;color:var(--gray);font-weight:400;line-height:1.7;max-width:480px;margin-bottom:36px;animation:fadeUp 0.5s 0.16s ease both;opacity:0;animation-fill-mode:both;}
+.hero-btns{display:flex;flex-wrap:wrap;gap:12px;animation:fadeUp 0.5s 0.24s ease both;opacity:0;animation-fill-mode:both;}
+.btn-p{background:var(--purple);color:var(--white);padding:13px 28px;border-radius:6px;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.06em;cursor:pointer;transition:all 0.22s;box-shadow:0 4px 24px rgba(124,58,237,0.3);}
+.btn-p:hover{background:var(--pm);box-shadow:0 4px 36px rgba(139,70,240,0.45);transform:translateY(-2px);}
+.btn-g{background:transparent;color:var(--white);padding:13px 28px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.22s;}
+.btn-g:hover{border-color:var(--pl);color:var(--pl);}
+.hero-stats{display:flex;gap:clamp(20px,5vw,56px);flex-wrap:wrap;margin-top:56px;padding-top:36px;border-top:1px solid var(--pb);animation:fadeUp 0.5s 0.32s ease both;opacity:0;animation-fill-mode:both;}
+.snum{font-family:'Fraunces',serif;font-size:clamp(34px,7vw,48px);font-weight:700;color:var(--pl);line-height:1;}
+.slbl{font-size:12px;color:var(--gdim);font-weight:500;margin-top:5px;}
+
+/* MARQUEE */
+.mstrip{background:rgba(124,58,237,0.06);border-top:1px solid var(--pb);border-bottom:1px solid var(--pb);padding:12px 0;overflow:hidden;}
+.mtrack{display:flex;gap:44px;white-space:nowrap;animation:marquee 24s linear infinite;font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--pl);}
+.mtrack .d{opacity:0.35;}
+
+/* SECTION */
+.sec{padding:clamp(56px,10vw,100px) clamp(20px,5vw,60px);}
+.slbl-tag{font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.stitle{font-family:'Fraunces',serif;font-size:clamp(30px,5vw,50px);font-weight:700;line-height:1.08;margin-bottom:48px;}
+.stitle em{font-style:italic;color:var(--pl);}
+
+/* SERVICES */
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;}
+.svc-card{background:var(--card);border:1px solid var(--pb);border-radius:12px;padding:28px 24px;transition:all 0.25s;position:relative;overflow:hidden;}
+.svc-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--purple),transparent);opacity:0;transition:opacity 0.25s;}
+.svc-card:hover{border-color:rgba(124,58,237,0.4);transform:translateY(-3px);}
+.svc-card:hover::after{opacity:1;}
+.svc-icon{font-size:26px;margin-bottom:14px;}
+.svc-card h3{font-family:'Fraunces',serif;font-size:19px;font-weight:600;margin-bottom:9px;}
+.svc-card p{color:var(--gray);font-size:13px;line-height:1.72;font-weight:400;}
+
+/* ABOUT */
+.about-wrap{display:grid;grid-template-columns:1fr 1fr;gap:56px;padding:110px clamp(20px,5vw,60px) 72px;align-items:start;}
+.about-text h1{font-family:'Fraunces',serif;font-size:clamp(34px,5.5vw,52px);font-weight:700;line-height:1.06;margin-bottom:22px;}
+.about-text h1 em{font-style:italic;color:var(--pl);}
+.about-text p{color:var(--gray);line-height:1.8;font-size:15px;margin-bottom:16px;}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px;}
+.badge{background:rgba(124,58,237,0.1);border:1px solid var(--pb);border-radius:4px;padding:6px 14px;font-size:12px;font-weight:600;color:var(--pl);}
+.profile-card{background:var(--card);border:1px solid var(--pb);border-radius:14px;padding:36px 32px;position:sticky;top:90px;}
+.pname{font-family:'Fraunces',serif;font-size:26px;font-weight:700;margin-bottom:3px;}
+.prole{font-size:12px;color:var(--pl);font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:28px;}
+.irow{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid rgba(124,58,237,0.07);}
+.irow:last-child{border-bottom:none;}
+.ikey{font-size:11px;color:var(--gdim);font-weight:500;}
+.ival{font-size:13px;font-weight:600;}
+.skills-wrap{padding:0 clamp(20px,5vw,60px) clamp(56px,10vw,96px);}
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-top:36px;}
+.skill-tile{background:var(--card);border:1px solid var(--pb);border-radius:10px;padding:20px 14px;text-align:center;transition:all 0.22s;}
+.skill-tile:hover{border-color:var(--pl);background:rgba(124,58,237,0.1);}
+.si{font-size:24px;margin-bottom:9px;}
+.sn{font-size:12px;font-weight:700;color:var(--gray);}
+
+/* PORTFOLIO — equal treatment */
+.port-hero{padding:120px clamp(20px,5vw,60px) 36px;text-align:center;}
+.port-hero h1{font-family:'Fraunces',serif;font-size:clamp(42px,9vw,78px);font-weight:700;margin-bottom:14px;}
+.port-hero p{color:var(--gray);font-size:15px;max-width:480px;margin:0 auto;line-height:1.65;}
+.filter-bar{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;padding:28px clamp(20px,5vw,60px);}
+.ftab{background:transparent;border:1px solid rgba(124,58,237,0.22);color:var(--gray);padding:8px 20px;border-radius:100px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.ftab:hover,.ftab.active{background:var(--purple);border-color:var(--purple);color:var(--white);}
+
+/* Masonry-style equal grid for videos + photos */
+.port-section-title{padding:0 clamp(20px,5vw,60px) 16px;display:flex;align-items:center;gap:16px;}
+.port-section-title h3{font-family:'Fraunces',serif;font-size:22px;font-weight:600;}
+.port-section-title .pcount{background:rgba(124,58,237,0.15);border:1px solid var(--pb);border-radius:100px;padding:3px 12px;font-size:12px;font-weight:600;color:var(--pl);}
+.port-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:18px;padding:0 clamp(20px,5vw,60px) 16px;}
+.port-grid.featured-first .port-card:first-child{grid-column:1/-1;}
+.port-card{background:var(--card);border:1px solid var(--pb);border-radius:12px;overflow:hidden;transition:all 0.25s;}
+.port-card:hover{border-color:rgba(124,58,237,0.42);transform:translateY(-3px);}
+.media-box{width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,rgba(124,58,237,0.1),var(--deep));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border-bottom:1px solid var(--pb);}
+.port-grid.featured-first .port-card:first-child .media-box{aspect-ratio:21/9;}
+.photo-box{width:100%;aspect-ratio:4/3;background:linear-gradient(135deg,rgba(124,58,237,0.08),var(--deep));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border-bottom:1px solid var(--pb);}
+.play-btn{width:50px;height:50px;border-radius:50%;background:rgba(124,58,237,0.2);border:2px solid var(--pl);display:flex;align-items:center;justify-content:center;font-size:18px;transition:all 0.22s;}
+.port-card:hover .play-btn{background:var(--purple);transform:scale(1.08);}
+.upload-label{font-size:12px;color:var(--gdim);text-align:center;padding:0 14px;line-height:1.5;}
+.port-info{padding:18px 20px;}
+.port-info h3{font-family:'Fraunces',serif;font-size:18px;font-weight:600;margin-bottom:6px;}
+.port-info p{color:var(--gray);font-size:13px;line-height:1.6;}
+.ptags{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;}
+.ptag{background:rgba(124,58,237,0.09);border:1px solid rgba(124,58,237,0.16);border-radius:3px;padding:3px 9px;font-size:11px;font-weight:600;color:var(--pl);}
+
+/* TESTIMONIALS */
+.test-hero{padding:120px clamp(20px,5vw,60px) 36px;text-align:center;}
+.test-hero h1{font-family:'Fraunces',serif;font-size:clamp(40px,8vw,68px);font-weight:700;margin-bottom:14px;}
+.test-hero p{color:var(--gray);font-size:15px;max-width:440px;margin:0 auto;line-height:1.65;}
+.test-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:18px;padding:0 clamp(20px,5vw,60px) 56px;}
+.test-card{background:var(--card);border:1px solid var(--pb);border-radius:12px;padding:26px 22px;transition:all 0.25s;}
+.test-card:hover{border-color:rgba(124,58,237,0.38);transform:translateY(-3px);}
+.test-top{display:flex;align-items:center;gap:14px;margin-bottom:18px;}
+.test-avatar{width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid rgba(124,58,237,0.3);flex-shrink:0;background:rgba(124,58,237,0.15);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--pl);}
+.test-meta .tname{font-family:'Fraunces',serif;font-size:16px;font-weight:600;margin-bottom:2px;}
+.test-meta .tbrand{font-size:12px;color:var(--gdim);font-weight:500;}
+.trating{display:flex;gap:2px;margin-bottom:12px;}
+.trating span{font-size:13px;}
+.tstar{color:#eab308;}
+.tstar-empty{color:#3a3050;}
+.test-txt{color:var(--gray);font-size:14px;line-height:1.75;font-style:italic;}
+.test-cta{text-align:center;padding:0 clamp(20px,5vw,60px) 72px;}
+.test-cta p{color:var(--gray);font-size:15px;margin-bottom:20px;}
+
+/* PRICING */
+.pricing-hero{padding:120px clamp(20px,5vw,60px) 36px;text-align:center;}
+.pricing-hero h1{font-family:'Fraunces',serif;font-size:clamp(40px,8vw,68px);font-weight:700;margin-bottom:14px;}
+.pricing-hero p{color:var(--gray);font-size:15px;max-width:500px;margin:0 auto;line-height:1.65;}
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));gap:20px;padding:0 clamp(20px,5vw,60px) 32px;}
+.price-card{background:var(--card);border:1px solid var(--pb);border-radius:14px;padding:32px 28px;transition:all 0.25s;position:relative;}
+.price-card.popular{border-color:var(--purple);box-shadow:0 0 32px rgba(124,58,237,0.2);}
+.popular-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--purple);color:var(--white);font-size:11px;font-weight:700;letter-spacing:0.1em;padding:4px 16px;border-radius:100px;white-space:nowrap;}
+.price-card:hover{transform:translateY(-4px);}
+.price-card.popular:hover{box-shadow:0 0 48px rgba(124,58,237,0.32);}
+.price-icon{font-size:30px;margin-bottom:16px;}
+.price-card h3{font-family:'Fraunces',serif;font-size:22px;font-weight:700;margin-bottom:8px;}
+.price-card .price-desc{color:var(--gray);font-size:13px;line-height:1.65;margin-bottom:20px;}
+.price-amount{margin-bottom:20px;}
+.price-from{font-size:12px;color:var(--gdim);font-weight:500;margin-bottom:3px;}
+.price-num{font-family:'Fraunces',serif;font-size:clamp(32px,5vw,42px);font-weight:700;color:var(--white);line-height:1;}
+.price-num em{font-size:18px;font-style:normal;color:var(--gdim);}
+.price-range{font-size:13px;color:var(--gdim);margin-top:3px;}
+.price-divider{height:1px;background:rgba(124,58,237,0.12);margin:20px 0;}
+.price-features{display:flex;flex-direction:column;gap:11px;margin-bottom:24px;}
+.pf{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--gray);line-height:1.5;}
+.pf-check{color:var(--green);font-size:14px;flex-shrink:0;margin-top:1px;}
+.price-cta{width:100%;background:var(--purple);color:var(--white);padding:13px;border-radius:6px;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.22s;}
+.price-cta:hover{background:var(--pm);transform:translateY(-1px);}
+.price-card:not(.popular) .price-cta{background:transparent;border:1px solid var(--pb);color:var(--pl);}
+.price-card:not(.popular) .price-cta:hover{background:rgba(124,58,237,0.12);border-color:var(--pl);}
+.pricing-note{text-align:center;padding:0 clamp(20px,5vw,60px) 32px;color:var(--gdim);font-size:13px;line-height:1.7;max-width:600px;margin:0 auto;}
+.pricing-faq{padding:0 clamp(20px,5vw,60px) 80px;}
+.faq-item{background:var(--card);border:1px solid var(--pb);border-radius:10px;margin-bottom:12px;overflow:hidden;}
+.faq-q{padding:18px 22px;font-weight:600;font-size:14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;}
+.faq-q:hover{color:var(--pl);}
+.faq-icon{color:var(--pl);font-size:18px;transition:transform 0.25s;flex-shrink:0;}
+.faq-item.open .faq-icon{transform:rotate(45deg);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height 0.3s ease;color:var(--gray);font-size:13px;line-height:1.75;}
+.faq-item.open .faq-a{max-height:200px;}
+.faq-a-inner{padding:0 22px 18px;}
+
+/* POLICY */
+.policy-wrap{max-width:720px;margin:0 auto;padding:120px clamp(20px,5vw,40px) 80px;}
+.policy-wrap h1{font-family:'Fraunces',serif;font-size:clamp(36px,6vw,54px);font-weight:700;margin-bottom:10px;}
+.policy-wrap .policy-date{font-size:13px;color:var(--gdim);margin-bottom:44px;}
+.policy-wrap h2{font-family:'Fraunces',serif;font-size:22px;font-weight:600;margin:36px 0 14px;color:var(--pl);}
+.policy-wrap p{color:var(--gray);font-size:14px;line-height:1.82;margin-bottom:14px;}
+.policy-wrap ul{color:var(--gray);font-size:14px;line-height:1.82;margin:0 0 14px 20px;}
+.policy-wrap ul li{margin-bottom:6px;}
+.policy-divider{height:1px;background:var(--pb);margin:28px 0;}
+
+/* APPOINTMENT */
+.appt-hero{padding:120px clamp(20px,5vw,60px) 44px;text-align:center;}
+.appt-hero h1{font-family:'Fraunces',serif;font-size:clamp(38px,7vw,64px);font-weight:700;margin-bottom:14px;}
+.appt-hero p{color:var(--gray);font-size:15px;max-width:480px;margin:0 auto;line-height:1.65;}
+.appt-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;padding:0 clamp(20px,5vw,60px) 80px;align-items:start;}
+.form-card{background:var(--card);border:1px solid var(--pb);border-radius:14px;padding:clamp(24px,4vw,44px) clamp(20px,3vw,36px);}
+.form-card h3{font-family:'Fraunces',serif;font-size:24px;font-weight:700;margin-bottom:28px;}
+.fgroup{margin-bottom:20px;}
+.flabel{display:block;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gdim);margin-bottom:8px;}
+.finput,.fselect,.ftextarea{width:100%;background:rgba(124,58,237,0.05);border:1px solid rgba(124,58,237,0.16);border-radius:7px;padding:12px 15px;color:var(--white);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;transition:border-color 0.2s;}
+.finput::placeholder,.ftextarea::placeholder{color:var(--gdim);}
+.finput:focus,.fselect:focus,.ftextarea:focus{outline:none;border-color:var(--pl);background:rgba(124,58,237,0.08);}
+.fselect{appearance:none;}
+.fselect option{background:#120d2e;}
+.ftextarea{resize:vertical;min-height:100px;line-height:1.6;}
+.submit-btn{width:100%;background:var(--purple);color:var(--white);padding:14px;border-radius:7px;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.06em;cursor:pointer;transition:all 0.22s;box-shadow:0 4px 20px rgba(124,58,237,0.25);margin-top:6px;}
+.submit-btn:hover{background:var(--pm);transform:translateY(-1px);}
+.submit-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+.form-msg{margin-top:14px;padding:12px 16px;border-radius:7px;font-size:13px;font-weight:600;display:none;}
+.form-msg.success{background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);color:var(--green);display:block;}
+.form-msg.error{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#f87171;display:block;}
+.contact-col{display:flex;flex-direction:column;gap:18px;}
+.contact-card{background:var(--card);border:1px solid var(--pb);border-radius:14px;padding:clamp(22px,3vw,36px);}
+.contact-card h3{font-family:'Fraunces',serif;font-size:22px;font-weight:700;margin-bottom:24px;}
+.citem{display:flex;align-items:flex-start;gap:14px;margin-bottom:20px;}
+.cicon{width:40px;height:40px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.18);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.ckey{font-size:11px;color:var(--gdim);font-weight:600;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:3px;}
+.cval{font-size:14px;font-weight:600;}
+.socials{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap;}
+.soc-btn{flex:1;min-width:110px;background:rgba(124,58,237,0.08);border:1px solid var(--pb);border-radius:7px;padding:12px 10px;text-align:center;color:var(--pl);font-size:12px;font-weight:700;text-decoration:none;transition:all 0.2s;display:block;cursor:pointer;}
+.soc-btn:hover{background:var(--purple);color:var(--white);border-color:var(--purple);}
+.why-card{background:var(--card);border:1px solid var(--pb);border-radius:12px;padding:24px;}
+.why-card h4{font-family:'Fraunces',serif;font-size:19px;font-weight:700;margin-bottom:18px;}
+.wi{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;font-size:13px;color:var(--gray);line-height:1.5;}
+.wi span{color:var(--pl);flex-shrink:0;margin-top:1px;}
+
+/* FOOTER */
+footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(20px,5vw,60px);display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;}
+.footer-logo{font-family:'Fraunces',serif;font-size:20px;font-weight:700;}
+.footer-logo em{color:var(--pl);font-style:normal;}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap;}
+.footer-links a{font-size:12px;color:var(--gdim);text-decoration:none;transition:color 0.2s;font-weight:500;cursor:pointer;}
+.footer-links a:hover{color:var(--white);}
+.footer-copy{font-size:12px;color:var(--gdim);}
+
+/* KEYFRAMES */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+@keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .about-wrap{grid-template-columns:1fr;gap:36px;padding-top:106px;}
+  .profile-card{position:static;}
+  .appt-grid{grid-template-columns:1fr;}
+}
+@media(max-width:640px){
+  .hbg{display:flex;}
+  .nav-links{display:none;}
+  nav{padding:15px 20px;}
+  .hero{padding:96px 20px 64px;}
+  .hero-stats{flex-wrap:wrap;gap:24px;}
+  .port-grid.featured-first .port-card:first-child .media-box{aspect-ratio:16/9;}
+  .sec,.svc-grid{padding-left:20px;padding-right:20px;}
+  .port-hero,.test-hero,.appt-hero,.pricing-hero{padding:106px 20px 32px;}
+  .filter-bar,.port-grid,.port-section-title,.photos-sec,.test-grid,.test-cta,.appt-grid,.pricing-grid,.pricing-note,.pricing-faq{padding-left:20px;padding-right:20px;}
+  .about-wrap{padding:106px 20px 56px;}
+  .skills-wrap{padding:0 20px 56px;}
+  footer{flex-direction:column;text-align:center;gap:12px;}
+  .hero-btns,.btn-p,.btn-g{width:100%;}
+  .btn-p,.btn-g{text-align:center;}
+  .hero-btns{flex-direction:column;}
+  .pricing-grid .port-grid{grid-template-columns:1fr;}
+}
+@media(max-width:380px){.hero h1{font-size:40px;}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo" onclick="go('home')">Urreal<em>3D</em></div>
+  <ul class="nav-links">
+    <li><a href="#" onclick="go('home');return false;" id="nl-home" class="active">Home</a></li>
+    <li><a href="#" onclick="go('about');return false;" id="nl-about">About</a></li>
+    <li><a href="#" onclick="go('portfolio');return false;" id="nl-portfolio">Portfolio</a></li>
+    <li><a href="#" onclick="go('pricing');return false;" id="nl-pricing">Pricing</a></li>
+    <li><a href="#" onclick="go('testimonials');return false;" id="nl-testimonials">Reviews</a></li>
+    <li><a href="#" onclick="go('appointment');return false;" id="nl-appointment">Book</a></li>
+  </ul>
+  <button class="hbg" id="hbg" onclick="toggleDrawer()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Slide-in Drawer -->
+<div class="drawer-overlay" id="doverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-logo">Urreal<em>3D</em></div>
+  <a href="#" onclick="go('home');return false;" id="dl-home" class="active">Home</a>
+  <a href="#" onclick="go('about');return false;" id="dl-about">About</a>
+  <a href="#" onclick="go('portfolio');return false;" id="dl-portfolio">Portfolio</a>
+  <a href="#" onclick="go('pricing');return false;" id="dl-pricing">Pricing</a>
+  <a href="#" onclick="go('testimonials');return false;" id="dl-testimonials">Reviews</a>
+  <a href="#" onclick="go('appointment');return false;" id="dl-appointment">Book a Call</a>
+  <a href="#" onclick="go('policy');return false;" id="dl-policy">Policy</a>
+</div>
+
+<!-- ═══ HOME ═══ -->
+<div class="page active" id="p-home">
+  <div class="hero">
+    <div class="orb1"></div><div class="orb2"></div><div class="gridlines"></div>
+    <div class="hero-content">
+      <div class="tag"><span class="tdot"></span> Available for new projects</div>
+      <h1>3D Clothing<span class="it">That Actually</span>Moves Right</h1>
+      <p class="hero-sub">We create premium 3D clothing animations and renders for fashion brands, e-commerce stores, and independent designers. Realistic fabric, fast delivery, results that sell.</p>
+      <div class="hero-btns">
+        <button class="btn-p" onclick="go('portfolio')">See the Work</button>
+        <button class="btn-g" onclick="go('pricing')">View Pricing</button>
+      </div>
+      <div class="hero-stats">
+        <div><div class="snum">3+</div><div class="slbl">Years Experience</div></div>
+        <div><div class="snum">50+</div><div class="slbl">Projects Done</div></div>
+        <div><div class="snum">100%</div><div class="slbl">Satisfaction Rate</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="mstrip">
+    <div class="mtrack">
+      <span>Clothing Animation</span><span class="d">·</span><span>3D Renders</span><span class="d">·</span><span>Fabric Simulation</span><span class="d">·</span><span>Fashion Tech</span><span class="d">·</span><span>Product Viz</span><span class="d">·</span><span>Urreal3D</span><span class="d">·</span>
+      <span>Clothing Animation</span><span class="d">·</span><span>3D Renders</span><span class="d">·</span><span>Fabric Simulation</span><span class="d">·</span><span>Fashion Tech</span><span class="d">·</span><span>Product Viz</span><span class="d">·</span><span>Urreal3D</span><span class="d">·</span>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="slbl-tag">What We Do</div>
+    <div class="stitle">Studio <em>Services</em></div>
+    <div class="svc-grid">
+      <div class="svc-card"><div class="svc-icon">👗</div><h3>Clothing Animation</h3><p>Realistic fabric physics — silk drapes, denim creases, knitwear stretches. Your garments animated the way they actually move.</p></div>
+      <div class="svc-card"><div class="svc-icon">🎬</div><h3>Product Visualization</h3><p>360° product renders and videos built for e-commerce listings, product pages, and marketing campaigns.</p></div>
+      <div class="svc-card"><div class="svc-icon">⚡</div><h3>Fashion Reels</h3><p>Short-form animated reels ready for Instagram, TikTok, and brand websites. Scroll-stopping and on-brand.</p></div>
+      <div class="svc-card"><div class="svc-icon">🧵</div><h3>Fabric Simulation</h3><p>Silk, cotton, leather, denim, wool — we simulate any material with the right weight, sheen, and behavior.</p></div>
+      <div class="svc-card"><div class="svc-icon">🖼️</div><h3>3D Still Renders</h3><p>High-resolution static renders for lookbooks, ads, and product catalogs. Clean backgrounds or full scene setups.</p></div>
+      <div class="svc-card"><div class="svc-icon">🎨</div><h3>Custom Characters</h3><p>Fully rigged 3D characters wearing your garments, posed and lit for any brand aesthetic or campaign.</p></div>
+    </div>
+  </div>
+  <footer>
+    <div class="footer-logo">Urreal<em>3D</em></div>
+    <div class="footer-links">
+      <a onclick="go('policy')">Privacy Policy</a>
+      <a onclick="go('policy')">Terms of Service</a>
+      <a onclick="go('appointment')">Contact</a>
+    </div>
+    <div class="footer-copy">© 2024 Urreal3D · Stephen R Christian</div>
+  </footer>
+</div>
+
+<!-- ═══ ABOUT ═══ -->
+<div class="page" id="p-about">
+  <div class="about-wrap">
+    <div class="about-text">
+      <div class="slbl-tag">About the Studio</div>
+      <h1>Real passion for<br/><em>fabric in motion</em></h1>
+      <p>Urreal3D is a 3D clothing animation studio run by Stephen R Christian — a 20-year-old B.Tech IT graduate from India who got into 3D animation because he genuinely loves how clothes move.</p>
+      <p>Over the past 3 years, Stephen has worked with fashion brands and independent designers, building a workflow that's fast, clean, and focused on one thing: making garments look exactly right on screen.</p>
+      <p>The studio is small by design. Every project goes through Stephen personally — no junior work, no outsourcing, just focused attention on your brief from start to finish.</p>
+      <div class="badges">
+        <span class="badge">B.Tech IT</span><span class="badge">3D Animator</span>
+        <span class="badge">Clothing Specialist</span><span class="badge">India 🇮🇳</span>
+      </div>
+    </div>
+    <div class="profile-card">
+      <div class="pname">Stephen R Christian</div>
+      <div class="prole">Founder & Lead Animator</div>
+      <div class="irow"><span class="ikey">Studio</span><span class="ival">Urreal3D</span></div>
+      <div class="irow"><span class="ikey">Focus</span><span class="ival">Clothing Animation</span></div>
+      <div class="irow"><span class="ikey">Experience</span><span class="ival">3+ Years</span></div>
+      <div class="irow"><span class="ikey">Education</span><span class="ival">B.Tech – IT</span></div>
+      <div class="irow"><span class="ikey">Location</span><span class="ival">India 🇮🇳</span></div>
+      <div class="irow"><span class="ikey">WhatsApp</span><span class="ival">+91 78598 74272</span></div>
+      <div class="irow"><span class="ikey">Instagram</span><span class="ival" style="color:var(--pl)">@urreal3d</span></div>
+    </div>
+  </div>
+  <div class="skills-wrap">
+    <div class="slbl-tag">Tools & Software</div>
+    <div class="stitle" style="margin-bottom:0">The <em>Tech Stack</em></div>
+    <div class="skills-grid">
+      <div class="skill-tile"><div class="si">🟠</div><div class="sn">Blender</div></div>
+      <div class="skill-tile"><div class="si">🔵</div><div class="sn">CLO 3D</div></div>
+      <div class="skill-tile"><div class="si">🟣</div><div class="sn">Marvelous Designer</div></div>
+      <div class="skill-tile"><div class="si">⚫</div><div class="sn">Cinema 4D</div></div>
+      <div class="skill-tile"><div class="si">🎨</div><div class="sn">Substance Painter</div></div>
+      <div class="skill-tile"><div class="si">✨</div><div class="sn">After Effects</div></div>
+      <div class="skill-tile"><div class="si">🖼️</div><div class="sn">Photoshop</div></div>
+      <div class="skill-tile"><div class="si">🎬</div><div class="sn">DaVinci Resolve</div></div>
+    </div>
+  </div>
+  <footer>
+    <div class="footer-logo">Urreal<em>3D</em></div>
+    <div class="footer-links"><a onclick="go('policy')">Privacy Policy</a><a onclick="go('appointment')">Contact</a></div>
+    <div class="footer-copy">© 2024 Urreal3D · Stephen R Christian</div>
+  </footer>
+</div>
+
+<!-- ═══ PORTFOLIO ═══ -->
+<div class="page" id="p-portfolio">
+  <div class="port-hero">
+    <div class="slbl-tag">The Work</div>
+    <h1>Portfolio</h1>
+    <p>A mix of animations and renders — the full picture of what Urreal3D delivers.</p>
+  </div>
+  <div class="filter-bar">
+    <button class="ftab active" onclick="filterTab(this)">All</button>
+    <button class="ftab" onclick="filterTab(this)">Animations</button>
+    <button class="ftab" onclick="filterTab(this)">Still Renders</button>
+    <button class="ftab" onclick="filterTab(this)">Fashion Reels</button>
+  </div>
+
+  <!-- Videos -->
+  <div class="port-section-title"><h3>Animations & Reels</h3><span class="pcount">10 projects</span></div>
+  <div class="port-grid featured-first" style="margin-bottom:16px;">
+    <div class="port-card">
+      <div class="media-box"><div class="play-btn">▶</div><div class="upload-label">🎬 Upload Showreel · 1920×820 recommended</div></div>
+      <div class="port-info"><h3>Studio Showreel 2024</h3><p>The best of Urreal3D in one reel — silk gowns, streetwear, bridal, and more.</p><div class="ptags"><span class="ptag">Showreel</span><span class="ptag">Featured</span></div></div>
+    </div>
+    <div class="port-card"><div class="media-box"><div class="play-btn">▶</div><div class="upload-label">Upload Video 01</div></div><div class="port-info"><h3>Silk Evening Gown</h3><p>Fluid drape and shimmer simulation under soft studio lighting.</p><div class="ptags"><span class="ptag">Silk</span><span class="ptag">Luxury</span></div></div></div>
+    <div class="port-card"><div class="media-box"><div class="play-btn">▶</div><div class="upload-label">Upload Video 02</div></div><div class="port-info"><h3>Streetwear Drop</h3><p>Hoodie and cargo pants — heavy cotton weight, realistic movement.</p><div class="ptags"><span class="ptag">Streetwear</span></div></div></div>
+    <div class="port-card"><div class="media-box"><div class="play-btn">▶</div><div class="upload-label">Upload Video 03</div></div><div class="port-info"><h3>Bridal Gown</h3><p>Long train animation with detailed lace texture and soft veil flow.</p><div class="ptags"><span class="ptag">Bridal</span></div></div></div>
+    <div class="port-card"><div class="media-box"><div class="play-btn">▶</div><div class="upload-label">Upload Video 04</div></div><div class="port-info"><h3>Denim Collection</h3><p>Rigid fabric behavior for a premium denim brand launch.</p><div class="ptags"><span class="ptag">Denim</span></div></div></div>
+    <div class="port-card"><div class="media-box"><div class="play-btn">▶</div><div class="upload-label">Upload Video 05</div></div><div class="port-info"><h3>Sportswear Reel</h3><p>Athletic wear in motion — stretch, compression, dynamic movement.</p><div class="ptags"><span class="ptag">Sportswear</span></div></div></div>
+    <div class="port-card"><div class="media-box"><div class="play-btn">▶</div><div class="upload-label">Upload Video 06</div></div><div class="port-info"><h3>Knitwear Study</h3><p>Detailed yarn-level simulation for a luxury knitwear brand.</p><div class="ptags"><span class="ptag">Knitwear</span></div></div></div>
+    <div class="port-card"><div class="media-box"><div class="play-btn">▶</div><div class="upload-label">Upload Video 07</div></div><div class="port-info"><h3>Leather Jacket</h3><p>Stiff leather deformation with scuff and crease detailing.</p><div class="ptags"><span class="ptag">Leather</span></div></div></div>
+    <div class="port-card"><div class="media-box"><div class="play-btn">▶</div><div class="upload-label">Upload Video 08</div></div><div class="port-info"><h3>Sari Drape</h3><p>Traditional sari with flowing dupatta — authentic fabric behavior.</p><div class="ptags"><span class="ptag">Traditional</span></div></div></div>
+    <div class="port-card"><div class="media-box"><div class="play-btn">▶</div><div class="upload-label">Upload Video 09</div></div><div class="port-info"><h3>Kids Apparel</h3><p>Bright, light fabrics for a children's clothing brand product reel.</p><div class="ptags"><span class="ptag">Kids</span></div></div></div>
+  </div>
+
+  <!-- Photos — equal prominence -->
+  <div class="port-section-title" style="margin-top:32px;"><h3>Still Renders & Photos</h3><span class="pcount">5 renders</span></div>
+  <div class="port-grid" style="margin-bottom:60px;">
+    <div class="port-card"><div class="photo-box"><span style="font-size:36px;">🖼️</span><div class="upload-label">Upload Render 01 · JPG/PNG</div></div><div class="port-info"><h3>Lookbook Still — Silk Wrap</h3><p>High-res render for a luxury brand's spring lookbook. Clean white background with dramatic side light.</p><div class="ptags"><span class="ptag">Lookbook</span><span class="ptag">Silk</span></div></div></div>
+    <div class="port-card"><div class="photo-box"><span style="font-size:36px;">🖼️</span><div class="upload-label">Upload Render 02</div></div><div class="port-info"><h3>Product Render — Denim Jacket</h3><p>360° turntable stills for an e-commerce listing. Stitch detail and fabric texture highlighted.</p><div class="ptags"><span class="ptag">E-commerce</span><span class="ptag">Denim</span></div></div></div>
+    <div class="port-card"><div class="photo-box"><span style="font-size:36px;">🖼️</span><div class="upload-label">Upload Render 03</div></div><div class="port-info"><h3>Flat Lay — Knitwear Set</h3><p>Styled flat lay render showing texture depth and color accuracy for a knitwear collection.</p><div class="ptags"><span class="ptag">Flat Lay</span><span class="ptag">Knitwear</span></div></div></div>
+    <div class="port-card"><div class="photo-box"><span style="font-size:36px;">🖼️</span><div class="upload-label">Upload Render 04</div></div><div class="port-info"><h3>Campaign Still — Bridal</h3><p>Full scene render with character, gown, and mood lighting for a bridal brand campaign.</p><div class="ptags"><span class="ptag">Campaign</span><span class="ptag">Bridal</span></div></div></div>
+    <div class="port-card"><div class="photo-box"><span style="font-size:36px;">🖼️</span><div class="upload-label">Upload Render 05</div></div><div class="port-info"><h3>Streetwear Editorial</h3><p>Dark cinematic render for an urban streetwear brand's social campaign.</p><div class="ptags"><span class="ptag">Editorial</span><span class="ptag">Streetwear</span></div></div></div>
+  </div>
+
+  <footer>
+    <div class="footer-logo">Urreal<em>3D</em></div>
+    <div class="footer-links"><a onclick="go('policy')">Policy</a><a onclick="go('appointment')">Contact</a></div>
+    <div class="footer-copy">© 2024 Urreal3D · Stephen R Christian</div>
+  </footer>
+</div>
+
+<!-- ═══ PRICING ═══ -->
+<div class="page" id="p-pricing">
+  <div class="pricing-hero">
+    <div class="slbl-tag">Transparent Pricing</div>
+    <h1>Simple, Honest <em style="font-style:italic;color:var(--pl)">Rates</em></h1>
+    <p>No hidden fees, no surprise invoices. Here's exactly what you get — and what it costs.</p>
+  </div>
+  <div class="pricing-grid">
+
+    <!-- Template Images -->
+    <div class="price-card">
+      <div class="price-icon">🖼️</div>
+      <h3>Template Images</h3>
+      <p class="price-desc">Pre-built 3D render scenes. You send your garment design, we drop it in, adjust materials and colors, and deliver a clean high-res image — fast.</p>
+      <div class="price-amount">
+        <div class="price-from">Starting at</div>
+        <div class="price-num">$50<em>/image</em></div>
+      </div>
+      <div class="price-divider"></div>
+      <div class="price-features">
+        <div class="pf"><span class="pf-check">✓</span>1 high-res render (4K)</div>
+        <div class="pf"><span class="pf-check">✓</span>Clean white or gradient background</div>
+        <div class="pf"><span class="pf-check">✓</span>Color & material matching</div>
+        <div class="pf"><span class="pf-check">✓</span>2 revision rounds</div>
+        <div class="pf"><span class="pf-check">✓</span>Delivery in 2–3 business days</div>
+      </div>
+      <button class="price-cta" onclick="go('appointment')">Get Started</button>
+    </div>
+
+    <!-- Custom Images -->
+    <div class="price-card">
+      <div class="price-icon">🎨</div>
+      <h3>Custom Images</h3>
+      <p class="price-desc">Full custom render built from scratch. We model the scene, set the lighting, and position the garment exactly how you'd imagine it in a campaign shoot — without the shoot.</p>
+      <div class="price-amount">
+        <div class="price-from">Starting at</div>
+        <div class="price-num">$200<em>–$300</em></div>
+      </div>
+      <div class="price-divider"></div>
+      <div class="price-features">
+        <div class="pf"><span class="pf-check">✓</span>Custom scene & lighting design</div>
+        <div class="pf"><span class="pf-check">✓</span>Full garment modeling (if needed)</div>
+        <div class="pf"><span class="pf-check">✓</span>Multiple angles included</div>
+        <div class="pf"><span class="pf-check">✓</span>3 revision rounds</div>
+        <div class="pf"><span class="pf-check">✓</span>Commercial use license</div>
+        <div class="pf"><span class="pf-check">✓</span>Delivery in 4–6 business days</div>
+      </div>
+      <button class="price-cta" onclick="go('appointment')">Get a Quote</button>
+    </div>
+
+    <!-- Template Videos -->
+    <div class="price-card">
+      <div class="price-icon">▶️</div>
+      <h3>Template Videos</h3>
+      <p class="price-desc">Ready-made animation templates with your garment dropped in. Great for product launches, social content, and e-commerce pages where you need quality fast.</p>
+      <div class="price-amount">
+        <div class="price-from">Starting at</div>
+        <div class="price-num">$100<em>/video</em></div>
+      </div>
+      <div class="price-divider"></div>
+      <div class="price-features">
+        <div class="pf"><span class="pf-check">✓</span>10–30 second animation</div>
+        <div class="pf"><span class="pf-check">✓</span>1080p export (4K available)</div>
+        <div class="pf"><span class="pf-check">✓</span>Background music optional</div>
+        <div class="pf"><span class="pf-check">✓</span>2 revision rounds</div>
+        <div class="pf"><span class="pf-check">✓</span>Delivery in 3–5 business days</div>
+      </div>
+      <button class="price-cta" onclick="go('appointment')">Order Now</button>
+    </div>
+
+    <!-- Custom Videos -->
+    <div class="price-card popular">
+      <div class="popular-badge">Most Popular</div>
+      <div class="price-icon">🎬</div>
+      <h3>Custom Videos</h3>
+      <p class="price-desc">Fully custom clothing animation built around your brief. More complex animations with detailed fabric behavior take more time — price reflects that honestly.</p>
+      <div class="price-amount">
+        <div class="price-from">Starting at</div>
+        <div class="price-num">$300<em>–$500</em></div>
+        <div class="price-range">Final price depends on animation complexity & length</div>
+      </div>
+      <div class="price-divider"></div>
+      <div class="price-features">
+        <div class="pf"><span class="pf-check">✓</span>Custom scene, character & garment</div>
+        <div class="pf"><span class="pf-check">✓</span>Advanced fabric physics simulation</div>
+        <div class="pf"><span class="pf-check">✓</span>15–60 second animation</div>
+        <div class="pf"><span class="pf-check">✓</span>Cinematic lighting & camera work</div>
+        <div class="pf"><span class="pf-check">✓</span>Unlimited revisions (within scope)</div>
+        <div class="pf"><span class="pf-check">✓</span>Full commercial license</div>
+        <div class="pf"><span class="pf-check">✓</span>Delivery in 7–14 business days</div>
+      </div>
+      <button class="price-cta" onclick="go('appointment')">Book a Call</button>
+    </div>
+  </div>
+
+  <p class="pricing-note">All prices in USD. Projects outside standard scope will be quoted individually — just reach out and describe what you need. Rush delivery available for +30% fee. Volume discounts available for 3+ deliverables.</p>
+
+  <div class="pricing-faq">
+    <div class="slbl-tag" style="margin-bottom:20px;">Common Questions</div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What do I need to send you to get started? <span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">For template orders, just send a photo or sketch of the garment, fabric type, and color reference. For custom work, a brief with your brand style, references, and intended use is enough — we'll handle everything from there.</div></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">How does payment work? <span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">50% upfront to start the project, 50% on delivery before final files are shared. We accept PayPal, Wise, and bank transfer. No payment is required before a quote is agreed upon.</div></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Can I use the final files commercially? <span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Yes. All delivered files include full commercial usage rights — you can use them in ads, social media, e-commerce, campaigns, print, and beyond. You own the output.</div></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What if I'm not happy with the result? <span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Revisions are included in every package. We keep working until you're genuinely satisfied. If after all revisions you're still not happy, we'll discuss a partial refund — your satisfaction matters more than a one-time payment.</div></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Do you offer discounts for bulk orders? <span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Yes — orders of 3 or more deliverables get a 10–15% discount depending on the mix. Ongoing monthly retainer arrangements are also available for brands that need regular content.</div></div>
+    </div>
+  </div>
+  <footer>
+    <div class="footer-logo">Urreal<em>3D</em></div>
+    <div class="footer-links"><a onclick="go('policy')">Policy</a><a onclick="go('appointment')">Contact</a></div>
+    <div class="footer-copy">© 2024 Urreal3D · Stephen R Christian</div>
+  </footer>
+</div>
+
+<!-- ═══ TESTIMONIALS ═══ -->
+<div class="page" id="p-testimonials">
+  <div class="test-hero">
+    <div class="slbl-tag">Client Reviews</div>
+    <h1>What Clients Say</h1>
+    <p>Real feedback from designers and brands who've worked with Urreal3D.</p>
+  </div>
+  <div class="test-grid">
+
+    <!-- 5 stars -->
+    <div class="test-card">
+      <div class="test-top">
+        <div class="test-avatar">JM</div>
+        <div class="test-meta">
+          <div class="tname">Jake Morrow</div>
+          <div class="tbrand">Founder · Morrow Streetwear</div>
+        </div>
+      </div>
+      <div class="trating"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div>
+      <p class="test-txt">I sent Stephen a rough sketch and within a week I had a full animation that honestly looked better than some brand videos I've paid $3k+ for. The fabric physics were dead on — heavy cotton, the wrinkles, all of it. Already booked him for three more drops.</p>
+    </div>
+
+    <!-- 4 stars -->
+    <div class="test-card">
+      <div class="test-top">
+        <div class="test-avatar">SR</div>
+        <div class="test-meta">
+          <div class="tname">Sofia Reyes</div>
+          <div class="tbrand">Creative Dir · Velour Studio</div>
+        </div>
+      </div>
+      <div class="trating"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar-empty">★</span></div>
+      <p class="test-txt">Really solid work. We used Urreal3D for our spring lookbook and the renders came out cleaner than expected. Communication was smooth and he was upfront about timeline. Minor note — first draft needed a lighting tweak, but revision was fast. Would use again.</p>
+    </div>
+
+    <!-- 5 stars -->
+    <div class="test-card">
+      <div class="test-top">
+        <div class="test-avatar">AL</div>
+        <div class="test-meta">
+          <div class="tname">Amber Liu</div>
+          <div class="tbrand">Owner · LaceUp Bridal</div>
+        </div>
+      </div>
+      <div class="trating"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div>
+      <p class="test-txt">The bridal gown animation was breathtaking. The veil movement, the train draping on the ground — I didn't think 3D could look this realistic. Brides on my Instagram were commenting asking if it was real footage. That's the best review I can give.</p>
+    </div>
+
+    <!-- 4 stars -->
+    <div class="test-card">
+      <div class="test-top">
+        <div class="test-avatar">DK</div>
+        <div class="test-meta">
+          <div class="tname">Derek Kim</div>
+          <div class="tbrand">Product Lead · UrbanThread Co.</div>
+        </div>
+      </div>
+      <div class="trating"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar-empty">★</span></div>
+      <p class="test-txt">We needed product renders for 12 SKUs and Stephen knocked them out without making us feel like a burden. The template images were clean, accurate to our colors, and came back in 2 days. Only thing I'd mention is that rush delivery costs extra — worth it though.</p>
+    </div>
+
+    <!-- 5 stars -->
+    <div class="test-card">
+      <div class="test-top">
+        <div class="test-avatar">PR</div>
+        <div class="test-meta">
+          <div class="tname">Priya Nair</div>
+          <div class="tbrand">Designer · Studio Drape</div>
+        </div>
+      </div>
+      <div class="trating"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div>
+      <p class="test-txt">Stephen just gets fabric. He didn't need to be told how silk behaves differently from chiffon — it was just right. We worked on a custom saree animation and the result was something I'm still using in presentations to clients a year later.</p>
+    </div>
+
+    <!-- 5 stars -->
+    <div class="test-card">
+      <div class="test-top">
+        <div class="test-avatar">MW</div>
+        <div class="test-meta">
+          <div class="tname">Marcus Webb</div>
+          <div class="tbrand">Brand Manager · Nordvik Denim</div>
+        </div>
+      </div>
+      <div class="trating"><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span><span class="tstar">★</span></div>
+      <p class="test-txt">We used Urreal3D for a campaign video and it ended up being the highest performing post we've ever run on Instagram. I genuinely couldn't believe the stitch detail on the denim. Excellent value at the price point — I've paid far more for far less.</p>
+    </div>
+
+  </div>
+  <div class="test-cta">
+    <p>Ready to see what we can do with your garments?</p>
+    <button class="btn-p" onclick="go('appointment')">Start a Project</button>
+  </div>
+  <footer>
+    <div class="footer-logo">Urreal<em>3D</em></div>
+    <div class="footer-links"><a onclick="go('policy')">Policy</a><a onclick="go('appointment')">Contact</a></div>
+    <div class="footer-copy">© 2024 Urreal3D · Stephen R Christian</div>
+  </footer>
+</div>
+
+<!-- ═══ APPOINTMENT ═══ -->
+<div class="page" id="p-appointment">
+  <div class="appt-hero">
+    <div class="slbl-tag">Get in Touch</div>
+    <h1>Start a <em style="font-style:italic;color:var(--pl)">Project</em></h1>
+    <p>Fill out the form and you'll hear back within 24 hours. No commitment needed — just tell us what you're working on.</p>
+  </div>
+  <div class="appt-grid">
+    <div class="form-card">
+      <h3>Project Inquiry</h3>
+      <div class="fgroup"><label class="flabel">Your Name *</label><input class="finput" id="f-name" type="text" placeholder="Full name"/></div>
+      <div class="fgroup"><label class="flabel">Email *</label><input class="finput" id="f-email" type="email" placeholder="you@yourbrand.com"/></div>
+      <div class="fgroup"><label class="flabel">Brand / Company</label><input class="finput" id="f-brand" type="text" placeholder="Your brand name (optional)"/></div>
+      <div class="fgroup"><label class="flabel">Service Needed *</label>
+        <select class="fselect" id="f-service">
+          <option value="">Choose a service...</option>
+          <option>Template Images — $50</option>
+          <option>Custom Images — $200–$300</option>
+          <option>Template Videos — $100</option>
+          <option>Custom Videos — $300–$500</option>
+          <option>Not sure yet — let's talk</option>
+        </select>
+      </div>
+      <div class="fgroup"><label class="flabel">Budget Range</label>
+        <select class="fselect" id="f-budget">
+          <option value="">Select range...</option>
+          <option>Under $100</option>
+          <option>$100–$300</option>
+          <option>$300–$600</option>
+          <option>$600+</option>
+          <option>Let's discuss</option>
+        </select>
+      </div>
+      <div class="fgroup"><label class="flabel">Tell Us About Your Project *</label><textarea class="ftextarea" id="f-message" placeholder="What garment? What style? Any references? The more detail the better."></textarea></div>
+      <button class="submit-btn" id="submit-btn" onclick="submitForm()">Send Inquiry →</button>
+      <div class="form-msg" id="form-msg"></div>
+    </div>
+    <div class="contact-col">
+      <div class="contact-card">
+        <h3>Other Ways to Reach Us</h3>
+        <div class="citem"><div class="cicon">📱</div><div><div class="ckey">WhatsApp</div><div class="cval">+91 78598 74272</div></div></div>
+        <div class="citem"><div class="cicon">📍</div><div><div class="ckey">Location</div><div class="cval">India — remote worldwide 🌍</div></div></div>
+        <div class="citem"><div class="cicon">⏱️</div><div><div class="ckey">Response Time</div><div class="cval">Within 24 hours</div></div></div>
+        <div class="citem"><div class="cicon">🎓</div><div><div class="ckey">Background</div><div class="cval">B.Tech IT Graduate</div></div></div>
+        <div class="socials">
+          <a class="soc-btn" href="#" target="_blank">📸 Instagram 1</a>
+          <a class="soc-btn" href="#" target="_blank">📸 Instagram 2</a>
+        </div>
+      </div>
+      <div class="why-card">
+        <h4>Why Urreal3D?</h4>
+        <div class="wi"><span>→</span>Every project handled personally by Stephen — no juniors, no outsourcing</div>
+        <div class="wi"><span>→</span>3+ years focused exclusively on clothing and fabric animation</div>
+        <div class="wi"><span>→</span>Fast turnaround without cutting corners on quality</div>
+        <div class="wi"><span>→</span>Transparent pricing — no surprise invoices</div>
+        <div class="wi"><span>→</span>Revisions until you're genuinely happy</div>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <div class="footer-logo">Urreal<em>3D</em></div>
+    <div class="footer-links"><a onclick="go('policy')">Policy</a></div>
+    <div class="footer-copy">© 2024 Urreal3D · Stephen R Christian</div>
+  </footer>
+</div>
+
+<!-- ═══ POLICY ═══ -->
+<div class="page" id="p-policy">
+  <div class="policy-wrap">
+    <h1>Terms, Privacy & Policy</h1>
+    <p class="policy-date">Last updated: January 2024 · Urreal3D – Clothing Animation Studio</p>
+
+    <h2>1. Services & Deliverables</h2>
+    <p>Urreal3D provides 3D clothing animation and render services as described on this website. All deliverables — videos, images, and project files — are specified in the project brief agreed upon before work begins. Any work outside the agreed scope requires a separate quote and approval.</p>
+
+    <h2>2. Payment Terms</h2>
+    <p>All projects require a 50% deposit before work starts. The remaining 50% is due upon project completion and before final files are delivered. Accepted payment methods include PayPal, Wise (TransferWise), and international bank transfer. All prices are in USD unless otherwise agreed in writing.</p>
+    <p>For template-based orders under $150, full payment upfront may be required.</p>
+
+    <div class="policy-divider"></div>
+
+    <h2>3. Revisions & Cancellations</h2>
+    <p>Each package includes a specified number of revision rounds. Revisions are defined as reasonable adjustments within the original brief — not a change of direction or entirely new concept. Additional revisions beyond the included rounds are billed at $25/hour.</p>
+    <p>If a client cancels a project after work has begun, the deposit is non-refundable. If Urreal3D cancels the project for any reason, the full deposit will be refunded within 5 business days.</p>
+
+    <h2>4. Intellectual Property & Usage Rights</h2>
+    <p>Upon receipt of final payment, the client receives full commercial usage rights to the delivered files. This includes use in advertising, social media, e-commerce, print, and broadcast. Urreal3D retains the right to display completed work in its portfolio unless the client requests confidentiality in writing before the project begins.</p>
+    <p>Source files (Blender/CLO project files) are not included in standard deliverables and may be licensed separately.</p>
+
+    <div class="policy-divider"></div>
+
+    <h2>5. Privacy & Data</h2>
+    <p>When you submit an inquiry through this website, we collect your name, email address, and project details. This information is used solely to respond to your inquiry and manage your project — it is never sold, shared, or used for marketing without your explicit consent.</p>
+    <p>We do not use tracking cookies or third-party analytics on this website. No personal data is stored beyond what is necessary for project management.</p>
+    <p>You may request deletion of your data at any time by contacting us via WhatsApp or email.</p>
+
+    <h2>6. Confidentiality</h2>
+    <p>We understand that some clients need their projects kept private — particularly unreleased collections or brand campaigns. If you require an NDA (Non-Disclosure Agreement) before sharing project details, we're happy to sign one. Just mention it in your inquiry.</p>
+
+    <div class="policy-divider"></div>
+
+    <h2>7. Turnaround & Deadlines</h2>
+    <p>Estimated delivery timelines are stated in each pricing package. These are estimates based on normal workload and assume timely feedback from the client. Delays in client feedback may extend the timeline accordingly. Rush delivery is available for a 30% surcharge — request this at the time of inquiry to confirm availability.</p>
+
+    <h2>8. Warranties & Limitations</h2>
+    <p>Urreal3D guarantees that all delivered work is original and created by the studio. We are not liable for delays caused by circumstances outside our control (technical failures, illness, etc.) beyond a reasonable amount. Our total liability in any dispute is limited to the amount paid for that specific project.</p>
+
+    <h2>9. Contact</h2>
+    <p>For any questions about these terms, or to request data deletion, please reach out:</p>
+    <ul>
+      <li>WhatsApp: +91 78598 74272</li>
+      <li>Instagram DM: @urreal3d</li>
+      <li>Or use the booking form on this website</li>
+    </ul>
+
+    <div class="policy-divider"></div>
+    <p style="font-size:13px;color:var(--gdim);">These terms apply to all projects booked through urreal3d.com. By submitting an inquiry or making a payment, you agree to these terms.</p>
+  </div>
+  <footer>
+    <div class="footer-logo">Urreal<em>3D</em></div>
+    <div class="footer-links"><a onclick="go('home')">Home</a><a onclick="go('appointment')">Contact</a></div>
+    <div class="footer-copy">© 2024 Urreal3D · Stephen R Christian</div>
+  </footer>
+</div>
+
+<script>
+// ── Page Navigation ──
+const pages = ['home','about','portfolio','pricing','testimonials','appointment','policy'];
+function go(name){
+  pages.forEach(p=>{
+    document.getElementById('p-'+p).classList.remove('active');
+    const nl=document.getElementById('nl-'+p);
+    const dl=document.getElementById('dl-'+p);
+    if(nl)nl.classList.remove('active');
+    if(dl)dl.classList.remove('active');
+  });
+  document.getElementById('p-'+name).classList.add('active');
+  const nl=document.getElementById('nl-'+name);
+  const dl=document.getElementById('dl-'+name);
+  if(nl)nl.classList.add('active');
+  if(dl)dl.classList.add('active');
+  window.scrollTo(0,0);
+  closeDrawer();
+}
+
+// ── Drawer ──
+function toggleDrawer(){
+  const d=document.getElementById('drawer');
+  const o=document.getElementById('doverlay');
+  const h=document.getElementById('hbg');
+  d.classList.toggle('open');
+  o.classList.toggle('open');
+  h.classList.toggle('open');
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('doverlay').classList.remove('open');
+  document.getElementById('hbg').classList.remove('open');
+}
+
+// ── Filter Tabs ──
+function filterTab(el){
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── FAQ ──
+function toggleFaq(el){
+  const item=el.parentElement;
+  item.classList.toggle('open');
+}
+
+// ── Form Submission ──
+async function submitForm(){
+  const name=document.getElementById('f-name').value.trim();
+  const email=document.getElementById('f-email').value.trim();
+  const brand=document.getElementById('f-brand').value.trim();
+  const service=document.getElementById('f-service').value;
+  const budget=document.getElementById('f-budget').value;
+  const message=document.getElementById('f-message').value.trim();
+  const btn=document.getElementById('submit-btn');
+  const msg=document.getElementById('form-msg');
+
+  msg.className='form-msg';msg.style.display='none';
+
+  if(!name||!email||!message){
+    msg.textContent='Please fill in your name, email, and project description.';
+    msg.className='form-msg error';return;
+  }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    msg.textContent='Please enter a valid email address.';
+    msg.className='form-msg error';return;
+  }
+
+  btn.disabled=true;btn.textContent='Sending...';
+
+  try{
+    // Change this URL to your deployed backend URL
+    const API_URL = window.location.hostname==='localhost'
+      ? 'http://localhost:3001/api/inquiry'
+      : '/api/inquiry';
+
+    const res=await fetch(API_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name,email,brand,service,budget,message})
+    });
+    const data=await res.json();
+
+    if(res.ok && data.success){
+      msg.textContent=`Got it, ${name.split(' ')[0]}! You'll hear back within 24 hours.`;
+      msg.className='form-msg success';
+      // Clear form
+      ['f-name','f-email','f-brand','f-message'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('f-service').value='';
+      document.getElementById('f-budget').value='';
+    } else {
+      msg.textContent=data.error||'Something went wrong. Try WhatsApp instead.';
+      msg.className='form-msg error';
+    }
+  } catch(e){
+    msg.textContent='Could not connect to the server. Please try WhatsApp or email directly.';
+    msg.className='form-msg error';
+  }
+  btn.disabled=false;btn.textContent='Send Inquiry →';
+}
+</script>
+</body>
+</html>
