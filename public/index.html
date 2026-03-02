@@ -123,9 +123,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;justify-content
 .port-grid.featured-first .port-card:first-child{grid-column:1/-1;}
 .port-card{background:var(--card);border:1px solid var(--pb);border-radius:12px;overflow:hidden;transition:all 0.25s;}
 .port-card:hover{border-color:rgba(124,58,237,0.42);transform:translateY(-3px);}
-.media-box{width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,rgba(124,58,237,0.1),var(--deep));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border-bottom:1px solid var(--pb);}
+.media-box{width:100%;aspect-ratio:9/16;background:linear-gradient(135deg,rgba(124,58,237,0.1),var(--deep));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border-bottom:1px solid var(--pb);}
 .port-grid.featured-first .port-card:first-child .media-box{aspect-ratio:21/9;}
-.photo-box{width:100%;aspect-ratio:4/3;background:linear-gradient(135deg,rgba(124,58,237,0.08),var(--deep));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border-bottom:1px solid var(--pb);}
+.photo-box{width:100%;aspect-ratio:9/16;background:linear-gradient(135deg,rgba(124,58,237,0.08),var(--deep));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border-bottom:1px solid var(--pb);}
 .play-btn{width:50px;height:50px;border-radius:50%;background:rgba(124,58,237,0.2);border:2px solid var(--pl);display:flex;align-items:center;justify-content:center;font-size:18px;transition:all 0.22s;}
 .port-card:hover .play-btn{background:var(--purple);transform:scale(1.08);}
 .upload-label{font-size:12px;color:var(--gdim);text-align:center;padding:0 14px;line-height:1.5;}
@@ -263,7 +263,7 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
   nav{padding:15px 20px;}
   .hero{padding:96px 20px 64px;}
   .hero-stats{flex-wrap:wrap;gap:24px;}
-  .port-grid.featured-first .port-card:first-child .media-box{aspect-ratio:16/9;}
+  .port-grid.featured-first .port-card:first-child .media-box{aspect-ratio:9/16;}
   .sec,.svc-grid{padding-left:20px;padding-right:20px;}
   .port-hero,.test-hero,.appt-hero,.pricing-hero{padding:106px 20px 32px;}
   .filter-bar,.port-grid,.port-section-title,.photos-sec,.test-grid,.test-cta,.appt-grid,.pricing-grid,.pricing-note,.pricing-faq{padding-left:20px;padding-right:20px;}
@@ -379,7 +379,14 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
       <div class="irow"><span class="ikey">Experience</span><span class="ival">3+ Years</span></div>
       <div class="irow"><span class="ikey">Education</span><span class="ival">B.Tech – IT</span></div>
       <div class="irow"><span class="ikey">Location</span><span class="ival">India 🇮🇳</span></div>
-      <div class="irow"><span class="ikey">WhatsApp</span><span class="ival">+91 78598 74272</span></div>
+  <div class="irow">
+  <span class="ikey">WhatsApp</span>
+  <span class="ival">
+    <a href="https://wa.me/917859874272" target="_blank" style="color:#c084fc; font-weight:600; text-decoration:none;">
+       +91 78598 74272
+    </a>
+  </span>
+</div>
       <div class="irow"><span class="ikey">Instagram</span><span class="ival" style="color:var(--pl)">@urreal3d</span></div>
     </div>
   </div>
@@ -415,35 +422,56 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
     <button class="ftab active" onclick="filterTab(this)">All</button>
     <button class="ftab" onclick="filterTab(this)">Animations</button>
     <button class="ftab" onclick="filterTab(this)">Still Renders</button>
-    <button class="ftab" onclick="filterTab(this)">Fashion Reels</button>
   </div>
 
   <!-- Videos -->
   <div class="port-section-title"><h3>Animations & Reels</h3><span class="pcount">10 projects</span></div>
   <div class="port-grid featured-first" style="margin-bottom:16px;">
     <div class="port-card">
-      <div class="media-box"><div class="play-btn">▶</div><div class="upload-label">🎬 Upload Showreel · 1920×820 recommended</div></div>
+      <div class="media-box"><video autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;">
+    <source src="videos/first.mp4" type="video/mp4">
+</video></div>
       <div class="port-info"><h3>Studio Showreel 2024</h3><p>The best of Urreal3D in one reel — silk gowns, streetwear, bridal, and more.</p><div class="ptags"><span class="ptag">Showreel</span><span class="ptag">Featured</span></div></div>
     </div>
-    <div class="port-card"><div class="media-box"><div class="play-btn">▶</div><div class="upload-label">Upload Video 01</div></div><div class="port-info"><h3>Silk Evening Gown</h3><p>Fluid drape and shimmer simulation under soft studio lighting.</p><div class="ptags"><span class="ptag">Silk</span><span class="ptag">Luxury</span></div></div></div>
-    <div class="port-card"><div class="media-box"><div class="play-btn">▶</div><div class="upload-label">Upload Video 02</div></div><div class="port-info"><h3>Streetwear Drop</h3><p>Hoodie and cargo pants — heavy cotton weight, realistic movement.</p><div class="ptags"><span class="ptag">Streetwear</span></div></div></div>
-    <div class="port-card"><div class="media-box"><div class="play-btn">▶</div><div class="upload-label">Upload Video 03</div></div><div class="port-info"><h3>Bridal Gown</h3><p>Long train animation with detailed lace texture and soft veil flow.</p><div class="ptags"><span class="ptag">Bridal</span></div></div></div>
-    <div class="port-card"><div class="media-box"><div class="play-btn">▶</div><div class="upload-label">Upload Video 04</div></div><div class="port-info"><h3>Denim Collection</h3><p>Rigid fabric behavior for a premium denim brand launch.</p><div class="ptags"><span class="ptag">Denim</span></div></div></div>
-    <div class="port-card"><div class="media-box"><div class="play-btn">▶</div><div class="upload-label">Upload Video 05</div></div><div class="port-info"><h3>Sportswear Reel</h3><p>Athletic wear in motion — stretch, compression, dynamic movement.</p><div class="ptags"><span class="ptag">Sportswear</span></div></div></div>
-    <div class="port-card"><div class="media-box"><div class="play-btn">▶</div><div class="upload-label">Upload Video 06</div></div><div class="port-info"><h3>Knitwear Study</h3><p>Detailed yarn-level simulation for a luxury knitwear brand.</p><div class="ptags"><span class="ptag">Knitwear</span></div></div></div>
-    <div class="port-card"><div class="media-box"><div class="play-btn">▶</div><div class="upload-label">Upload Video 07</div></div><div class="port-info"><h3>Leather Jacket</h3><p>Stiff leather deformation with scuff and crease detailing.</p><div class="ptags"><span class="ptag">Leather</span></div></div></div>
-    <div class="port-card"><div class="media-box"><div class="play-btn">▶</div><div class="upload-label">Upload Video 08</div></div><div class="port-info"><h3>Sari Drape</h3><p>Traditional sari with flowing dupatta — authentic fabric behavior.</p><div class="ptags"><span class="ptag">Traditional</span></div></div></div>
-    <div class="port-card"><div class="media-box"><div class="play-btn">▶</div><div class="upload-label">Upload Video 09</div></div><div class="port-info"><h3>Kids Apparel</h3><p>Bright, light fabrics for a children's clothing brand product reel.</p><div class="ptags"><span class="ptag">Kids</span></div></div></div>
+    <div class="port-card"data-category="Animations"><div class="media-box"><video autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;">
+  <source src="videos/one.mp4" type="video/mp4">
+</video></div>
+
+<div class="port-info"><h3>Silk Evening Gown</h3><p>Fluid drape and shimmer simulation under soft studio lighting.</p><div class="ptags"><span class="ptag">Silk</span><span class="ptag">Luxury</span></div></div></div>
+    <div class="port-card"data-category="Animations"><div class="media-box"><video autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;">
+  <source src="videos/two.mp4" type="video/mp4">
+</video></div><div class="port-info"><h3>Streetwear Drop</h3><p>Hoodie and cargo pants — heavy cotton weight, realistic movement.</p><div class="ptags"><span class="ptag">Streetwear</span></div></div></div>
+    <div class="port-card"data-category="Animations"><div class="media-box"><video autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;">
+  <source src="videos/three.mp4" type="video/mp4">
+</video></div><div class="port-info"><h3>Bridal Gown</h3><p>Long train animation with detailed lace texture and soft veil flow.</p><div class="ptags"><span class="ptag">Bridal</span></div></div></div>
+    <div class="port-card"data-category="Animations"><div class="media-box"><video autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;">
+  <source src="videos/four.mp4" type="video/mp4">
+</video></div><div class="port-info"><h3>Denim Collection</h3><p>Rigid fabric behavior for a premium denim brand launch.</p><div class="ptags"><span class="ptag">Denim</span></div></div></div>
+    <div class="port-card"data-category="Animations"><div class="media-box"><video autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;">
+  <source src="videos/five.mp4" type="video/mp4">
+</video></div><div class="port-info"><h3>Sportswear Reel</h3><p>Athletic wear in motion — stretch, compression, dynamic movement.</p><div class="ptags"><span class="ptag">Sportswear</span></div></div></div>
+    <div class="port-card"data-category="Animations"><div class="media-box"><video autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;">
+  <source src="videos/six.mp4" type="video/mp4">
+</video></div><div class="port-info"><h3>Knitwear Study</h3><p>Detailed yarn-level simulation for a luxury knitwear brand.</p><div class="ptags"><span class="ptag">Knitwear</span></div></div></div>
+    <div class="port-card"data-category="Animations"><div class="media-box"><video autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;">
+  <source src="videos/seven.mp4" type="video/mp4">
+</video></div><div class="port-info"><h3>Leather Jacket</h3><p>Stiff leather deformation with scuff and crease detailing.</p><div class="ptags"><span class="ptag">Leather</span></div></div></div>
+    <div class="port-card"data-category="Animations"><div class="media-box"><video autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;">
+  <source src="videos/eight.mp4" type="video/mp4">
+</video></div><div class="port-info"><h3>Sari Drape</h3><p>Traditional sari with flowing dupatta — authentic fabric behavior.</p><div class="ptags"><span class="ptag">Traditional</span></div></div></div>
+    <div class="port-card"data-category="Animations"><div class="media-box"><video autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;">
+  <source src="videos/nine.mp4" type="video/mp4">
+</video></div><div class="port-info"><h3>Kids Apparel</h3><p>Bright, light fabrics for a children's clothing brand product reel.</p><div class="ptags"><span class="ptag">Kids</span></div></div></div>
   </div>
 
   <!-- Photos — equal prominence -->
   <div class="port-section-title" style="margin-top:32px;"><h3>Still Renders & Photos</h3><span class="pcount">5 renders</span></div>
   <div class="port-grid" style="margin-bottom:60px;">
-    <div class="port-card"><div class="photo-box"><span style="font-size:36px;">🖼️</span><div class="upload-label">Upload Render 01 · JPG/PNG</div></div><div class="port-info"><h3>Lookbook Still — Silk Wrap</h3><p>High-res render for a luxury brand's spring lookbook. Clean white background with dramatic side light.</p><div class="ptags"><span class="ptag">Lookbook</span><span class="ptag">Silk</span></div></div></div>
-    <div class="port-card"><div class="photo-box"><span style="font-size:36px;">🖼️</span><div class="upload-label">Upload Render 02</div></div><div class="port-info"><h3>Product Render — Denim Jacket</h3><p>360° turntable stills for an e-commerce listing. Stitch detail and fabric texture highlighted.</p><div class="ptags"><span class="ptag">E-commerce</span><span class="ptag">Denim</span></div></div></div>
-    <div class="port-card"><div class="photo-box"><span style="font-size:36px;">🖼️</span><div class="upload-label">Upload Render 03</div></div><div class="port-info"><h3>Flat Lay — Knitwear Set</h3><p>Styled flat lay render showing texture depth and color accuracy for a knitwear collection.</p><div class="ptags"><span class="ptag">Flat Lay</span><span class="ptag">Knitwear</span></div></div></div>
-    <div class="port-card"><div class="photo-box"><span style="font-size:36px;">🖼️</span><div class="upload-label">Upload Render 04</div></div><div class="port-info"><h3>Campaign Still — Bridal</h3><p>Full scene render with character, gown, and mood lighting for a bridal brand campaign.</p><div class="ptags"><span class="ptag">Campaign</span><span class="ptag">Bridal</span></div></div></div>
-    <div class="port-card"><div class="photo-box"><span style="font-size:36px;">🖼️</span><div class="upload-label">Upload Render 05</div></div><div class="port-info"><h3>Streetwear Editorial</h3><p>Dark cinematic render for an urban streetwear brand's social campaign.</p><div class="ptags"><span class="ptag">Editorial</span><span class="ptag">Streetwear</span></div></div></div>
+    <div class="port-card"data-category="Still Renders"><div class="photo-box"><img src="images/one.jpg" style="width:100%; height:100%; object-fit:cover;"></div><div class="port-info"><h3>Lookbook Still — Silk Wrap</h3><p>High-res render for a luxury brand's spring lookbook. Clean white background with dramatic side light.</p><div class="ptags"><span class="ptag">Lookbook</span><span class="ptag">Silk</span></div></div></div>
+    <div class="port-card"data-category="Still Renders"><div class="photo-box"><img src="images/two.png" style="width:100%; height:100%; object-fit:cover;"></div><div class="port-info"><h3>Product Render — Denim Jacket</h3><p>360° turntable stills for an e-commerce listing. Stitch detail and fabric texture highlighted.</p><div class="ptags"><span class="ptag">E-commerce</span><span class="ptag">Denim</span></div></div></div>
+    <div class="port-card"data-category="Still Renders"><div class="photo-box"><img src="images/three.jpg" style="width:100%; height:100%; object-fit:cover;"></div><div class="port-info"><h3>Flat Lay — Knitwear Set</h3><p>Styled flat lay render showing texture depth and color accuracy for a knitwear collection.</p><div class="ptags"><span class="ptag">Flat Lay</span><span class="ptag">Knitwear</span></div></div></div>
+    <div class="port-card"data-category="Still Renders"><div class="photo-box"><img src="images/four.jpg" style="width:100%; height:100%; object-fit:cover;"></div><div class="port-info"><h3>Campaign Still — Bridal</h3><p>Full scene render with character, gown, and mood lighting for a bridal brand campaign.</p><div class="ptags"><span class="ptag">Campaign</span><span class="ptag">Bridal</span></div></div></div>
+    <div class="port-card"data-category="Still Renders"><div class="photo-box"><img src="images/five.jpg" style="width:100%; height:100%; object-fit:cover;"></div><div class="port-info"><h3>Streetwear Editorial</h3><p>Dark cinematic render for an urban streetwear brand's social campaign.</p><div class="ptags"><span class="ptag">Editorial</span><span class="ptag">Streetwear</span></div></div></div>
   </div>
 
   <footer>
@@ -719,7 +747,11 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
     <div class="contact-col">
       <div class="contact-card">
         <h3>Other Ways to Reach Us</h3>
-        <div class="citem"><div class="cicon">📱</div><div><div class="ckey">WhatsApp</div><div class="cval">+91 78598 74272</div></div></div>
+        <div class="citem"><div class="cicon">📱</div><div><div class="ckey">WhatsApp</div><div class="cval">
+  <a href="https://wa.me/917859874272" target="_blank" style="color:#c084fc; text-decoration:none; font-weight:600;">
+     +91 78598 74272
+  </a>
+</div></div></div>
         <div class="citem"><div class="cicon">📍</div><div><div class="ckey">Location</div><div class="cval">India — remote worldwide 🌍</div></div></div>
         <div class="citem"><div class="cicon">⏱️</div><div><div class="ckey">Response Time</div><div class="cval">Within 24 hours</div></div></div>
         <div class="citem"><div class="cicon">🎓</div><div><div class="ckey">Background</div><div class="cval">B.Tech IT Graduate</div></div></div>
@@ -904,6 +936,31 @@ async function submitForm(){
     msg.className='form-msg error';
   }
   btn.disabled=false;btn.textContent='Send Inquiry →';
+}
+</script>
+<script>
+function filterTab(btn) {
+
+  document.querySelectorAll(".ftab").forEach(tab => {
+    tab.classList.remove("active");
+  });
+
+  btn.classList.add("active");
+
+  let filterValue = btn.innerText;
+  let cards = document.querySelectorAll(".port-card");
+
+  cards.forEach(card => {
+
+    if (filterValue === "All") {
+      card.style.display = "block";
+    } else if (card.getAttribute("data-category") === filterValue) {
+      card.style.display = "block";
+    } else {
+      card.style.display = "none";
+    }
+
+  });
 }
 </script>
 </body>
