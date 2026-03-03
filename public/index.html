@@ -3,7 +3,7 @@
 <head>
 <!-- Social share / WhatsApp preview -->
 <meta property="og:title" content="Urreal3D">
-<meta property="og:description" content="3D Clothing Animation">
+<meta property="og:description" content="https://urreal4d.onrender.com/images/logo.png">
 <meta property="og:image" content="images/logo.png">
 <meta property="og:url" content="https://urreal4d.onrender.com">
 <meta property="og:type" content="website">
@@ -291,11 +291,14 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
   <div class="logo" onclick="go('home')">Urreal<em>3D</em></div>
   <ul class="nav-links">
     <li><a href="#" onclick="go('home');return false;" id="nl-home" class="active">Home</a></li>
-    <li><a href="#" onclick="go('about');return false;" id="nl-about">About</a></li>
+    <li><a onclick="go('render')" id="nl-render">Render</a></li>
     <li><a href="#" onclick="go('portfolio');return false;" id="nl-portfolio">Portfolio</a></li>
     <li><a href="#" onclick="go('pricing');return false;" id="nl-pricing">Pricing</a></li>
     <li><a href="#" onclick="go('testimonials');return false;" id="nl-testimonials">Reviews</a></li>
     <li><a href="#" onclick="go('appointment');return false;" id="nl-appointment">Book</a></li>
+    <li id="auth-user-li" style="display:none;"><span id="auth-user-name" style="font-size:13px;font-weight:600;color:var(--pl);"></span></li>
+    <li><a id="auth-btn" onclick="openAuthModal('login')" style="cursor:pointer;">Login</a></li>
+    <li><a href="#" onclick="go('about');return false;" id="nl-about">About</a></li>
   </ul>
   <button class="hbg" id="hbg" onclick="toggleDrawer()" aria-label="Menu">
     <span></span><span></span><span></span>
@@ -306,13 +309,15 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
 <div class="drawer-overlay" id="doverlay" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-logo">Urreal<em>3D</em></div>
+  <a id="drawer-auth-btn" onclick="openAuthModal('login')" style="cursor:pointer;">Login</a>
   <a href="#" onclick="go('home');return false;" id="dl-home" class="active">Home</a>
-  <a href="#" onclick="go('about');return false;" id="dl-about">About</a>
+  <a onclick="go('render')" id="dl-render">Render</a>
   <a href="#" onclick="go('portfolio');return false;" id="dl-portfolio">Portfolio</a>
   <a href="#" onclick="go('pricing');return false;" id="dl-pricing">Pricing</a>
   <a href="#" onclick="go('testimonials');return false;" id="dl-testimonials">Reviews</a>
   <a href="#" onclick="go('appointment');return false;" id="dl-appointment">Book a Call</a>
   <a href="#" onclick="go('policy');return false;" id="dl-policy">Policy</a>
+  <a href="#" onclick="go('about');return false;" id="dl-about">About</a>
 </div>
 
 <!-- ═══ HOME ═══ -->
@@ -325,7 +330,7 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
       <p class="hero-sub">We create premium 3D clothing animations and renders for fashion brands, e-commerce stores, and independent designers. Realistic fabric, fast delivery, results that sell.</p>
       <div class="hero-btns">
         <button class="btn-p" onclick="go('portfolio')">See the Work</button>
-        <button class="btn-g" onclick="go('pricing')">View Pricing</button>
+        <button class="btn-g" onclick="go('pricing')">Render Now</button>
       </div>
       <div class="hero-stats">
         <div><div class="snum">3+</div><div class="slbl">Years Experience</div></div>
@@ -764,8 +769,8 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
         <div class="citem"><div class="cicon">⏱️</div><div><div class="ckey">Response Time</div><div class="cval">Within 24 hours</div></div></div>
         <div class="citem"><div class="cicon">🎓</div><div><div class="ckey">Background</div><div class="cval">B.Tech IT Graduate</div></div></div>
         <div class="socials">
-          <a class="soc-btn" href="#" target="_blank">📸 Instagram 1</a>
-          <a class="soc-btn" href="#" target="_blank">📸 Instagram 2</a>
+<a class="soc-btn" href="https://www.instagram.com/urreal3d" target="_blank">@urreal3d</a>
+<a class="soc-btn" href="https://www.instagram.com/sthn3d" target="_blank">@sthn3d</a>
         </div>
       </div>
       <div class="why-card">
@@ -846,7 +851,7 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
 
 <script>
 // ── Page Navigation ──
-const pages = ['home','about','portfolio','pricing','testimonials','appointment','policy'];
+const pages = ['home','about','render','portfolio','pricing','testimonials','appointment','policy'];
 function go(name){
   pages.forEach(p=>{
     document.getElementById('p-'+p).classList.remove('active');
@@ -970,6 +975,836 @@ function filterTab(btn) {
 
   });
 }
+</script>
+<!--
+  ================================================================
+  URREAL3D — RENDER PAGE SNIPPET
+  ================================================================
+  HOW TO ADD THIS TO YOUR index.html:
+
+  1. PAGES ARRAY — find this line in your <script>:
+       const pages = ['home','about','portfolio','pricing','testimonials','appointment','policy'];
+     Change to:
+       const pages = ['home','about','portfolio','pricing','testimonials','appointment','policy','render'];
+
+  2. NAV LINK — inside <ul class="nav-links">, add:
+       <li><a onclick="go('render')" id="nl-render">Render</a></li>
+
+  3. DRAWER LINK — inside <div class="drawer">, add:
+       <a onclick="go('render')" id="dl-render">Render</a>
+
+  4. PASTE EVERYTHING BELOW just before the closing </body> tag
+  ================================================================
+-->
+
+<!-- ═══ RENDER PAGE ═══ -->
+<div class="page" id="p-render">
+
+<style>
+.render-hero{padding:120px clamp(20px,5vw,60px) 44px;text-align:center;position:relative;overflow:hidden;}
+.render-hero .rh-orb{position:absolute;top:0;right:-5%;width:min(600px,120vw);height:min(600px,120vw);border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,0.13),transparent 60%);pointer-events:none;}
+.render-hero h1{font-family:'Fraunces',serif;font-size:clamp(42px,9vw,76px);font-weight:700;margin-bottom:14px;position:relative;}
+.render-hero h1 em{font-style:italic;color:var(--pl);}
+.render-hero .rh-sub{color:var(--gray);font-size:15px;max-width:500px;margin:0 auto 12px;line-height:1.65;position:relative;}
+.render-hero .price-pills{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:22px;position:relative;}
+.render-hero .ppill{background:rgba(124,58,237,0.12);border:1px solid var(--pb);border-radius:100px;padding:7px 20px;font-size:13px;font-weight:700;color:var(--pl);display:flex;align-items:center;gap:7px;}
+.render-pill-btn{background:transparent;border:1px solid rgba(124,58,237,0.22);color:var(--gray);padding:8px 20px;border-radius:100px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.render-pill-btn:hover{background:rgba(124,58,237,0.15);border-color:var(--pl);color:var(--white);}
+.render-pill-btn.active{background:var(--purple);border-color:var(--purple);color:var(--white);}
+.render-hero .ppill span{color:var(--white);}
+
+.render-section{padding:0 clamp(20px,5vw,60px) 20px;}
+.render-section-head{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+.render-section-head h3{font-family:'Fraunces',serif;font-size:22px;font-weight:600;}
+.render-section-head .rcount{background:rgba(124,58,237,0.15);border:1px solid var(--pb);border-radius:100px;padding:3px 12px;font-size:12px;font-weight:600;color:var(--pl);}
+.render-section-head .rtype-badge{margin-left:auto;background:rgba(124,58,237,0.08);border:1px solid var(--pb);border-radius:4px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.08em;}
+
+.render-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(240px,100%),1fr));gap:16px;margin-bottom:48px;}
+.render-grid.render-carousel{display:flex;flex-direction:row;overflow-x:auto;gap:16px;padding-bottom:16px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--purple) transparent;}
+.render-grid.render-carousel::-webkit-scrollbar{height:4px;}
+.render-grid.render-carousel::-webkit-scrollbar-track{background:transparent;}
+.render-grid.render-carousel::-webkit-scrollbar-thumb{background:var(--purple);border-radius:2px;}
+.render-grid.render-carousel .rt-card{min-width:240px;max-width:240px;flex-shrink:0;scroll-snap-align:start;}
+.rt-img-carousel{position:relative;width:100%;height:100%;}
+.rt-carousel-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.3s;}
+.rt-carousel-img.active{opacity:1;}
+.rt-carousel-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(6,4,15,0.7);border:1px solid var(--pb);border-radius:50%;width:30px;height:30px;color:var(--white);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;transition:all 0.2s;}
+.rt-carousel-btn:hover{background:var(--purple);}
+.rt-carousel-btn.left{left:8px;}
+.rt-carousel-btn.right{right:8px;}
+.rt-carousel-dots{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:10;}
+.rt-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.3);transition:all 0.2s;}
+.rt-dot.active{background:var(--white);width:14px;border-radius:3px;}
+.rt-card{background:var(--card);border:1px solid var(--pb);border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.25s;position:relative;}
+.rt-card:hover{border-color:rgba(124,58,237,0.5);transform:translateY(-4px);box-shadow:0 8px 32px rgba(124,58,237,0.15);}
+.rt-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--purple),transparent);opacity:0;transition:opacity 0.25s;}
+.rt-card:hover::after{opacity:1;}
+.rt-media{width:100%;aspect-ratio:9/16;background:linear-gradient(135deg,rgba(124,58,237,0.1),var(--deep));position:relative;overflow:hidden;}
+.rt-media video,.rt-media img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.4s ease;}
+.rt-card:hover .rt-media video,.rt-card:hover .rt-media img{transform:scale(1.04);}
+.rt-media-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(6,4,15,0.7) 0%,transparent 50%);opacity:0;transition:opacity 0.25s;display:flex;align-items:center;justify-content:center;}
+.rt-card:hover .rt-media-overlay{opacity:1;}
+.rt-tap-hint{background:rgba(124,58,237,0.85);border:1px solid var(--pl);border-radius:100px;padding:8px 18px;font-size:12px;font-weight:700;color:var(--white);letter-spacing:0.06em;backdrop-filter:blur(8px);}
+.rt-price-chip{position:absolute;top:10px;right:10px;background:rgba(6,4,15,0.85);border:1px solid var(--pb);border-radius:100px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--pl);backdrop-filter:blur(8px);}
+.rt-info{padding:14px 16px 16px;}
+.rt-info h4{font-family:'Fraunces',serif;font-size:15px;font-weight:600;margin-bottom:4px;}
+.rt-info p{color:var(--gray);font-size:12px;line-height:1.55;}
+
+/* Bottom Sheet Panel */
+.rp-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:500;opacity:0;pointer-events:none;transition:opacity 0.28s;backdrop-filter:blur(4px);}
+.rp-overlay.open{opacity:1;pointer-events:all;}
+.rp-panel{position:fixed;bottom:0;left:0;right:0;z-index:510;background:var(--deep);border-top:1px solid var(--pb);border-radius:20px 20px 0 0;max-height:92vh;overflow-y:auto;transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.4,0,0.2,1);padding:0 0 40px;}
+.rp-panel.open{transform:translateY(0);}
+.rp-handle{width:40px;height:4px;background:rgba(124,58,237,0.3);border-radius:2px;margin:14px auto 0;}
+.rp-inner{display:grid;grid-template-columns:1fr 1fr;gap:32px;padding:24px clamp(20px,5vw,56px) 0;max-width:960px;margin:0 auto;}
+@media(max-width:640px){.rp-inner{grid-template-columns:1fr;gap:20px;}}
+.rp-preview{aspect-ratio:9/16;border-radius:12px;overflow:hidden;border:1px solid var(--pb);background:var(--card);max-height:420px;}
+.rp-preview video,.rp-preview img{width:100%;height:100%;object-fit:cover;display:block;}
+.rp-details{display:flex;flex-direction:column;gap:0;position:relative;}
+.rp-close{position:absolute;top:-4px;right:0;background:rgba(124,58,237,0.12);border:1px solid var(--pb);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--gray);font-size:16px;transition:all 0.2s;}
+.rp-close:hover{background:rgba(124,58,237,0.25);color:var(--white);}
+.rp-type-tag{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.rp-title{font-family:'Fraunces',serif;font-size:clamp(22px,4vw,32px);font-weight:700;line-height:1.1;margin-bottom:10px;}
+.rp-desc{color:var(--gray);font-size:13px;line-height:1.7;margin-bottom:20px;}
+.rp-price-row{display:flex;align-items:center;gap:14px;padding:14px 18px;background:rgba(124,58,237,0.08);border:1px solid var(--pb);border-radius:10px;margin-bottom:22px;}
+.rp-price-label{font-size:12px;color:var(--gdim);font-weight:500;}
+.rp-price-val{font-family:'Fraunces',serif;font-size:32px;font-weight:700;color:var(--pl);line-height:1;margin-left:auto;}
+.rp-upload-title{font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gdim);margin-bottom:14px;}
+.rp-uploads{display:flex;flex-direction:column;gap:10px;margin-bottom:22px;}
+.rp-upload-row{display:flex;align-items:center;gap:12px;}
+.rp-upload-row label{font-size:12px;font-weight:600;color:var(--gray);width:80px;flex-shrink:0;}
+.rp-file-btn{flex:1;background:rgba(124,58,237,0.05);border:1px dashed rgba(124,58,237,0.3);border-radius:7px;padding:9px 14px;font-size:12px;color:var(--gdim);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:8px;overflow:hidden;white-space:nowrap;}
+.rp-file-btn:hover{border-color:var(--pl);color:var(--pl);background:rgba(124,58,237,0.1);}
+.rp-file-btn input[type="file"]{display:none;}
+.rp-file-icon{font-size:14px;flex-shrink:0;}
+.rp-render-btn{width:100%;background:var(--purple);color:var(--white);padding:15px;border-radius:8px;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;letter-spacing:0.06em;cursor:pointer;transition:all 0.22s;box-shadow:0 4px 24px rgba(124,58,237,0.3);display:flex;align-items:center;justify-content:center;gap:10px;}
+.rp-render-btn:hover{background:var(--pm);box-shadow:0 4px 40px rgba(139,70,240,0.5);transform:translateY(-2px);}
+.rp-render-btn .btn-arrow{font-size:16px;transition:transform 0.2s;}
+.rp-render-btn:hover .btn-arrow{transform:translateX(4px);}
+.rp-note{text-align:center;margin-top:10px;font-size:11px;color:var(--gdim);line-height:1.6;}
+.rp-text-input{flex:1;background:rgba(124,58,237,0.05);border:1px solid rgba(124,58,237,0.16);border-radius:7px;padding:9px 14px;color:var(--white);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;transition:border-color 0.2s;}
+.rp-text-input:focus{outline:none;border-color:var(--pl);background:rgba(124,58,237,0.08);}
+.rp-text-input::placeholder{color:var(--gdim);}
+.rp-upload-section{border:1px solid rgba(124,58,237,0.16);border-radius:12px;padding:16px;margin-bottom:16px;transition:all 0.3s;}
+.rp-upload-section.locked{opacity:0.5;pointer-events:none;filter:grayscale(0.3);}
+.rp-upload-section.unlocked{opacity:1;pointer-events:all;border-color:var(--pl);box-shadow:0 0 18px rgba(124,58,237,0.2);filter:none;}
+.rp-upload-lock-bar{display:flex;align-items:center;gap:8px;background:rgba(124,58,237,0.1);border:1px solid var(--pb);border-radius:8px;padding:10px 14px;font-size:12px;font-weight:600;color:var(--gdim);margin-bottom:4px;}
+.rp-upload-section.unlocked .rp-upload-lock-bar{display:none;}
+</style>
+
+  <!-- Hero -->
+  <div class="render-hero">
+    <div class="rh-orb"></div>
+    <div class="slbl-tag">Templates &amp; Renders</div>
+    <h1>Pick a Template,<br><em>Upload &amp; Render</em></h1>
+  
+<p class="rh-sub">Choose a pre-made 3D template, upload your design files, and get a stunning render of your t-shirt delivered.</p>
+  <div class="price-pills">
+  <button class="ppill render-pill-btn active" onclick="filterRender(this,'all')">All Templates</button>
+  <button class="ppill render-pill-btn" onclick="filterRender(this,'image')">🖼 Still Renders</button>
+  <button class="ppill render-pill-btn" onclick="filterRender(this,'video')">🎬 Video Renders</button>
+</div>
+  </div>
+
+  <!-- Video Templates -->
+      <div class="render-section" data-type="video">
+      <div class="render-section-head">
+      <h3>Video Templates</h3>
+      <span class="rcount">5</span>
+      <span class="rtype-badge">₹1,999 / video</span>
+    </div>
+    <div class="render-grid">
+
+      <div class="rt-card" onclick="openRenderPanel('video','Showreel Drop','A dynamic 360° t-shirt animation with dramatic lighting — perfect for a product launch or social drop.','videos/one.mp4','₹1,999')">
+        <div class="rt-media">
+          <video autoplay muted loop playsinline><source src="videos/one.mp4" type="video/mp4"></video>
+          <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
+          <div class="rt-price-chip">₹1,999</div>
+        </div>
+        <div class="rt-info"><h4>Showreel Drop</h4><p>360° cinematic animation, studio lighting.</p></div>
+      </div>
+
+      <div class="rt-card" onclick="openRenderPanel('video','Streetwear Float','Minimal streetwear piece drifting through space, illuminated with dramatic rim lighting.','videos/two.mp4','₹1,999')">
+        <div class="rt-media">
+          <video autoplay muted loop playsinline><source src="videos/two.mp4" type="video/mp4"></video>
+          <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
+          <div class="rt-price-chip">₹1,999</div>
+        </div>
+        <div class="rt-info"><h4>Streetwear Float</h4><p>Floating tee with rim lighting, dark BG.</p></div>
+      </div>
+
+      <div class="rt-card" onclick="openRenderPanel('video','Garage Scene','Streetwear piece presented in a high-contrast garage scene for a rugged, authentic feel.','videos/three.mp4','₹1,999')">
+        <div class="rt-media">
+          <video autoplay muted loop playsinline><source src="videos/three.mp4" type="video/mp4"></video>
+          <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
+          <div class="rt-price-chip">₹1,999</div>
+        </div>
+        <div class="rt-info"><h4>Garage Scene</h4><p>Urban environment, rugged &amp; authentic.</p></div>
+      </div>
+
+      <div class="rt-card" onclick="openRenderPanel('video','Dynamic Motion','Dynamic animation with lifelike fabric movement and fluid physics simulation.','videos/four.mp4','₹1,999')">
+        <div class="rt-media">
+          <video autoplay muted loop playsinline><source src="videos/four.mp4" type="video/mp4"></video>
+          <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
+          <div class="rt-price-chip">₹1,999</div>
+        </div>
+        <div class="rt-info"><h4>Dynamic Motion</h4><p>Fluid fabric physics, lifelike movement.</p></div>
+      </div>
+
+      <div class="rt-card" onclick="openRenderPanel('video','Multi Model','Multi-model presentation emphasising structure, drape, and realism from every angle.','videos/five.mp4','₹1,999')">
+        <div class="rt-media">
+          <video autoplay muted loop playsinline><source src="videos/five.mp4" type="video/mp4"></video>
+          <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
+          <div class="rt-price-chip">₹1,999</div>
+        </div>
+        <div class="rt-info"><h4>Multi Model</h4><p>Every angle covered, oversized silhouette.</p></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Image Templates -->
+  <div class="render-section" data-type="image">
+    <div class="render-section-head">
+      <h3>Still Render Templates</h3>
+      <span class="rcount">5</span>
+      <span class="rtype-badge">₹999 / image</span>
+    </div>
+    <div class="render-grid">
+
+      <div class="rt-card" onclick="openRenderPanel('image','Lookbook — Silk Wrap','High-res render for a luxury brand lookbook. Clean background with dramatic side light.',['images/one.jpg','images/one-2.jpg','images/one-3.jpg','images/one-4.jpg','images/one-5.jpg'],'₹999')">
+  <div class="rt-media">
+    <div class="rt-img-carousel" onclick="event.stopPropagation()">
+      <img src="images/one.jpg" class="rt-carousel-img active" loading="lazy">
+      <img src="images/one-2.jpg" class="rt-carousel-img" loading="lazy">
+      <img src="images/one-3.jpg" class="rt-carousel-img" loading="lazy">
+      <img src="images/one-4.jpg" class="rt-carousel-img" loading="lazy">
+      <img src="images/one-5.jpg" class="rt-carousel-img" loading="lazy">
+      <button class="rt-carousel-btn left" onclick="slideCard(this,-1)">‹</button>
+      <button class="rt-carousel-btn right" onclick="slideCard(this,1)">›</button>
+      <div class="rt-carousel-dots">
+        <span class="rt-dot active"></span><span class="rt-dot"></span><span class="rt-dot"></span><span class="rt-dot"></span><span class="rt-dot"></span>
+      </div>
+    </div>
+    <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
+    <div class="rt-price-chip">₹999</div>
+  </div>
+  <div class="rt-info"><h4>Lookbook — Silk Wrap</h4><p>Clean BG, dramatic side lighting.</p></div>
+</div>
+
+      <div class="rt-card" onclick="openRenderPanel('image','Product Render — Fire','Photorealistic still for e-commerce with stitch detail and fabric texture highlighted.',['images/two.png','images/two-2.png','images/two-3.png','images/two-4.png','images/two-5.png'],'₹999')">
+  <div class="rt-media">
+    <div class="rt-img-carousel" onclick="event.stopPropagation()">
+      <img src="images/two.png" class="rt-carousel-img active" loading="lazy">
+      <img src="images/two-2.png" class="rt-carousel-img" loading="lazy">
+      <img src="images/two-3.png" class="rt-carousel-img" loading="lazy">
+      <img src="images/two-4.png" class="rt-carousel-img" loading="lazy">
+      <img src="images/two-5.png" class="rt-carousel-img" loading="lazy">
+      <button class="rt-carousel-btn left" onclick="slideCard(this,-1)">‹</button>
+      <button class="rt-carousel-btn right" onclick="slideCard(this,1)">›</button>
+      <div class="rt-carousel-dots">
+        <span class="rt-dot active"></span><span class="rt-dot"></span><span class="rt-dot"></span><span class="rt-dot"></span><span class="rt-dot"></span>
+      </div>
+    </div>
+    <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
+    <div class="rt-price-chip">₹999</div>
+  </div>
+  <div class="rt-info"><h4>Product Render — Fire</h4><p>E-commerce ready, stitch &amp; texture detail.</p></div>
+</div>
+
+      <div class="rt-card" onclick="openRenderPanel('image','Fabric Feel','Flat lay render showing texture depth and colour accuracy for an outwear collection.',['images/three.jpg','images/three-2.jpg','images/three-3.jpg','images/three-4.jpg','images/three-5.jpg'],'₹999')">
+  <div class="rt-media">
+    <div class="rt-img-carousel" onclick="event.stopPropagation()">
+      <img src="images/three.jpg" class="rt-carousel-img active" loading="lazy">
+      <img src="images/three-2.jpg" class="rt-carousel-img" loading="lazy">
+      <img src="images/three-3.jpg" class="rt-carousel-img" loading="lazy">
+      <img src="images/three-4.jpg" class="rt-carousel-img" loading="lazy">
+      <img src="images/three-5.jpg" class="rt-carousel-img" loading="lazy">
+      <button class="rt-carousel-btn left" onclick="slideCard(this,-1)">‹</button>
+      <button class="rt-carousel-btn right" onclick="slideCard(this,1)">›</button>
+      <div class="rt-carousel-dots">
+        <span class="rt-dot active"></span><span class="rt-dot"></span><span class="rt-dot"></span><span class="rt-dot"></span><span class="rt-dot"></span>
+      </div>
+    </div>
+    <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
+    <div class="rt-price-chip">₹999</div>
+  </div>
+  <div class="rt-info"><h4>Fabric Feel</h4><p>Flat lay, texture depth, colour accuracy.</p></div>
+</div>
+
+      <div class="rt-card" onclick="openRenderPanel('image','Campaign Still — Dramatic','Full scene render with character, t-shirt, and mood lighting for a clothing brand campaign.',['images/four.jpg','images/four-2.jpg','images/four-3.jpg','images/four-4.jpg','images/four-5.jpg'],'₹999')">
+  <div class="rt-media">
+    <div class="rt-img-carousel" onclick="event.stopPropagation()">
+      <img src="images/four.jpg" class="rt-carousel-img active" loading="lazy">
+      <img src="images/four-2.jpg" class="rt-carousel-img" loading="lazy">
+      <img src="images/four-3.jpg" class="rt-carousel-img" loading="lazy">
+      <img src="images/four-4.jpg" class="rt-carousel-img" loading="lazy">
+      <img src="images/four-5.jpg" class="rt-carousel-img" loading="lazy">
+      <button class="rt-carousel-btn left" onclick="slideCard(this,-1)">‹</button>
+      <button class="rt-carousel-btn right" onclick="slideCard(this,1)">›</button>
+      <div class="rt-carousel-dots">
+        <span class="rt-dot active"></span><span class="rt-dot"></span><span class="rt-dot"></span><span class="rt-dot"></span><span class="rt-dot"></span>
+      </div>
+    </div>
+    <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
+    <div class="rt-price-chip">₹999</div>
+  </div>
+  <div class="rt-info"><h4>Campaign Still — Dramatic</h4><p>Full scene, character &amp; mood lighting.</p></div>
+</div>
+
+      <div class="rt-card" onclick="openRenderPanel('image','Streetwear Editorial','Dark cinematic render for an urban streetwear brand social campaign.',['images/five.jpg','images/five-2.jpg','images/five-3.jpg','images/five-4.jpg','images/five-5.jpg'],'₹999')">
+  <div class="rt-media">
+    <div class="rt-img-carousel" onclick="event.stopPropagation()">
+      <img src="images/five.jpg" class="rt-carousel-img active" loading="lazy">
+      <img src="images/five-2.jpg" class="rt-carousel-img" loading="lazy">
+      <img src="images/five-3.jpg" class="rt-carousel-img" loading="lazy">
+      <img src="images/five-4.jpg" class="rt-carousel-img" loading="lazy">
+      <img src="images/five-5.jpg" class="rt-carousel-img" loading="lazy">
+      <button class="rt-carousel-btn left" onclick="slideCard(this,-1)">‹</button>
+      <button class="rt-carousel-btn right" onclick="slideCard(this,1)">›</button>
+      <div class="rt-carousel-dots">
+        <span class="rt-dot active"></span><span class="rt-dot"></span><span class="rt-dot"></span><span class="rt-dot"></span><span class="rt-dot"></span>
+      </div>
+    </div>
+    <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
+    <div class="rt-price-chip">₹999</div>
+  </div>
+  <div class="rt-info"><h4>Streetwear Editorial</h4><p>Dark cinematic, urban social campaign.</p></div>
+</div>
+
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-logo">Urreal<em>3D</em></div>
+    <div class="footer-links"><a onclick="go('policy')">Privacy Policy</a><a onclick="go('appointment')">Contact</a></div>
+    <div class="footer-copy">© 2024 Urreal3D · Stephen R Christian</div>
+  </footer>
+</div>
+<!-- ═══ END RENDER PAGE ═══ -->
+
+
+<!-- ═══ RENDER DETAIL PANEL (paste this outside the page div, still before </body>) ═══ -->
+<div class="rp-overlay" id="rp-overlay" onclick="closeRenderPanel()"></div>
+
+<div class="rp-panel" id="rp-panel">
+  <div class="rp-handle"></div>
+  <div class="rp-inner">
+    <div class="rp-preview" id="rp-preview-box"></div>
+    <div class="rp-details">
+      <button class="rp-close" onclick="closeRenderPanel()">✕</button>
+      <div class="rp-type-tag" id="rp-type-tag">VIDEO TEMPLATE</div>
+      <div class="rp-title" id="rp-title">Template Name</div>
+      <div class="rp-desc" id="rp-desc">Description.</div>
+      <div class="rp-price-row">
+        <div>
+          <div class="rp-price-label">Render Price</div>
+          <div style="font-size:11px;color:var(--gdim);margin-top:2px;">T-shirt · Front, Back, Sleeves + Logo, Reference</div>
+        </div>
+        <div class="rp-price-val" id="rp-price">₹1,999</div>
+      </div>
+      <!-- Client Details Form -->
+<div class="rp-client-form">
+  <div class="rp-upload-title">Your Details</div>
+  <div class="rp-uploads">
+    <div class="rp-upload-row">
+      <label>Name</label>
+      <input class="rp-text-input" type="text" id="client-name" placeholder="Your full name" oninput="checkClientForm()">
+    </div>
+    <div class="rp-upload-row">
+      <label>Brand</label>
+      <input class="rp-text-input" type="text" id="client-brand" placeholder="Your brand name" oninput="checkClientForm()">
+    </div>
+    <div class="rp-upload-row">
+      <label>WhatsApp</label>
+      <input class="rp-text-input" type="tel" id="client-wp" placeholder="+91 98765 43210" oninput="checkClientForm()">
+    </div>
+  </div>
+</div>
+
+<!-- Upload Section — locked until form filled -->
+<div class="rp-upload-section locked" id="rp-upload-section">
+  <div class="rp-upload-lock-bar" id="rp-upload-lock-bar">
+    <span>🔒</span>
+    <span>Fill your details above to unlock file upload</span>
+  </div>
+  <div class="rp-upload-title" style="margin-top:14px;">Upload Your Design Files</div>
+  <div class="rp-uploads">
+  <div class="rp-upload-row">
+  <label>Reference <span style="color:#f87171;font-size:10px;">★ Must</span></label>
+  <div class="rp-file-btn" onclick="this.querySelector('input').click()">
+    <span class="rp-file-icon">📸</span>
+    <span class="rp-file-name" id="ref-file-name">Upload upto 5 images…</span>
+    <input type="file" id="ref-file-input" accept="image/*" multiple onchange="const n=this.files.length;if(n>5){alert('Max 5 reference images allowed.');this.value='';this.parentElement.querySelector('.rp-file-name').textContent='Upload upto 5 images…';}else{this.parentElement.querySelector('.rp-file-name').textContent=n+' image'+(n>1?'s':'')+' selected';}">
+  </div>
+  </div>
+</div>
+  <div class="rp-uploads">
+    <div class="rp-upload-row">
+      <label>Front</label>
+      <div class="rp-file-btn" onclick="this.querySelector('input').click()">
+        <span class="rp-file-icon">📁</span><span class="rp-file-name">Choose file…</span>
+        <input type="file" accept="image/*,.ai,.psd,.pdf" onchange="setFileName(this)">
+      </div>
+    </div>
+    <div class="rp-upload-row">
+      <label>Back</label>
+      <div class="rp-file-btn" onclick="this.querySelector('input').click()">
+        <span class="rp-file-icon">📁</span><span class="rp-file-name">Choose file…</span>
+        <input type="file" accept="image/*,.ai,.psd,.pdf" onchange="setFileName(this)">
+      </div>
+    </div>
+    <div class="rp-upload-row">
+      <label>Sleeves</label>
+      <div class="rp-file-btn" onclick="this.querySelector('input').click()">
+        <span class="rp-file-icon">📁</span><span class="rp-file-name">Choose file…</span>
+        <input type="file" accept="image/*,.ai,.psd,.pdf" onchange="setFileName(this)">
+      </div>
+    </div>
+    <div class="rp-upload-row">
+      <label>Logo</label>
+      <div class="rp-file-btn" onclick="this.querySelector('input').click()">
+        <span class="rp-file-icon">📁</span><span class="rp-file-name">Choose file…</span>
+        <input type="file" accept="image/*,.svg,.ai,.pdf" onchange="setFileName(this)">
+      </div>
+    </div>
+  </div>
+
+
+<button class="rp-render-btn" onclick="handleRender()">
+  Render My T-Shirt <span class="btn-arrow">→</span>
+</button>
+<div class="rp-note">PNG, JPG, PDF, AI, PSD · Max 50MB · Reference is mandatory</div>
+
+</div>
+
+</div>
+    </div>
+  </div>
+</div>
+<!-- ═══ END RENDER PANEL ═══ -->
+
+<script>
+function openRenderPanel(type, title, desc, src, price) {
+  document.getElementById('rp-type-tag').textContent = type === 'video' ? 'VIDEO TEMPLATE' : 'STILL RENDER TEMPLATE';
+  document.getElementById('rp-title').textContent = title;
+  document.getElementById('rp-desc').textContent = desc;
+  const isVideo = type === 'video';
+const detectedPrice = window.currentPricing
+  ? (isVideo ? window.currentPricing.templateVideo : window.currentPricing.templateImage)
+  : price;
+document.getElementById('rp-price').textContent = detectedPrice;
+
+  const preview = document.getElementById('rp-preview-box');
+
+  if (type === 'video') {
+    preview.innerHTML = `<video autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;"><source src="${src}" type="video/mp4"></video>`;
+  } else {
+    const images = Array.isArray(src) ? src : [src];
+    let dotsHtml = images.map((_, i) => `<span class="rt-dot ${i===0?'active':''}"></span>`).join('');
+    let imgsHtml = images.map((s, i) => `<img src="${s}" class="rt-carousel-img ${i===0?'active':''}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:${i===0?1:0};transition:opacity 0.3s;">`).join('');
+    preview.innerHTML = `
+      <div class="rt-img-carousel" style="position:relative;width:100%;height:100%;">
+        ${imgsHtml}
+        <button class="rt-carousel-btn left" onclick="slideCard(this,-1)">‹</button>
+        <button class="rt-carousel-btn right" onclick="slideCard(this,1)">›</button>
+        <div class="rt-carousel-dots">${dotsHtml}</div>
+      </div>`;
+  }
+
+  document.querySelectorAll('.rp-file-name').forEach(el => el.textContent = 'Choose file…');
+  document.querySelectorAll('.rp-file-btn input[type="file"]').forEach(el => el.value = '');
+  document.getElementById('client-name').value = '';
+  document.getElementById('client-brand').value = '';
+  document.getElementById('client-wp').value = '';
+  document.getElementById('rp-upload-section').classList.add('locked');
+  document.getElementById('rp-upload-section').classList.remove('unlocked');
+
+  document.getElementById('rp-overlay').classList.add('open');
+  document.getElementById('rp-panel').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeRenderPanel(){
+  document.getElementById('rp-overlay').classList.remove('open');
+  document.getElementById('rp-panel').classList.remove('open');
+  document.body.style.overflow='';
+}
+function setFileName(input){
+  input.parentElement.querySelector('.rp-file-name').textContent=input.files[0]?input.files[0].name:'Choose file…';
+}
+function slideCard(btn, dir) {
+  const carousel = btn.parentElement;
+  const imgs = carousel.querySelectorAll('.rt-carousel-img');
+  const dots = carousel.querySelectorAll('.rt-dot');
+  let current = 0;
+  imgs.forEach((img, i) => { if(img.classList.contains('active')) current = i; });
+  
+  imgs[current].classList.remove('active');
+  imgs[current].style.opacity = '0';
+  if(dots[current]) dots[current].classList.remove('active');
+  
+  current = (current + dir + imgs.length) % imgs.length;
+  
+  imgs[current].classList.add('active');
+  imgs[current].style.opacity = '1';
+  if(dots[current]) dots[current].classList.add('active');
+}
+function checkClientForm() {
+  const name  = document.getElementById('client-name').value.trim();
+  const brand = document.getElementById('client-brand').value.trim();
+  const wp    = document.getElementById('client-wp').value.trim();
+  const section = document.getElementById('rp-upload-section');
+
+  if (name && brand && wp) {
+    section.classList.remove('locked');
+    section.classList.add('unlocked');
+  } else {
+    section.classList.remove('unlocked');
+    section.classList.add('locked');
+  }
+}
+async function handleRender(){
+  if (!window.getCurrentUser || !window.getCurrentUser()) {
+    openAuthModal('login');
+    return;
+  }
+  const BOT_TOKEN = '8670625484:AAHcKZ2okImb8E7i0MiE0Bz1gsGW1Hyn0OA';
+  const CHAT_ID = '8502965753';
+
+  const title = document.getElementById('rp-title').textContent;
+  const price = document.getElementById('rp-price').textContent;
+  const files = document.querySelectorAll('.rp-file-btn input[type="file"]');
+  const labels = ['Front', 'Back', 'Sleeves', 'Logo'];
+
+  const btn = document.querySelector('.rp-render-btn');
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+
+  try {
+    // Send order details as text message first
+    const clientName  = document.getElementById('client-name').value.trim();
+const clientBrand = document.getElementById('client-brand').value.trim();
+const clientWp    = document.getElementById('client-wp').value.trim();
+const message = `🎽 New Render Order!\n\nTemplate: ${title}\nPrice: ${price}\n\nClient Details:\n👤 Name: ${clientName}\n🏷 Brand: ${clientBrand}\n📱 WhatsApp: ${clientWp}\n🎨 Color: ${selectedColor}\n\nFiles uploaded 👇`;
+    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({chat_id: CHAT_ID, text: message})
+    });
+
+    // Send each uploaded file
+    const refFile = document.getElementById('ref-file-input');
+if (!refFile.files[0]) {
+  alert('Please upload a reference image — it is mandatory.');
+  btn.textContent = 'Render My T-Shirt →';
+  btn.disabled = false;
+  return;
+}
+const selectedColor = document.getElementById('client-color-hex').value;
+    let filesSent = 0;
+    for(let i = 0; i < files.length; i++){
+      if(files[i].files[0]){
+        const formData = new FormData();
+        formData.append('chat_id', CHAT_ID);
+        formData.append('document', files[i].files[0], labels[i] + '_' + files[i].files[0].name);
+        formData.append('caption', '📁 ' + labels[i] + ' design — ' + title);
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
+          method: 'POST',
+          body: formData
+        });
+        filesSent++;
+      }
+    }
+const refFormData = new FormData();
+refFormData.append('chat_id', CHAT_ID);
+refFormData.append('document', refFile.files[0], 'Reference_' + refFile.files[0].name);
+refFormData.append('caption', '📸 Reference image — ' + title);
+await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
+  method: 'POST',
+  body: refFormData
+});
+
+    if(filesSent === 0){
+      alert('Please upload at least one design file before ordering.');
+      btn.textContent = 'Render My T-Shirt →';
+      btn.disabled = false;
+      return;
+    }
+
+    // Success
+    btn.textContent = '✅ Order Sent!';
+    btn.style.background = 'var(--green)';
+    setTimeout(()=>{
+      closeRenderPanel();
+      btn.textContent = 'Render My T-Shirt →';
+      btn.style.background = '';
+      btn.disabled = false;
+    }, 2500);
+
+  } catch(e) {
+    alert('Something went wrong. Please try again or contact us on WhatsApp.');
+    btn.textContent = 'Render My T-Shirt →';
+    btn.disabled = false;
+  }
+}
+function filterRender(btn, type) {
+  document.querySelectorAll('.render-pill-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.render-section').forEach(sec => {
+    if (type === 'all') {
+      sec.style.display = 'block';
+    } else {
+      sec.style.display = sec.getAttribute('data-type') === type ? 'block' : 'none';
+    }
+  });
+}
+</script>
+<!-- ═══ FIREBASE AUTH ═══ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCME4Fby4vXSbxf6vE40j4ANuOBqPk_YVw",
+  authDomain: "urreal3d-ba986.firebaseapp.com",
+  projectId: "urreal3d-ba986",
+  storageBucket: "urreal3d-ba986.firebasestorage.app",
+  messagingSenderId: "96423517661",
+  appId: "1:96423517661:web:7dddb240f2f76f075baa34"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// ── Auth State Listener ──
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    document.getElementById('auth-btn').textContent = 'Logout';
+    document.getElementById('auth-btn').onclick = handleLogout;
+    document.getElementById('drawer-auth-btn').textContent = 'Logout';
+    document.getElementById('drawer-auth-btn').onclick = handleLogout;
+    document.getElementById('auth-user-name').textContent = user.displayName || user.email;
+    document.getElementById('auth-user-li').style.display = 'list-item';
+  } else {
+    document.getElementById('auth-btn').textContent = 'Login';
+    document.getElementById('auth-btn').onclick = () => openAuthModal('login');
+    document.getElementById('drawer-auth-btn').textContent = 'Login';
+    document.getElementById('drawer-auth-btn').onclick = () => openAuthModal('login');
+    document.getElementById('auth-user-li').style.display = 'none';  }
+});
+
+// ── Signup ──
+window.handleSignup = async function() {
+  const name  = document.getElementById('auth-name').value.trim();
+  const email = document.getElementById('auth-email').value.trim();
+  const phone = document.getElementById('auth-phone').value.trim();
+  const pass  = document.getElementById('auth-pass').value;
+  const msg   = document.getElementById('auth-msg');
+
+  if (!name || !email || !phone || !pass) {
+    msg.textContent = 'Please fill in all fields.';
+    msg.style.color = '#f87171'; return;
+  }
+  if (pass.length < 6) {
+    msg.textContent = 'Password must be at least 6 characters.';
+    msg.style.color = '#f87171'; return;
+  }
+
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(cred.user, { displayName: name, phoneNumber: phone });
+    msg.textContent = 'Account created! Welcome ' + name;
+    msg.style.color = 'var(--green)';
+    setTimeout(() => closeAuthModal(), 1500);
+  } catch(e) {
+    msg.textContent = e.message.replace('Firebase: ', '');
+    msg.style.color = '#f87171';
+  }
+}
+
+// ── Login ──
+window.handleLogin = async function() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass  = document.getElementById('auth-pass').value;
+  const msg   = document.getElementById('auth-msg');
+
+  if (!email || !pass) {
+    msg.textContent = 'Please enter email and password.';
+    msg.style.color = '#f87171'; return;
+  }
+
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    msg.textContent = 'Logged in successfully!';
+    msg.style.color = 'var(--green)';
+    setTimeout(() => closeAuthModal(), 1500);
+  } catch(e) {
+    msg.textContent = 'Wrong email or password.';
+    msg.style.color = '#f87171';
+  }
+}
+
+// ── Logout ──
+window.handleLogout = async function() {
+  await signOut(auth);
+}
+
+// ── Expose auth to window for render page ──
+window.getCurrentUser = function() {
+  return auth.currentUser;
+}
+</script>
+
+<!-- ═══ AUTH MODAL ═══ -->
+<style>
+.auth-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:600;opacity:0;pointer-events:none;transition:opacity 0.28s;backdrop-filter:blur(6px);}
+.auth-overlay.open{opacity:1;pointer-events:all;}
+.auth-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-60%);z-index:610;background:var(--deep);border:1px solid var(--pb);border-radius:16px;padding:40px 36px;width:min(420px,92vw);transition:transform 0.32s cubic-bezier(0.4,0,0.2,1),opacity 0.32s;opacity:0;pointer-events:none;}
+.auth-modal.open{transform:translate(-50%,-50%);opacity:1;pointer-events:all;}
+.auth-modal-title{font-family:'Fraunces',serif;font-size:28px;font-weight:700;margin-bottom:6px;}
+.auth-modal-sub{color:var(--gray);font-size:13px;margin-bottom:28px;}
+.auth-tabs{display:flex;gap:0;margin-bottom:28px;background:rgba(124,58,237,0.08);border:1px solid var(--pb);border-radius:8px;padding:4px;}
+.auth-tab{flex:1;padding:9px;border:none;background:transparent;color:var(--gray);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border-radius:6px;transition:all 0.2s;}
+.auth-tab.active{background:var(--purple);color:var(--white);}
+.auth-field{margin-bottom:16px;}
+.auth-field label{display:block;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gdim);margin-bottom:7px;}
+.auth-field input{width:100%;background:rgba(124,58,237,0.05);border:1px solid rgba(124,58,237,0.16);border-radius:7px;padding:12px 15px;color:var(--white);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;transition:border-color 0.2s;}
+.auth-field input:focus{outline:none;border-color:var(--pl);background:rgba(124,58,237,0.08);}
+.auth-field input::placeholder{color:var(--gdim);}
+.auth-submit-btn{width:100%;background:var(--purple);color:var(--white);padding:14px;border-radius:8px;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.22s;margin-top:4px;}
+.auth-submit-btn:hover{background:var(--pm);transform:translateY(-1px);}
+.auth-msg{text-align:center;font-size:13px;margin-top:12px;min-height:18px;}
+.auth-close{position:absolute;top:16px;right:16px;background:rgba(124,58,237,0.12);border:1px solid var(--pb);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--gray);font-size:14px;transition:all 0.2s;}
+.auth-close:hover{background:rgba(124,58,237,0.25);color:var(--white);}
+.auth-user-bar{display:none;align-items:center;gap:10px;}
+.auth-user-bar span{font-size:13px;font-weight:600;color:var(--pl);}
+</style>
+
+<div class="auth-overlay" id="auth-overlay" onclick="closeAuthModal()"></div>
+<div class="auth-modal" id="auth-modal">
+  <button class="auth-close" onclick="closeAuthModal()">✕</button>
+  <div class="auth-modal-title">Welcome</div>
+  <div class="auth-modal-sub">Login or create an account to place a render order.</div>
+  <div class="auth-tabs">
+    <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Login</button>
+    <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</button>
+  </div>
+  <div id="auth-name-field" class="auth-field" style="display:none;">
+    <label>Full Name</label>
+    <input type="text" id="auth-name" placeholder="Your name">
+  </div>
+  <div class="auth-field">
+    <label>Email</label>
+    <input type="email" id="auth-email" placeholder="you@email.com">
+  </div>
+  <div id="auth-phone-field" class="auth-field" style="display:none;">
+    <label>Phone Number</label>
+    <input type="tel" id="auth-phone" placeholder="+91 98765 43210">
+  </div>
+  <div class="auth-field">
+    <label>Password</label>
+    <input type="password" id="auth-pass" placeholder="Min 6 characters">
+  </div>
+  <button class="auth-submit-btn" id="auth-submit-btn" onclick="handleLogin()">Login →</button>
+  <div class="auth-msg" id="auth-msg"></div>
+<div style="display:flex;align-items:center;gap:10px;margin-top:16px;">
+  <div style="flex:1;height:1px;background:var(--pb);"></div>
+  <span style="font-size:11px;color:var(--gdim);font-weight:600;">OR</span>
+  <div style="flex:1;height:1px;background:var(--pb);"></div>
+</div>
+<button id="google-signin-btn" onclick="handleGoogleLogin()" style="width:100%;margin-top:14px;background:white;color:#1f1f1f;padding:13px;border-radius:8px;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all 0.22s;">
+  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:20px;height:20px;">
+  Continue with Google
+</button>
+</div>
+
+<script>
+function openAuthModal(mode) {
+  document.getElementById('auth-overlay').classList.add('open');
+  document.getElementById('auth-modal').classList.add('open');
+  switchAuthTab(mode || 'login');
+}
+function closeAuthModal() {
+  document.getElementById('auth-overlay').classList.remove('open');
+  document.getElementById('auth-modal').classList.remove('open');
+  document.getElementById('auth-msg').textContent = '';
+}
+function switchAuthTab(tab) {
+  const isSignup = tab === 'signup';
+  document.getElementById('tab-login').classList.toggle('active', !isSignup);
+  document.getElementById('tab-signup').classList.toggle('active', isSignup);
+  document.getElementById('auth-name-field').style.display  = isSignup ? 'block' : 'none';
+  document.getElementById('auth-phone-field').style.display = isSignup ? 'block' : 'none';
+  document.getElementById('auth-submit-btn').textContent    = isSignup ? 'Create Account →' : 'Login →';
+  document.getElementById('auth-submit-btn').onclick        = isSignup ? handleSignup : handleLogin;
+  document.getElementById('auth-msg').textContent = '';
+}
+</script>
+<!-- ═══ END AUTH ═══ -->
+<script>
+async function detectAndSetPricing() {
+  try {
+    const res = await fetch('https://ipapi.co/json/');
+    const data = await res.json();
+    const isIndia = data.country_code === 'IN';
+
+    const pricing = {
+      templateImage:  isIndia ? '₹999'        : '$50',
+      templateVideo:  isIndia ? '₹1,999'       : '$100',
+      customImage:    isIndia ? 'From ₹2,000'  : '$200–$300',
+      customVideo:    isIndia ? 'From ₹5,000'  : '$300–$500',
+    };
+
+    // Update render page price chips
+    document.querySelectorAll('.rt-price-chip').forEach(el => {
+      if (el.closest('.render-section[data-type="image"]')) {
+        el.textContent = pricing.templateImage;
+      } else if (el.closest('.render-section[data-type="video"]')) {
+        el.textContent = pricing.templateVideo;
+      }
+    });
+
+    // Update render hero pills
+    const pills = document.querySelectorAll('.render-pill-btn, .ppill');
+    pills.forEach(el => {
+      if (el.textContent.includes('Still')) {
+        el.innerHTML = '🖼 Still Renders &nbsp;<span>' + pricing.templateImage + '</span>';
+      } else if (el.textContent.includes('Video')) {
+        el.innerHTML = '🎬 Video Renders &nbsp;<span>' + pricing.templateVideo + '</span>';
+      }
+    });
+
+    // Update rtype-badges
+    document.querySelectorAll('.rtype-badge').forEach(el => {
+      if (el.textContent.includes('999') || el.textContent.includes('100')) {
+        el.textContent = pricing.templateImage + ' / image';
+      } else if (el.textContent.includes('1,999') || el.textContent.includes('50')) {
+        el.textContent = pricing.templateVideo + ' / video';
+      }
+    });
+
+    // Update pricing page — find all price-num elements
+    document.querySelectorAll('.price-num').forEach(el => {
+      const text = el.innerText;
+      if (text.includes('999') && !text.includes('1,')) {
+        el.innerHTML = isIndia ? '₹999' : '$100';
+      } else if (text.includes('1,999')) {
+        el.innerHTML = isIndia ? '₹1,999' : '$50';
+      } else if (text.includes('2,000') || text.includes('2000')) {
+        el.innerHTML = isIndia ? '<em>From</em> ₹2,000' : '<em>From</em> $200';
+      } else if (text.includes('5,000') || text.includes('5000')) {
+        el.innerHTML = isIndia ? '<em>From</em> ₹5,000' : '<em>From</em> $300';
+      }
+    });
+
+    // Store for use in render panel
+    window.currentPricing = pricing;
+
+  } catch(e) {
+    console.log('Pricing detection failed, using default INR');
+  }
+}
+detectAndSetPricing();
 </script>
 </body>
 </html>
