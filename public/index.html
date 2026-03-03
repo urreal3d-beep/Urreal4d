@@ -1732,8 +1732,8 @@ await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
       btn.disabled = false;
     }, 2500);
 
-  } catch(e) {
-    alert('Something went wrong. Please try again or contact us on WhatsApp.');
+} catch(e) {
+    alert('Error: ' + e.message);
     btn.textContent = 'Render My T-Shirt →';
     btn.disabled = false;
   }
