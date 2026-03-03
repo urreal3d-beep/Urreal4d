@@ -312,8 +312,17 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
 <div class="drawer-overlay" id="doverlay" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-logo">Urreal<em>3D</em></div>
-  <a id="drawer-auth-btn" onclick="openAuthModal('login')" style="cursor:pointer;">Login</a>
-<a onclick="openProfile()" id="drawer-profile-btn" style="display:none;cursor:pointer;">👤 My Profile</a>
+  <div id="drawer-profile-box" style="display:none;margin:16px 28px;background:rgba(124,58,237,0.1);border:1px solid var(--pb);border-radius:12px;padding:16px;cursor:pointer;" onclick="openProfile();closeDrawer();">
+  <div style="display:flex;align-items:center;gap:14px;">
+    <div style="width:48px;height:48px;border-radius:50%;background:rgba(124,58,237,0.2);border:1px solid var(--pb);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    </div>
+    <div>
+      <div id="drawer-profile-name" style="font-family:'Fraunces',serif;font-size:16px;font-weight:700;color:var(--white);">My Profile</div>
+      <div id="drawer-profile-email" style="font-size:11px;color:var(--gdim);margin-top:2px;">View projects & account</div>
+    </div>
+  </div>
+</div>
   <a href="#" onclick="go('home');return false;" id="dl-home" class="active">Home</a>
   <a onclick="go('render')" id="dl-render">Render</a>
   <a href="#" onclick="go('portfolio');return false;" id="dl-portfolio">Portfolio</a>
@@ -1772,6 +1781,9 @@ onAuthStateChanged(auth, (user) => {
   if (user) {
 document.getElementById('auth-btn').style.display = 'none';
 document.getElementById('drawer-auth-btn').style.display = 'none';
+document.getElementById('drawer-profile-box').style.display = 'block';
+document.getElementById('drawer-profile-name').textContent = user.displayName || 'My Profile';
+document.getElementById('drawer-profile-email').textContent = user.email;
     document.getElementById('auth-btn').onclick = handleLogout;
     document.getElementById('drawer-auth-btn').textContent = 'Logout';
     document.getElementById('drawer-auth-btn').onclick = handleLogout;
@@ -1780,6 +1792,7 @@ document.getElementById('drawer-auth-btn').style.display = 'none';
   } else {
 document.getElementById('auth-btn').style.display = 'inline';
 document.getElementById('drawer-auth-btn').style.display = 'block';
+document.getElementById('drawer-profile-box').style.display = 'none';
     document.getElementById('auth-btn').onclick = () => openAuthModal('login');
     document.getElementById('drawer-auth-btn').textContent = 'Login';
     document.getElementById('drawer-auth-btn').onclick = () => openAuthModal('login');
