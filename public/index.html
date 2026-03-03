@@ -30,6 +30,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;justify-content
 .logo em{color:var(--pl);font-style:normal;}
 .nav-links{display:flex;gap:28px;list-style:none;}
 .nav-links a{color:var(--gray);text-decoration:none;font-size:13px;font-weight:500;letter-spacing:0.04em;transition:color 0.2s;}
+.nav-links li{display:flex;align-items:center;}
 .nav-links a:hover,.nav-links a.active{color:var(--white);}
 .hbg{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:6px;z-index:400;}
 .hbg span{display:block;width:22px;height:2px;background:var(--white);border-radius:2px;transition:all 0.28s;}
@@ -296,9 +297,12 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
     <li><a href="#" onclick="go('pricing');return false;" id="nl-pricing">Pricing</a></li>
     <li><a href="#" onclick="go('testimonials');return false;" id="nl-testimonials">Reviews</a></li>
     <li><a href="#" onclick="go('appointment');return false;" id="nl-appointment">Book</a></li>
-    <li id="auth-user-li" style="display:none;"><span id="auth-user-name" style="font-size:13px;font-weight:600;color:var(--pl);"></span></li>
     <li><a id="auth-btn" onclick="openAuthModal('login')" style="cursor:pointer;">Login</a></li>
-    <li><a href="#" onclick="go('about');return false;" id="nl-about">About</a></li>
+  <li><a href="#" onclick="go('about');return false;" id="nl-about">About</a></li>
+    <li style="display:flex;align-items:center;"><button id="nav-profile-btn" onclick="openProfile()" style="width:36px;height:36px;border-radius:50%;background:rgba(124,58,237,0.2);border:1px solid var(--pb);cursor:pointer;display:none;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.background='rgba(124,58,237,0.4)'" onmouseout="this.style.background='rgba(124,58,237,0.2)'">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+</button></li>
+<li id="auth-user-li" style="display:none;margin:0;padding:0;"><span id="auth-user-name" style="font-size:13px;font-weight:600;color:var(--pl);"></span></li>
   </ul>
   <button class="hbg" id="hbg" onclick="toggleDrawer()" aria-label="Menu">
     <span></span><span></span><span></span>
@@ -1287,6 +1291,161 @@ function filterTab(btn) {
 </div>
 <!-- ═══ END RENDER PAGE ═══ -->
 
+<!-- ═══ PROFILE PANEL ═══ -->
+<div class="auth-overlay" id="profile-overlay" onclick="closeProfile()"></div>
+<div id="profile-panel" style="position:fixed;top:0;right:0;bottom:0;width:min(480px,100vw);background:var(--deep);border-left:1px solid var(--pb);z-index:400;transform:translateX(100%);transition:transform 0.32s cubic-bezier(0.4,0,0.2,1);overflow-y:auto;padding:0 0 40px;">
+
+  <!-- Header -->
+  <div style="padding:24px 28px;border-bottom:1px solid var(--pb);display:flex;align-items:center;justify-content:space-between;">
+    <div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.18em;color:var(--gold);text-transform:uppercase;margin-bottom:4px;">My Account</div>
+      <div id="profile-name" style="font-family:'Fraunces',serif;font-size:22px;font-weight:700;"></div>
+      <div id="profile-email" style="font-size:12px;color:var(--gdim);margin-top:2px;"></div>
+    </div>
+    <button onclick="closeProfile()" style="background:rgba(124,58,237,0.12);border:1px solid var(--pb);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--gray);font-size:16px;">✕</button>
+  </div>
+
+  <!-- Tabs -->
+  <div style="display:flex;gap:0;padding:16px 28px 0;">
+    <button class="profile-tab active" id="ptab-orders" onclick="switchProfileTab('orders')" style="flex:1;padding:10px;border:none;background:transparent;color:var(--gray);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;">My Projects</button>
+    <button class="profile-tab" id="ptab-account" onclick="switchProfileTab('account')" style="flex:1;padding:10px;border:none;background:transparent;color:var(--gray);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;">Account</button>
+  </div>
+  <div style="height:1px;background:var(--pb);margin:0 28px;"></div>
+
+  <!-- Orders Tab -->
+  <div id="profile-orders-tab" style="padding:24px 28px;">
+    <div id="profile-orders-list">
+      <div style="text-align:center;padding:40px 0;color:var(--gdim);font-size:13px;">Loading your projects...</div>
+    </div>
+  </div>
+
+  <!-- Account Tab -->
+  <div id="profile-account-tab" style="padding:24px 28px;display:none;">
+    <div style="background:var(--card);border:1px solid var(--pb);border-radius:12px;padding:24px;">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;">
+        <div style="width:56px;height:56px;border-radius:50%;background:rgba(124,58,237,0.2);border:1px solid var(--pb);display:flex;align-items:center;justify-content:center;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        </div>
+        <div>
+          <div id="profile-account-name" style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;"></div>
+          <div id="profile-account-email" style="font-size:12px;color:var(--gdim);margin-top:2px;"></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(124,58,237,0.07);">
+          <span style="font-size:12px;color:var(--gdim);">Email</span>
+          <span id="profile-info-email" style="font-size:13px;font-weight:600;"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(124,58,237,0.07);">
+          <span style="font-size:12px;color:var(--gdim);">Member since</span>
+          <span id="profile-info-since" style="font-size:13px;font-weight:600;"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px 0;">
+          <span style="font-size:12px;color:var(--gdim);">Total Projects</span>
+          <span id="profile-info-total" style="font-size:13px;font-weight:600;color:var(--pl);">0</span>
+        </div>
+      </div>
+    </div>
+    <button onclick="handleLogout();closeProfile();" style="width:100%;margin-top:16px;background:transparent;border:1px solid rgba(241,87,87,0.3);color:#f87171;padding:12px;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;">Logout</button>
+  </div>
+
+</div>
+<!-- ═══ END PROFILE PANEL ═══ -->
+
+<style>
+.profile-tab.active{color:var(--white) !important;border-bottom:2px solid var(--pl) !important;}
+.order-card{background:var(--card);border:1px solid var(--pb);border-radius:12px;padding:20px;margin-bottom:14px;transition:all 0.25s;}
+.order-card:hover{border-color:rgba(124,58,237,0.35);}
+.order-status-pending{background:rgba(234,179,8,0.12);border:1px solid rgba(234,179,8,0.3);color:#eab308;border-radius:100px;padding:3px 12px;font-size:11px;font-weight:700;}
+.order-status-done{background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);color:#22c55e;border-radius:100px;padding:3px 12px;font-size:11px;font-weight:700;}
+</style>
+
+<script>
+function openProfile() {
+  const user = window.getCurrentUser();
+  if (!user) { openAuthModal('login'); return; }
+
+  document.getElementById('profile-name').textContent = user.displayName || 'Client';
+  document.getElementById('profile-email').textContent = user.email;
+  document.getElementById('profile-account-name').textContent = user.displayName || 'Client';
+  document.getElementById('profile-account-email').textContent = user.email;
+  document.getElementById('profile-info-email').textContent = user.email;
+
+  const since = user.metadata.creationTime
+    ? new Date(user.metadata.creationTime).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'})
+    : '—';
+  document.getElementById('profile-info-since').textContent = since;
+
+  document.getElementById('profile-overlay').classList.add('open');
+  document.getElementById('profile-panel').style.transform = 'translateX(0)';
+  document.body.style.overflow = 'hidden';
+
+  switchProfileTab('orders');
+  loadOrders();
+}
+
+function closeProfile() {
+  document.getElementById('profile-overlay').classList.remove('open');
+  document.getElementById('profile-panel').style.transform = 'translateX(100%)';
+  document.body.style.overflow = '';
+}
+
+function switchProfileTab(tab) {
+  document.getElementById('profile-orders-tab').style.display  = tab === 'orders'  ? 'block' : 'none';
+  document.getElementById('profile-account-tab').style.display = tab === 'account' ? 'block' : 'none';
+  document.getElementById('ptab-orders').classList.toggle('active',  tab === 'orders');
+  document.getElementById('ptab-account').classList.toggle('active', tab === 'account');
+}
+
+async function loadOrders() {
+  const list = document.getElementById('profile-orders-list');
+  list.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--gdim);font-size:13px;">Loading your projects...</div>';
+
+  if (!window.loadUserOrders) {
+    list.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--gdim);font-size:13px;">Could not load projects.</div>';
+    return;
+  }
+
+  const orders = await window.loadUserOrders();
+  document.getElementById('profile-info-total').textContent = orders.length;
+
+  if (orders.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:40px 0;"><div style="font-size:32px;margin-bottom:12px;">🎽</div><div style="color:var(--gdim);font-size:13px;">No projects yet. Place your first render order!</div></div>';
+    return;
+  }
+
+  list.innerHTML = orders.map((order, i) => {
+    const date = order.createdAt
+      ? new Date(order.createdAt.seconds * 1000).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
+      : 'Just now';
+
+    const isVideo = order.templateType === 'video';
+    const waitTime = isVideo ? '6 hours' : '2 hours';
+    const isDone = order.status === 'done' && order.renderedFile;
+
+    const statusHtml = isDone
+      ? `<span class="order-status-done">✓ Completed</span>`
+      : `<span class="order-status-pending">⏳ In Progress</span>`;
+
+    const renderHtml = isDone
+      ? `<a href="${order.renderedFile}" target="_blank" style="display:inline-block;margin-top:12px;background:var(--purple);color:var(--white);padding:8px 18px;border-radius:6px;font-size:12px;font-weight:700;text-decoration:none;">View Render →</a>`
+      : `<div style="margin-top:12px;background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);border-radius:8px;padding:10px 14px;font-size:12px;color:#eab308;">⏱ Your render will be ready within <strong>${waitTime}</strong> of order placement.</div>`;
+
+    return `
+      <div class="order-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="font-family:'Fraunces',serif;font-size:16px;font-weight:600;">Project ${orders.length - i}</div>
+          ${statusHtml}
+        </div>
+        <div style="font-size:13px;color:var(--gray);margin-bottom:4px;">📋 ${order.templateName || 'Custom Order'}</div>
+        <div style="font-size:12px;color:var(--gdim);">🕐 ${date}</div>
+        <div style="font-size:12px;color:var(--gdim);margin-top:3px;">💰 ${order.price || '—'}</div>
+        <div style="font-size:12px;color:var(--gdim);margin-top:3px;">🏷 ${order.brandName || '—'}</div>
+        ${renderHtml}
+      </div>`;
+  }).join('');
+}
+</script>
 
 <!-- ═══ RENDER DETAIL PANEL (paste this outside the page div, still before </body>) ═══ -->
 <div class="rp-overlay" id="rp-overlay" onclick="closeRenderPanel()"></div>
@@ -1477,6 +1636,21 @@ async function handleRender(){
 
   const title = document.getElementById('rp-title').textContent;
   const price = document.getElementById('rp-price').textContent;
+  const clientName  = document.getElementById('client-name').value.trim();
+const clientBrand = document.getElementById('client-brand').value.trim();
+const clientWp    = document.getElementById('client-wp').value.trim();
+const templateType = document.getElementById('rp-type-tag').textContent.includes('VIDEO') ? 'video' : 'image';
+
+if (window.saveOrderToFirestore) {
+  await window.saveOrderToFirestore({
+    templateName: title,
+    templateType: templateType,
+    price: price,
+    clientName: clientName,
+    brandName: clientBrand,
+    whatsapp: clientWp,
+  });
+}
   const files = document.querySelectorAll('.rp-file-btn input[type="file"]');
   const labels = ['Front', 'Back', 'Sleeves', 'Logo'];
 
@@ -1567,6 +1741,7 @@ function filterRender(btn, type) {
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCME4Fby4vXSbxf6vE40j4ANuOBqPk_YVw",
@@ -1579,8 +1754,8 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
-// ── Auth State Listener ──
 onAuthStateChanged(auth, (user) => {
   if (user) {
     document.getElementById('auth-btn').textContent = 'Logout';
@@ -1589,34 +1764,28 @@ onAuthStateChanged(auth, (user) => {
     document.getElementById('drawer-auth-btn').onclick = handleLogout;
     document.getElementById('auth-user-name').textContent = user.displayName || user.email;
     document.getElementById('auth-user-li').style.display = 'list-item';
+    document.getElementById('nav-profile-btn').style.display = 'flex';
   } else {
     document.getElementById('auth-btn').textContent = 'Login';
     document.getElementById('auth-btn').onclick = () => openAuthModal('login');
     document.getElementById('drawer-auth-btn').textContent = 'Login';
     document.getElementById('drawer-auth-btn').onclick = () => openAuthModal('login');
-    document.getElementById('auth-user-li').style.display = 'none';  }
+    document.getElementById('auth-user-li').style.display = 'none';
+   document.getElementById('nav-profile-btn').style.cssText = 'width:36px;height:36px;border-radius:50%;background:rgba(124,58,237,0.2);border:1px solid var(--pb);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;';
+  }
 });
 
-// ── Signup ──
 window.handleSignup = async function() {
   const name  = document.getElementById('auth-name').value.trim();
   const email = document.getElementById('auth-email').value.trim();
   const phone = document.getElementById('auth-phone').value.trim();
   const pass  = document.getElementById('auth-pass').value;
   const msg   = document.getElementById('auth-msg');
-
-  if (!name || !email || !phone || !pass) {
-    msg.textContent = 'Please fill in all fields.';
-    msg.style.color = '#f87171'; return;
-  }
-  if (pass.length < 6) {
-    msg.textContent = 'Password must be at least 6 characters.';
-    msg.style.color = '#f87171'; return;
-  }
-
+  if (!name || !email || !phone || !pass) { msg.textContent = 'Please fill in all fields.'; msg.style.color = '#f87171'; return; }
+  if (pass.length < 6) { msg.textContent = 'Password must be at least 6 characters.'; msg.style.color = '#f87171'; return; }
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    await updateProfile(cred.user, { displayName: name, phoneNumber: phone });
+    await updateProfile(cred.user, { displayName: name });
     msg.textContent = 'Account created! Welcome ' + name;
     msg.style.color = 'var(--green)';
     setTimeout(() => closeAuthModal(), 1500);
@@ -1626,20 +1795,14 @@ window.handleSignup = async function() {
   }
 }
 
-// ── Login ──
 window.handleLogin = async function() {
   const email = document.getElementById('auth-email').value.trim();
   const pass  = document.getElementById('auth-pass').value;
   const msg   = document.getElementById('auth-msg');
-
-  if (!email || !pass) {
-    msg.textContent = 'Please enter email and password.';
-    msg.style.color = '#f87171'; return;
-  }
-
+  if (!email || !pass) { msg.textContent = 'Please enter email and password.'; msg.style.color = '#f87171'; return; }
   try {
     await signInWithEmailAndPassword(auth, email, pass);
-    msg.textContent = 'Logged in successfully!';
+    msg.textContent = 'Logged in!';
     msg.style.color = 'var(--green)';
     setTimeout(() => closeAuthModal(), 1500);
   } catch(e) {
@@ -1648,17 +1811,59 @@ window.handleLogin = async function() {
   }
 }
 
-// ── Logout ──
 window.handleLogout = async function() {
   await signOut(auth);
 }
 
-// ── Expose auth to window for render page ──
 window.getCurrentUser = function() {
   return auth.currentUser;
 }
-</script>
 
+window.handleGoogleLogin = async function() {
+  const { GoogleAuthProvider, signInWithPopup } = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js");
+  const provider = new GoogleAuthProvider();
+  try {
+    await signInWithPopup(auth, provider);
+    closeAuthModal();
+  } catch(e) {
+    document.getElementById('auth-msg').textContent = 'Google login failed. Try again.';
+    document.getElementById('auth-msg').style.color = '#f87171';
+  }
+}
+
+// ── Save Order to Firestore ──
+window.saveOrderToFirestore = async function(orderData) {
+  try {
+    await addDoc(collection(db, 'orders'), {
+      ...orderData,
+      userId: auth.currentUser.uid,
+      userEmail: auth.currentUser.email,
+      userName: auth.currentUser.displayName,
+      createdAt: serverTimestamp(),
+      status: 'pending',
+      renderedFile: null
+    });
+  } catch(e) {
+    console.log('Order save failed:', e);
+  }
+}
+
+// ── Load Orders from Firestore ──
+window.loadUserOrders = async function() {
+  try {
+    const q = query(
+      collection(db, 'orders'),
+      where('userId', '==', auth.currentUser.uid),
+      orderBy('createdAt', 'desc')
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch(e) {
+    console.log('Load orders failed:', e);
+    return [];
+  }
+}
+</script>
 <!-- ═══ AUTH MODAL ═══ -->
 <style>
 .auth-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:600;opacity:0;pointer-events:none;transition:opacity 0.28s;backdrop-filter:blur(6px);}
