@@ -1873,7 +1873,7 @@ window.loadUserOrders = async function() {
     const snapshot = await getDocs(q);
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch(e) {
-    console.log('Load orders failed:', e);
+console.log('Load orders failed:', e.message);
     return [];
   }
 }
