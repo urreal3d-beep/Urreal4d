@@ -302,7 +302,6 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
     <li style="display:flex;align-items:center;"><button id="nav-profile-btn" onclick="openProfile()" style="width:36px;height:36px;border-radius:50%;background:rgba(124,58,237,0.2);border:1px solid var(--pb);cursor:pointer;display:none;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.background='rgba(124,58,237,0.4)'" onmouseout="this.style.background='rgba(124,58,237,0.2)'">
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
 </button></li>
-<li id="auth-user-li" style="display:none;margin:0;padding:0;"><span id="auth-user-name" style="font-size:13px;font-weight:600;color:var(--pl);"></span></li>
   </ul>
   <button class="hbg" id="hbg" onclick="toggleDrawer()" aria-label="Menu">
     <span></span><span></span><span></span>
@@ -314,6 +313,7 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
 <div class="drawer" id="drawer">
   <div class="drawer-logo">Urreal<em>3D</em></div>
   <a id="drawer-auth-btn" onclick="openAuthModal('login')" style="cursor:pointer;">Login</a>
+<a onclick="openProfile()" id="drawer-profile-btn" style="display:none;cursor:pointer;">👤 My Profile</a>
   <a href="#" onclick="go('home');return false;" id="dl-home" class="active">Home</a>
   <a onclick="go('render')" id="dl-render">Render</a>
   <a href="#" onclick="go('portfolio');return false;" id="dl-portfolio">Portfolio</a>
@@ -854,6 +854,19 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
 </div>
 
 <script>
+window.addEventListener('popstate', function() {
+  go('home');
+});
+
+// Push state when navigating
+const originalGo = go;
+window.go = function(name) {
+  originalGo(name);
+  history.pushState({page: name}, '', '');
+}
+
+// Set initial state
+history.replaceState({page: 'home'}, '', '');
 // ── Page Navigation ──
 const pages = ['home','about','render','portfolio','pricing','testimonials','appointment','policy'];
 function go(name){
@@ -1293,7 +1306,7 @@ function filterTab(btn) {
 
 <!-- ═══ PROFILE PANEL ═══ -->
 <div class="auth-overlay" id="profile-overlay" onclick="closeProfile()"></div>
-<div id="profile-panel" style="position:fixed;top:0;right:0;bottom:0;width:min(480px,100vw);background:var(--deep);border-left:1px solid var(--pb);z-index:400;transform:translateX(100%);transition:transform 0.32s cubic-bezier(0.4,0,0.2,1);overflow-y:auto;padding:0 0 40px;">
+<div id="profile-panel" style="position:fixed;top:0;right:0;bottom:0;width:min(480px,100vw);background:var(--deep);border-left:1px solid var(--pb);z-index:600;transform:translateX(100%);transition:transform 0.32s cubic-bezier(0.4,0,0.2,1);overflow-y:auto;padding:0 0 40px;">
 
   <!-- Header -->
   <div style="padding:24px 28px;border-bottom:1px solid var(--pb);display:flex;align-items:center;justify-content:space-between;">
@@ -1762,16 +1775,15 @@ onAuthStateChanged(auth, (user) => {
     document.getElementById('auth-btn').onclick = handleLogout;
     document.getElementById('drawer-auth-btn').textContent = 'Logout';
     document.getElementById('drawer-auth-btn').onclick = handleLogout;
-    document.getElementById('auth-user-name').textContent = user.displayName || user.email;
-    document.getElementById('auth-user-li').style.display = 'list-item';
-    document.getElementById('nav-profile-btn').style.display = 'flex';
+    document.getElementById('nav-profile-btn').style.cssText = 'width:36px;height:36px;border-radius:50%;background:rgba(124,58,237,0.2);border:1px solid var(--pb);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;';
+    document.getElementById('drawer-profile-btn').style.display = 'block';
   } else {
     document.getElementById('auth-btn').textContent = 'Login';
     document.getElementById('auth-btn').onclick = () => openAuthModal('login');
     document.getElementById('drawer-auth-btn').textContent = 'Login';
     document.getElementById('drawer-auth-btn').onclick = () => openAuthModal('login');
-    document.getElementById('auth-user-li').style.display = 'none';
-   document.getElementById('nav-profile-btn').style.cssText = 'width:36px;height:36px;border-radius:50%;background:rgba(124,58,237,0.2);border:1px solid var(--pb);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;';
+    document.getElementById('nav-profile-btn').style.display = 'none';
+    document.getElementById('drawer-profile-btn').style.display = 'none';
   }
 });
 
@@ -1820,17 +1832,20 @@ window.getCurrentUser = function() {
 }
 
 window.handleGoogleLogin = async function() {
-  const { GoogleAuthProvider, signInWithPopup } = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js");
-  const provider = new GoogleAuthProvider();
   try {
-    await signInWithPopup(auth, provider);
-    closeAuthModal();
+    const { GoogleAuthProvider, signInWithPopup } = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js");
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+    const result = await signInWithPopup(auth, provider);
+    if (result.user) {
+      closeAuthModal();
+    }
   } catch(e) {
-    document.getElementById('auth-msg').textContent = 'Google login failed. Try again.';
+    console.log(e);
+    document.getElementById('auth-msg').textContent = 'Google login failed: ' + e.message;
     document.getElementById('auth-msg').style.color = '#f87171';
   }
 }
-
 // ── Save Order to Firestore ──
 window.saveOrderToFirestore = async function(orderData) {
   try {
@@ -1866,7 +1881,7 @@ window.loadUserOrders = async function() {
 </script>
 <!-- ═══ AUTH MODAL ═══ -->
 <style>
-.auth-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:600;opacity:0;pointer-events:none;transition:opacity 0.28s;backdrop-filter:blur(6px);}
+.auth-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:590;opacity:0;pointer-events:none;transition:opacity 0.28s;backdrop-filter:blur(6px);}
 .auth-overlay.open{opacity:1;pointer-events:all;}
 .auth-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-60%);z-index:610;background:var(--deep);border:1px solid var(--pb);border-radius:16px;padding:40px 36px;width:min(420px,92vw);transition:transform 0.32s cubic-bezier(0.4,0,0.2,1),opacity 0.32s;opacity:0;pointer-events:none;}
 .auth-modal.open{transform:translate(-50%,-50%);opacity:1;pointer-events:all;}
