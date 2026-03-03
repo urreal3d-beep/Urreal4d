@@ -1676,7 +1676,7 @@ if (window.saveOrderToFirestore) {
     const clientName  = document.getElementById('client-name').value.trim();
 const clientBrand = document.getElementById('client-brand').value.trim();
 const clientWp    = document.getElementById('client-wp').value.trim();
-const message = `🎽 New Render Order!\n\nTemplate: ${title}\nPrice: ${price}\n\nClient Details:\n👤 Name: ${clientName}\n🏷 Brand: ${clientBrand}\n📱 WhatsApp: ${clientWp}\n🎨 Color: ${selectedColor}\n\nFiles uploaded 👇`;
+const message = `🎽 New Render Order!\n\nTemplate: ${title}\nPrice: ${price}\n\nClient Details:\n👤 Name: ${clientName}\n🏷 Brand: ${clientBrand}\n📱 WhatsApp: ${clientWp}\n\nFiles uploaded 👇`;
     await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
@@ -1691,7 +1691,6 @@ if (!refFile.files[0]) {
   btn.disabled = false;
   return;
 }
-const selectedColor = document.getElementById('client-color-hex').value;
     let filesSent = 0;
     for(let i = 0; i < files.length; i++){
       if(files[i].files[0]){
