@@ -1676,7 +1676,7 @@ if (window.saveOrderToFirestore) {
     const clientName  = document.getElementById('client-name').value.trim();
 const clientBrand = document.getElementById('client-brand').value.trim();
 const clientWp    = document.getElementById('client-wp').value.trim();
-const message = `🎽 New Render Order!\n\nTemplate: ${title}\nPrice: ${price}\n\nClient Details:\n👤 Name: ${clientName}\n🏷 Brand: ${clientBrand}\n📱 WhatsApp: ${clientWp}\n\nFiles uploaded 👇`;
+const message = `🎽 New Render Order!\n\nTemplate: ${title}\nPrice: ${price}\n\nClient Details:\n👤 Name: ${clientName}\n🏷 Brand: ${clientBrand}\n📱 WhatsApp: ${clientWp}\\n\nFiles uploaded 👇`;
     await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
@@ -1770,14 +1770,16 @@ const db = getFirestore(app);
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    document.getElementById('auth-btn').textContent = 'Logout';
+document.getElementById('auth-btn').style.display = 'none';
+document.getElementById('drawer-auth-btn').style.display = 'none';
     document.getElementById('auth-btn').onclick = handleLogout;
     document.getElementById('drawer-auth-btn').textContent = 'Logout';
     document.getElementById('drawer-auth-btn').onclick = handleLogout;
     document.getElementById('nav-profile-btn').style.cssText = 'width:36px;height:36px;border-radius:50%;background:rgba(124,58,237,0.2);border:1px solid var(--pb);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;';
     document.getElementById('drawer-profile-btn').style.display = 'block';
   } else {
-    document.getElementById('auth-btn').textContent = 'Login';
+document.getElementById('auth-btn').style.display = 'inline';
+document.getElementById('drawer-auth-btn').style.display = 'block';
     document.getElementById('auth-btn').onclick = () => openAuthModal('login');
     document.getElementById('drawer-auth-btn').textContent = 'Login';
     document.getElementById('drawer-auth-btn').onclick = () => openAuthModal('login');
@@ -1873,7 +1875,7 @@ window.loadUserOrders = async function() {
     const snapshot = await getDocs(q);
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch(e) {
-console.log('Load orders failed:', e.message);
+    console.log('Load orders failed:', e);
     return [];
   }
 }
