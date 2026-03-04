@@ -1792,6 +1792,7 @@ let _adminFilter = 'all';
 
 window.loadAdminOrders = async function() {
   const user = window.getCurrentUser();
+  alert('loadAdminOrders called, user: ' + (user ? user.email : 'null'));
   if (!user || user.email !== 'urreal3d@gmail.com') return;
   const list = document.getElementById('admin-clients-list');
   list.innerHTML = '<div class="admin-empty">Loading...</div>';
