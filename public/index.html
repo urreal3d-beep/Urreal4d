@@ -1772,9 +1772,12 @@ function checkClientForm() {
   }
 }
 
+</script>
+
+
 <script type="module">
-import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, updateDoc, orderBy, query } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+const adminApp = getApps().find(a => a.name === '[DEFAULT]') || initializeApp(firebaseConfig);
+const adminDb = getFirestore(adminApp);
 
 const firebaseConfig = {
   apiKey: "AIzaSyCME4Fby4vXSbxf6vE40j4ANuOBqPk_YVw",
@@ -1792,7 +1795,6 @@ let _adminFilter = 'all';
 
 window.loadAdminOrders = async function() {
   const user = window.getCurrentUser();
-  alert('loadAdminOrders called, user: ' + (user ? user.email : 'null'));
   if (!user || user.email !== 'urreal3d@gmail.com') return;
   const list = document.getElementById('admin-clients-list');
   list.innerHTML = '<div class="admin-empty">Loading...</div>';
