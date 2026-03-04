@@ -1466,14 +1466,21 @@ async function loadOrders() {
     const isVideo = order.templateType === 'video';
     const waitTime = isVideo ? '6 hours' : '2 hours';
     const isDone = order.status === 'done' && order.renderedFile;
+    const isFailed = order.status === 'payment_failed';
+    const isRejected = order.status === 'rejected';
+    const isAwaiting = order.paymentStatus === 'payment_pending';
 
-    const statusHtml = isDone
-      ? `<span class="order-status-done">✓ Completed</span>`
-      : `<span class="order-status-pending">⏳ In Progress</span>`;
+    let statusHtml = `<span class="order-status-pending">⏳ In Progress</span>`;
+    if (isDone) statusHtml = `<span class="order-status-done">✓ Completed</span>`;
+    else if (isFailed) statusHtml = `<span style="background:rgba(239,68,68,0.12);color:#f87171;padding:4px 10px;border-radius:100px;font-size:11px;font-weight:700;">❌ Payment Failed</span>`;
+    else if (isRejected) statusHtml = `<span style="background:rgba(107,114,128,0.1);color:var(--gdim);padding:4px 10px;border-radius:100px;font-size:11px;font-weight:700;">🚫 Order Rejected</span>`;
+    else if (isAwaiting) statusHtml = `<span style="background:rgba(249,115,22,0.12);color:#f97316;padding:4px 10px;border-radius:100px;font-size:11px;font-weight:700;">💳 Awaiting Confirmation</span>`;
 
-    const renderHtml = isDone
-      ? `<a href="${order.renderedFile}" target="_blank" style="display:inline-block;margin-top:12px;background:var(--purple);color:var(--white);padding:8px 18px;border-radius:6px;font-size:12px;font-weight:700;text-decoration:none;">View Render →</a>`
-      : `<div style="margin-top:12px;background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);border-radius:8px;padding:10px 14px;font-size:12px;color:#eab308;">⏱ Your render will be ready within <strong>${waitTime}</strong> of order placement.</div>`;
+    let renderHtml = `<div style="margin-top:12px;background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);border-radius:8px;padding:10px 14px;font-size:12px;color:#eab308;">⏱ Your render will be ready within <strong>${waitTime}</strong> of payment confirmation.</div>`;
+    if (isDone) renderHtml = `<a href="${order.renderedFile}" target="_blank" style="display:inline-block;margin-top:12px;background:var(--purple);color:var(--white);padding:8px 18px;border-radius:6px;font-size:12px;font-weight:700;text-decoration:none;">View Render →</a>`;
+    else if (isFailed) renderHtml = `<div style="margin-top:12px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:10px 14px;font-size:12px;color:#f87171;">❌ Payment could not be verified. Please contact us on WhatsApp to resolve this.</div>`;
+    else if (isRejected) renderHtml = `<div style="margin-top:12px;background:rgba(107,114,128,0.08);border:1px solid rgba(107,114,128,0.2);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--gdim);">🚫 This order was not accepted. Please contact us for more info.</div>`;
+    else if (isAwaiting) renderHtml = `<div style="margin-top:12px;background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:8px;padding:10px 14px;font-size:12px;color:#f97316;">💳 Payment under review. We'll confirm within a few hours. UTR: <strong>${order.utrId||'—'}</strong></div>`;
 
     return `
       <div class="order-card">
@@ -1490,8 +1497,6 @@ async function loadOrders() {
   }).join('');
 }
 </script>
-
-<!-- ═══ ADMIN PAGE ═══ -->
 
 <!-- ═══ ADMIN PAGE ═══ -->
 <div class="page" id="p-admin">
@@ -1563,20 +1568,41 @@ async function loadOrders() {
       </div>
       <div class="admin-stats">
         <div class="admin-stat"><div class="admin-stat-num" id="ast-total">0</div><div class="admin-stat-lbl">Total</div></div>
-        <div class="admin-stat"><div class="admin-stat-num" id="ast-pending" style="color:var(--yellow);">0</div><div class="admin-stat-lbl">Pending</div></div>
+        <div class="admin-stat"><div class="admin-stat-num" id="ast-awaiting" style="color:#f97316;">0</div><div class="admin-stat-lbl">Awaiting Payment</div></div>
+        <div class="admin-stat"><div class="admin-stat-num" id="ast-pending" style="color:var(--yellow);">0</div><div class="admin-stat-lbl">In Progress</div></div>
         <div class="admin-stat"><div class="admin-stat-num" id="ast-done" style="color:var(--green);">0</div><div class="admin-stat-lbl">Done</div></div>
       </div>
-      <div class="admin-filter">
-        <button class="admin-tab active" onclick="adminTabFilter(this,'all')">All Clients</button>
-        <button class="admin-tab" onclick="adminTabFilter(this,'pending')">⏳ Pending</button>
-        <button class="admin-tab" onclick="adminTabFilter(this,'done')">✓ Completed</button>
+      <!-- Main tabs: Payments | Orders -->
+      <div style="display:flex;gap:0;margin-bottom:24px;background:rgba(124,58,237,0.08);border:1px solid var(--pb);border-radius:10px;padding:4px;">
+        <button class="admin-tab active" id="main-tab-payments" onclick="switchAdminMain('payments')" style="flex:1;border-radius:8px;">💳 Payment Confirmations</button>
+        <button class="admin-tab" id="main-tab-orders" onclick="switchAdminMain('orders')" style="flex:1;border-radius:8px;">📦 All Orders</button>
       </div>
-      <div class="admin-refresh">
-        <div class="admin-count" id="admin-count">— clients</div>
-        <button class="admin-refresh-btn" onclick="loadAdminOrders()">↻ Refresh</button>
+
+      <!-- PAYMENTS TAB -->
+      <div id="admin-payments-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <div style="font-size:13px;font-weight:700;color:var(--pl);" id="payments-count">— payments</div>
+          <button class="admin-refresh-btn" onclick="loadAdminOrders()">↻ Refresh</button>
+        </div>
+        <div id="admin-payments-list"><div class="admin-empty">Loading...</div></div>
       </div>
-      <div id="admin-clients-list">
-        <div class="admin-empty">Loading orders...</div>
+
+      <!-- ORDERS TAB -->
+      <div id="admin-orders-section" style="display:none;">
+        <div class="admin-filter">
+          <button class="admin-tab active" onclick="adminTabFilter(this,'all')">All</button>
+          <button class="admin-tab" onclick="adminTabFilter(this,'pending')">⏳ In Progress</button>
+          <button class="admin-tab" onclick="adminTabFilter(this,'done')">✓ Completed</button>
+          <button class="admin-tab" onclick="adminTabFilter(this,'payment_failed')">❌ Failed</button>
+          <button class="admin-tab" onclick="adminTabFilter(this,'rejected')">🚫 Rejected</button>
+        </div>
+        <div class="admin-refresh">
+          <div class="admin-count" id="admin-count">— clients</div>
+          <button class="admin-refresh-btn" onclick="loadAdminOrders()">↻ Refresh</button>
+        </div>
+        <div id="admin-clients-list">
+          <div class="admin-empty">Loading orders...</div>
+        </div>
       </div>
     </div>
 
@@ -1780,46 +1806,70 @@ function checkClientForm() {
 <script>
 async function handleRender(){
   if (!window.getCurrentUser || !window.getCurrentUser()) { openAuthModal('login'); return; }
-  const BOT_TOKEN = '8670625484:AAHcKZ2okImb8E7i0MiE0Bz1gsGW1Hyn0OA';
-  const CHAT_ID = '8502965753';
   const title = document.getElementById('rp-title').textContent;
   const price = document.getElementById('rp-price').textContent;
   const clientName = document.getElementById('client-name').value.trim();
   const clientBrand = document.getElementById('client-brand').value.trim();
   const clientWp = document.getElementById('client-wp').value.trim();
   const templateType = document.getElementById('rp-type-tag').textContent.includes('VIDEO') ? 'video' : 'image';
-  if (window.saveOrderToFirestore) {
-    await window.saveOrderToFirestore({ templateName: title, templateType: templateType, price: price, clientName: clientName, brandName: clientBrand, whatsapp: clientWp });
-  }
+  const refFile = document.getElementById('ref-file-input');
+  if (!refFile.files[0]) { alert('Please upload a reference image — it is mandatory.'); return; }
   const files = document.querySelectorAll('.rp-file-btn input[type="file"]');
-  const labels = ['Front', 'Back', 'Sleeves', 'Logo'];
-  const btn = document.querySelector('.rp-render-btn');
-  btn.textContent = 'Sending...'; btn.disabled = true;
+  let filesSent = 0;
+  for(let i = 0; i < files.length; i++){ if(files[i].files[0]) filesSent++; }
+  if(filesSent === 0){ alert('Please upload at least one design file before ordering.'); return; }
+  // Store files in memory — sent to Telegram only after admin confirms payment
+  window._pendingOrderFiles = {
+    files: Array.from(files).map(f => f.files[0] || null),
+    refFile: refFile.files[0],
+    title, price, clientName, clientBrand, clientWp, templateType
+  };
+  // Show payment modal
+  document.getElementById('pay-amount').textContent = price;
+  document.getElementById('pay-utr').value = '';
+  document.getElementById('pay-msg').textContent = '';
+  document.getElementById('payment-overlay').classList.add('open');
+  document.getElementById('payment-modal').classList.add('open');
+}
+
+async function submitPayment() {
+  const utr = document.getElementById('pay-utr').value.trim();
+  const msg = document.getElementById('pay-msg');
+  if (!utr || utr.length < 6) { msg.textContent = 'Please enter a valid UTR / Transaction ID.'; msg.style.color = '#f87171'; return; }
+  const btn = document.getElementById('pay-submit-btn');
+  btn.textContent = 'Submitting...'; btn.disabled = true;
+  const d = window._pendingOrderFiles;
   try {
-    const message = `🎽 New Render Order!\n\nTemplate: ${title}\nPrice: ${price}\n\nClient Details:\n👤 Name: ${clientName}\n🏷 Brand: ${clientBrand}\n📱 WhatsApp: ${clientWp}\n\nFiles uploaded 👇`;
-    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({chat_id: CHAT_ID, text: message}) });
-    const refFile = document.getElementById('ref-file-input');
-    if (!refFile.files[0]) { alert('Please upload a reference image — it is mandatory.'); btn.textContent = 'Render My T-Shirt →'; btn.disabled = false; return; }
-    let filesSent = 0;
-    for(let i = 0; i < files.length; i++){
-      if(files[i].files[0]){
-        const formData = new FormData();
-        formData.append('chat_id', CHAT_ID);
-        formData.append('document', files[i].files[0], labels[i] + '_' + files[i].files[0].name);
-        formData.append('caption', '📁 ' + labels[i] + ' design — ' + title);
-        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, { method:'POST', body: formData });
-        filesSent++;
-      }
-    }
-    const refFormData = new FormData();
-    refFormData.append('chat_id', CHAT_ID);
-    refFormData.append('document', refFile.files[0], 'Reference_' + refFile.files[0].name);
-    refFormData.append('caption', '📸 Reference image — ' + title);
-    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, { method:'POST', body: refFormData });
-    if(filesSent === 0){ alert('Please upload at least one design file before ordering.'); btn.textContent = 'Render My T-Shirt →'; btn.disabled = false; return; }
-    btn.textContent = '✅ Order Sent!'; btn.style.background = 'var(--green)';
-    setTimeout(()=>{ closeRenderPanel(); btn.textContent = 'Render My T-Shirt →'; btn.style.background = ''; btn.disabled = false; }, 2500);
-  } catch(e) { alert('Error: ' + e.message); btn.textContent = 'Render My T-Shirt →'; btn.disabled = false; }
+    await window.saveOrderToFirestore({
+      templateName: d.title, templateType: d.templateType, price: d.price,
+      clientName: d.clientName, brandName: d.clientBrand, whatsapp: d.clientWp,
+      utrId: utr, paymentStatus: 'payment_pending'
+    });
+    document.getElementById('payment-overlay').classList.remove('open');
+    document.getElementById('payment-modal').classList.remove('open');
+    closeRenderPanel();
+    alert('✅ Order submitted! We will verify your payment and begin your render shortly.');
+  } catch(e) {
+    msg.textContent = 'Error submitting. Please try again.';
+    msg.style.color = '#f87171';
+  }
+  btn.textContent = 'Confirm Payment →'; btn.disabled = false;
+}
+
+function closePaymentModal() {
+  document.getElementById('payment-overlay').classList.remove('open');
+  document.getElementById('payment-modal').classList.remove('open');
+}
+
+// Called by admin — sends files to Telegram after confirming payment
+window.sendOrderToTelegram = async function(orderId) {
+  const BOT_TOKEN = '8670625484:AAHcKZ2okImb8E7i0MiE0Bz1gsGW1Hyn0OA';
+  const CHAT_ID = '8502965753';
+  const order = window._adminOrders ? window._adminOrders.find(o => o.id === orderId) : null;
+  if (!order) { alert('Order data not found. Please refresh.'); return; }
+  const labels = ['Front', 'Back', 'Sleeves', 'Logo'];
+  const message = `✅ Payment Confirmed — Order Started!\n\n🎽 Template: ${order.templateName}\n💰 Price: ${order.price}\n🔖 UTR: ${order.utrId||'—'}\n\n👤 Name: ${order.clientName||order.userName}\n🏷 Brand: ${order.brandName||'—'}\n📱 WhatsApp: ${order.whatsapp||'—'}\n📧 Email: ${order.userEmail||'—'}`;
+  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({chat_id: CHAT_ID, text: message}) });
 }
 
 function filterRender(btn, type) {
@@ -1831,6 +1881,36 @@ function filterRender(btn, type) {
   });
 }
 </script>
+
+<!-- ═══ PAYMENT MODAL ═══ -->
+<style>
+.pay-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:590;opacity:0;pointer-events:none;transition:opacity 0.28s;backdrop-filter:blur(6px);}
+.pay-overlay.open{opacity:1;pointer-events:all;}
+.pay-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-60%);z-index:610;background:var(--deep);border:1px solid var(--pb);border-radius:16px;padding:36px 32px;width:min(440px,92vw);transition:transform 0.32s cubic-bezier(0.4,0,0.2,1),opacity 0.32s;opacity:0;pointer-events:none;max-height:90vh;overflow-y:auto;}
+.pay-modal.open{transform:translate(-50%,-50%);opacity:1;pointer-events:all;}
+</style>
+<div class="pay-overlay" id="payment-overlay" onclick="closePaymentModal()"></div>
+<div class="pay-modal" id="payment-modal">
+  <button onclick="closePaymentModal()" style="position:absolute;top:14px;right:14px;background:rgba(124,58,237,0.12);border:1px solid var(--pb);border-radius:50%;width:30px;height:30px;color:var(--gray);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">✕</button>
+  <div style="font-family:'Fraunces',serif;font-size:24px;font-weight:700;margin-bottom:4px;">Complete Payment</div>
+  <div style="color:var(--gray);font-size:13px;margin-bottom:22px;line-height:1.6;">Pay via UPI to confirm your order. Your files will only be processed after we verify your payment.</div>
+  <div style="background:rgba(124,58,237,0.08);border:1px solid var(--pb);border-radius:12px;padding:20px;text-align:center;margin-bottom:20px;">
+    <div style="font-size:11px;font-weight:700;color:var(--gdim);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:6px;">Amount to Pay</div>
+    <div id="pay-amount" style="font-family:'Fraunces',serif;font-size:40px;font-weight:700;color:var(--pl);margin-bottom:18px;">₹999</div>
+    <img src="images/qr.png" style="width:170px;height:170px;border-radius:10px;object-fit:cover;border:2px solid var(--pb);margin-bottom:16px;display:block;margin-left:auto;margin-right:auto;">
+    <div style="font-size:12px;font-weight:600;color:var(--gdim);margin-bottom:6px;">UPI ID</div>
+    <div style="font-size:15px;font-weight:800;color:var(--pl);background:rgba(124,58,237,0.12);border:1px solid var(--pb);border-radius:6px;padding:10px 18px;display:inline-block;letter-spacing:0.03em;">9664871972@fam</div>
+  </div>
+  <div style="margin-bottom:8px;">
+    <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gdim);margin-bottom:8px;">UTR / Transaction ID *</label>
+    <input id="pay-utr" type="text" placeholder="Enter UTR or Transaction ID after paying" style="width:100%;background:rgba(124,58,237,0.05);border:1px solid rgba(124,58,237,0.16);border-radius:7px;padding:12px 15px;color:var(--white);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;outline:none;">
+  </div>
+  <div style="font-size:12px;color:var(--gdim);margin-bottom:16px;line-height:1.65;">📌 After paying, open your UPI app → Transaction History → copy the 12-digit UTR or Transaction ID and paste above.</div>
+  <div id="pay-msg" style="font-size:13px;margin-bottom:12px;min-height:18px;text-align:center;"></div>
+  <button id="pay-submit-btn" onclick="submitPayment()" style="width:100%;background:var(--purple);color:var(--white);padding:14px;border-radius:8px;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;transition:all 0.22s;">Confirm Payment →</button>
+  <button onclick="closePaymentModal()" style="width:100%;background:transparent;color:var(--gray);padding:12px;border-radius:8px;border:1px solid var(--pb);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">Cancel</button>
+</div>
+<!-- ═══ END PAYMENT MODAL ═══ -->
 
 <!-- ═══ FIREBASE AUTH ═══ -->
 <script type="module">
@@ -1961,7 +2041,9 @@ window.saveOrderToFirestore = async function(orderData) {
       userEmail: auth.currentUser.email,
       userName: auth.currentUser.displayName,
       createdAt: serverTimestamp(),
-      status: 'pending',
+      status: 'payment_pending',
+      paymentStatus: orderData.paymentStatus || 'payment_pending',
+      utrId: orderData.utrId || null,
       renderedFile: null
     });
   } catch(e) {
@@ -1988,38 +2070,110 @@ window.loadUserOrders = async function() {
 <!-- ═══ ADMIN SCRIPT ═══ -->
 <script type="module">
 import { getApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, updateDoc, query } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 const adminDb = getFirestore(getApp());
 let _adminOrders = [];
 let _adminFilter = 'all';
+window._adminOrders = _adminOrders;
+
+window.switchAdminMain = function(tab) {
+  document.getElementById('admin-payments-section').style.display = tab === 'payments' ? 'block' : 'none';
+  document.getElementById('admin-orders-section').style.display = tab === 'orders' ? 'block' : 'none';
+  document.getElementById('main-tab-payments').classList.toggle('active', tab === 'payments');
+  document.getElementById('main-tab-orders').classList.toggle('active', tab === 'orders');
+}
 
 window.loadAdminOrders = async function() {
   const user = window.getCurrentUser();
   if (!user || user.email !== 'urreal3d@gmail.com') return;
-  const list = document.getElementById('admin-clients-list');
-  list.innerHTML = '<div class="admin-empty">Loading...</div>';
+  document.getElementById('admin-payments-list').innerHTML = '<div class="admin-empty">Loading...</div>';
+  document.getElementById('admin-clients-list').innerHTML = '<div class="admin-empty">Loading...</div>';
   try {
-    const q = query(collection(adminDb,'orders'));
-    const snap = await getDocs(q);
-    _adminOrders = snap.docs.map(d=>({id:d.id,...d.data()}));
-    const pending = _adminOrders.filter(o=>(o.status||'pending')==='pending').length;
-    const done = _adminOrders.filter(o=>o.status==='done').length;
+    const snap = await getDocs(query(collection(adminDb, 'orders'), orderBy('createdAt', 'desc')));
+    _adminOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    window._adminOrders = _adminOrders;
+    const awaiting = _adminOrders.filter(o => o.paymentStatus === 'payment_pending').length;
+    const inprogress = _adminOrders.filter(o => o.status === 'pending' && o.paymentStatus === 'confirmed').length;
+    const done = _adminOrders.filter(o => o.status === 'done').length;
     document.getElementById('ast-total').textContent = _adminOrders.length;
-    document.getElementById('ast-pending').textContent = pending;
+    document.getElementById('ast-awaiting').textContent = awaiting;
+    document.getElementById('ast-pending').textContent = inprogress;
     document.getElementById('ast-done').textContent = done;
+    renderPaymentsList();
     renderAdminClients();
   } catch(e) {
     alert('Admin load error: ' + e.message);
-    list.innerHTML = '<div class="admin-empty">Error: ' + e.message + '</div>';
   }
+}
+
+function renderPaymentsList() {
+  const list = document.getElementById('admin-payments-list');
+  const pending = _adminOrders.filter(o => o.paymentStatus === 'payment_pending');
+  document.getElementById('payments-count').textContent = pending.length + ' awaiting confirmation';
+  if (pending.length === 0) { list.innerHTML = '<div class="admin-empty">✅ No pending payments — all clear!</div>'; return; }
+  list.innerHTML = pending.map(order => {
+    const date = order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'}) : 'Unknown';
+    return `
+      <div class="order-item" style="border:1px solid rgba(249,115,22,0.3);margin-bottom:14px;border-radius:12px;padding:20px;">
+        <div class="order-item-top" style="margin-bottom:14px;">
+          <div class="order-item-title" style="font-size:16px;">💳 ${order.templateName||'Custom'} — ${order.price||'—'}</div>
+          <span class="abadge abadge-pending" style="background:rgba(249,115,22,0.15);color:#f97316;border-color:rgba(249,115,22,0.3);">⏳ Awaiting</span>
+        </div>
+        <div class="order-item-grid" style="margin-bottom:14px;">
+          <div class="orow">👤 Client<strong>${order.clientName||order.userName||'—'}</strong></div>
+          <div class="orow">🏷 Brand<strong>${order.brandName||'—'}</strong></div>
+          <div class="orow">📱 WhatsApp<strong>${order.whatsapp||'—'}</strong></div>
+          <div class="orow">📧 Email<strong>${order.userEmail||'—'}</strong></div>
+          <div class="orow">💰 Price<strong>${order.price||'—'}</strong></div>
+          <div class="orow">📋 Type<strong>${order.templateType==='video'?'🎬 Video':'🖼 Image'}</strong></div>
+          <div class="orow">🕐 Date<strong>${date}</strong></div>
+        </div>
+        <div style="background:rgba(124,58,237,0.08);border:1px solid var(--pb);border-radius:8px;padding:12px 16px;margin-bottom:14px;">
+          <div style="font-size:11px;color:var(--gdim);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">UTR / Transaction ID</div>
+          <div style="font-size:16px;font-weight:800;color:var(--pl);letter-spacing:0.04em;">${order.utrId||'Not provided'}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+          <button onclick="adminConfirmPayment('${order.id}')" style="background:var(--green);color:#fff;padding:12px;border-radius:8px;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">✅ Confirm Payment</button>
+          <button onclick="adminRejectOrder('${order.id}','payment_failed')" style="background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);padding:12px;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">❌ Payment Failed</button>
+        </div>
+        <button onclick="adminRejectOrder('${order.id}','rejected')" style="width:100%;background:rgba(107,114,128,0.1);color:var(--gdim);border:1px solid var(--pb);padding:10px;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">🚫 Reject Order</button>
+      </div>`;
+  }).join('');
+}
+
+window.adminConfirmPayment = async function(orderId) {
+  if (!confirm('Confirm this payment? This will approve the order and notify the client.')) return;
+  try {
+    await updateDoc(doc(adminDb, 'orders', orderId), { paymentStatus: 'confirmed', status: 'pending' });
+    const order = _adminOrders.find(o => o.id === orderId);
+    if (order) { order.paymentStatus = 'confirmed'; order.status = 'pending'; }
+    // Send Telegram notification
+    if (window.sendOrderToTelegram) await window.sendOrderToTelegram(orderId);
+    alert('✅ Payment confirmed! Order is now active.');
+    window.loadAdminOrders();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+window.adminRejectOrder = async function(orderId, reason) {
+  const label = reason === 'payment_failed' ? 'mark as Payment Failed' : 'Reject this order';
+  if (!confirm(`Are you sure you want to ${label}? Client will see this status.`)) return;
+  try {
+    await updateDoc(doc(adminDb, 'orders', orderId), { paymentStatus: reason, status: reason });
+    const order = _adminOrders.find(o => o.id === orderId);
+    if (order) { order.paymentStatus = reason; order.status = reason; }
+    alert(reason === 'payment_failed' ? '❌ Marked as Payment Failed.' : '🚫 Order Rejected.');
+    window.loadAdminOrders();
+  } catch(e) { alert('Error: ' + e.message); }
 }
 
 function renderAdminClients() {
   const list = document.getElementById('admin-clients-list');
   let orders = _adminOrders;
-  if (_adminFilter === 'pending') orders = orders.filter(o=>(o.status||'pending')==='pending');
-  if (_adminFilter === 'done') orders = orders.filter(o=>o.status==='done');
+  if (_adminFilter === 'pending') orders = orders.filter(o => o.status === 'pending' && o.paymentStatus === 'confirmed');
+  else if (_adminFilter === 'done') orders = orders.filter(o => o.status === 'done');
+  else if (_adminFilter === 'payment_failed') orders = orders.filter(o => o.status === 'payment_failed');
+  else if (_adminFilter === 'rejected') orders = orders.filter(o => o.status === 'rejected');
   const clientMap = {};
   orders.forEach(order => {
     const key = order.userEmail || 'unknown';
@@ -2031,15 +2185,23 @@ function renderAdminClients() {
   if (clients.length === 0) { list.innerHTML = '<div class="admin-empty">No orders found.</div>'; return; }
   list.innerHTML = clients.map((client, ci) => {
     const initials = client.name.charAt(0).toUpperCase();
-    const pendingCount = client.orders.filter(o=>(o.status||'pending')==='pending').length;
+    const pendingCount = client.orders.filter(o => o.status === 'pending').length;
     const ordersHtml = client.orders.map((order, oi) => {
       const date = order.createdAt ? new Date(order.createdAt.seconds*1000).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'Unknown';
       const isDone = order.status === 'done';
+      const isFailed = order.status === 'payment_failed';
+      const isRejected = order.status === 'rejected';
+      const isAwaiting = order.paymentStatus === 'payment_pending';
+      let badgeClass = 'abadge-pending', badgeText = '⏳ In Progress';
+      if (isDone) { badgeClass = 'abadge-done'; badgeText = '✓ Done'; }
+      else if (isFailed) { badgeClass = ''; badgeText = '❌ Payment Failed'; }
+      else if (isRejected) { badgeClass = ''; badgeText = '🚫 Rejected'; }
+      else if (isAwaiting) { badgeClass = ''; badgeText = '💳 Awaiting Payment'; }
       return `
         <div class="order-item">
           <div class="order-item-top">
             <div class="order-item-title">Order ${oi+1} — ${order.templateName||'Custom'}</div>
-            <span class="abadge ${isDone?'abadge-done':'abadge-pending'}">${isDone?'✓ Done':'⏳ Pending'}</span>
+            <span class="abadge ${badgeClass}" style="${isFailed?'background:rgba(239,68,68,0.12);color:#f87171;border-color:rgba(239,68,68,0.3);':isRejected?'background:rgba(107,114,128,0.1);color:var(--gdim);':isAwaiting?'background:rgba(249,115,22,0.12);color:#f97316;border-color:rgba(249,115,22,0.3);':''}">${badgeText}</span>
           </div>
           <div class="order-item-grid">
             <div class="orow">👤 Client<strong>${order.clientName||order.userName||'—'}</strong></div>
@@ -2048,13 +2210,15 @@ function renderAdminClients() {
             <div class="orow">📧 Email<strong>${order.userEmail||'—'}</strong></div>
             <div class="orow">💰 Price<strong>${order.price||'—'}</strong></div>
             <div class="orow">📋 Type<strong>${order.templateType==='video'?'🎬 Video':'🖼 Image'}</strong></div>
+            <div class="orow">🔖 UTR<strong>${order.utrId||'—'}</strong></div>
             <div class="orow">🕐 Date<strong>${date}</strong></div>
           </div>
           ${isDone && order.renderedFile ? `<a href="${order.renderedFile}" target="_blank" style="display:block;text-align:center;margin-bottom:10px;background:rgba(124,58,237,0.1);border:1px solid var(--pb);color:var(--pl);padding:9px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;">👁 View Uploaded Render</a>` : ''}
+          ${!isFailed && !isRejected && !isAwaiting ? `
           <input class="order-link-input" id="alink-${order.id}" placeholder="Paste Google Drive link here..." value="${order.renderedFile||''}">
           <button class="order-done-btn ${isDone?'done':''}" id="abtn-${order.id}" onclick="adminMarkDone('${order.id}')">
             ${isDone ? '✓ Completed' : '🚀 Upload & Mark Done'}
-          </button>
+          </button>` : ''}
         </div>`;
     }).join('');
     return `
@@ -2063,7 +2227,7 @@ function renderAdminClients() {
           <div class="client-avatar">${initials}</div>
           <div class="client-info">
             <div class="client-name">${client.name}</div>
-            <div class="client-meta">${client.email} · ${client.orders.length} order${client.orders.length>1?'s':''} ${pendingCount>0?'· <span style="color:var(--yellow);">'+pendingCount+' pending</span>':''}</div>
+            <div class="client-meta">${client.email} · ${client.orders.length} order${client.orders.length>1?'s':''} ${pendingCount>0?'· <span style="color:var(--yellow);">'+pendingCount+' in progress</span>':''}</div>
           </div>
           <span class="client-chevron">⌄</span>
         </div>
@@ -2075,7 +2239,7 @@ function renderAdminClients() {
 window.toggleClient = function(ci) { document.getElementById('cc-'+ci).classList.toggle('open'); }
 
 window.adminTabFilter = function(btn, filter) {
-  document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#admin-orders-section .admin-tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   _adminFilter = filter;
   renderAdminClients();
@@ -2092,9 +2256,7 @@ window.adminMarkDone = async function(orderId) {
     const order = _adminOrders.find(o=>o.id===orderId);
     if (order) { order.status='done'; order.renderedFile=link; }
     btn.textContent = '✓ Completed'; btn.classList.add('done'); btn.disabled = false;
-    const pending = _adminOrders.filter(o=>(o.status||'pending')==='pending').length;
     const done = _adminOrders.filter(o=>o.status==='done').length;
-    document.getElementById('ast-pending').textContent = pending;
     document.getElementById('ast-done').textContent = done;
     alert('✓ Done! Client can now see their render.');
   } catch(e) { btn.textContent = '🚀 Upload & Mark Done'; btn.disabled = false; alert('Error: ' + e.message); }
