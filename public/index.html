@@ -8,6 +8,14 @@
 <meta property="og:url" content="https://urreal4d.onrender.com">
 <meta property="og:type" content="website">
 <meta charset="UTF-8"/>
+<!-- ── PWA / Add to Home Screen ── -->
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="images/applogo.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Urreal3D">
+<meta name="theme-color" content="#06040f">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
 <title>Urreal3D – 3D Clothing Animation Studio</title>
 
@@ -3382,6 +3390,7 @@ function initCarouselSwipe(carousel) {
     const dx = e.changedTouches[0].clientX - startX;
     if (Math.abs(dx) > 35) {
       slideCarousel(carousel, dx < 0 ? 1 : -1);
+      carousel._wasSwiped = true; // ← mark that a swipe just happened
       e.stopPropagation(); // don't open render panel after swipe
     }
     startedH = false;
@@ -4536,29 +4545,71 @@ async function submitReview() {
 </script>
 <!-- ═══ END STATS COUNT-UP ═══ -->
 
-<!-- ═══ LAZY LOADING ═══ -->
+<!-- ═══ LAZY LOADING + VIDEO PERFORMANCE ═══ -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  // ── Lazy load portfolio images ──
   const imgs = document.querySelectorAll('.port-card img');
   if ('IntersectionObserver' in window) {
-    const obs = new IntersectionObserver(function(entries) {
+    const imgObs = new IntersectionObserver(function(entries) {
       entries.forEach(function(e) {
         if (e.isIntersecting) {
           const img = e.target;
           if (img.dataset.src) { img.src = img.dataset.src; delete img.dataset.src; }
-          obs.unobserve(img);
+          imgObs.unobserve(img);
         }
       });
     }, { rootMargin: '200px' });
     imgs.forEach(function(img) {
       img.dataset.src = img.src;
       img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"%3E%3C/svg%3E';
-      obs.observe(img);
+      imgObs.observe(img);
+    });
+  }
+
+  // ── Video lazy-play: only play videos visible in viewport ──
+  // This prevents ALL videos from loading & playing simultaneously
+  if ('IntersectionObserver' in window) {
+    const videoObs = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        const video = e.target;
+        if (e.isIntersecting) {
+          // Load source only when entering view
+          if (video.dataset.lazySrc && !video.dataset.loaded) {
+            const source = video.querySelector('source');
+            if (source && source.dataset.src) {
+              source.src = source.dataset.src;
+              video.load();
+            }
+            video.dataset.loaded = '1';
+          }
+          video.play().catch(function(){});
+        } else {
+          video.pause();
+        }
+      });
+    }, { rootMargin: '120px', threshold: 0.1 });
+
+    // Find all non-hero autoplay videos and make them lazy
+    document.querySelectorAll('video[autoplay]').forEach(function(video) {
+      const source = video.querySelector('source');
+      // Skip the main hero video — it's above the fold and should load immediately
+      if (video.classList.contains('hero-video')) {
+        videoObs.observe(video);
+        return;
+      }
+      if (source && source.src && !source.dataset.src) {
+        source.dataset.src = source.src;
+        source.removeAttribute('src');
+        video.dataset.lazySrc = '1';
+        video.load(); // clears the buffer
+      }
+      videoObs.observe(video);
     });
   }
 });
 </script>
-<!-- ═══ END LAZY LOADING ═══ -->
+<!-- ═══ END LAZY LOADING + VIDEO PERFORMANCE ═══ -->
 
 </body>
 </html>
