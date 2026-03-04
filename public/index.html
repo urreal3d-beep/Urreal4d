@@ -1033,7 +1033,7 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
   .hero-content{padding:96px 20px 36px;}
   .hero-video-wrap{height:60vw;min-height:240px;}
   .hero-stats{flex-wrap:wrap;gap:20px;}
-  .port-grid{grid-template-columns:1fr;gap:12px;padding-left:0;padding-right:0;}
+  .port-grid{grid-template-columns:repeat(2,1fr);gap:10px;padding-left:12px;padding-right:12px;}
   .port-featured{padding:0 20px;}
   .port-section-title{padding-left:20px;padding-right:20px;}
   .filter-bar{padding-left:20px;padding-right:20px;}
@@ -1050,6 +1050,11 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
   .hero-btns,.btn-p,.btn-g{width:100%;}
   .btn-p,.btn-g{text-align:center;}
   .hero-btns{flex-direction:column;}
+  .render-grid{grid-template-columns:repeat(2,1fr) !important;gap:10px !important;}
+  .media-box,.photo-box{aspect-ratio:9/16 !important;}
+  .port-info h3{font-size:12px;}
+  .port-info p{font-size:10px;}
+  .ptag{font-size:8.5px;}
 }
 @media(min-width:641px) and (max-width:900px){
   .hbg{display:flex;}
@@ -3428,8 +3433,8 @@ document.getElementById('rp-price').textContent = detectedPrice;
   document.querySelectorAll('.rp-file-slot').forEach(el => el.classList.remove('has-file'));
   document.getElementById('rp-ref-slot').classList.remove('has-file');
   document.getElementById('ref-file-name').textContent = 'Upload up to 5 images — how you want it to look';
-  document.getElementById('rp-upload-section').classList.add('locked');
-  document.getElementById('rp-upload-section').classList.remove('unlocked');
+  document.getElementById('rp-upload-section').classList.remove('locked');
+  document.getElementById('rp-upload-section').classList.add('unlocked');
 
   document.getElementById('rp-overlay').classList.add('open');
   document.getElementById('rp-panel').classList.add('open');
@@ -3656,6 +3661,45 @@ async function checkoutCart() {
   if (!window.getCurrentUser || !window.getCurrentUser()) { openAuthModal('login'); return; }
   if (!window._cart || window._cart.length === 0) { alert('Your cart is empty.'); return; }
 
+  // Validate: reference required + at least one design file
+  for (let i = 0; i < window._cart.length; i++) {
+    const item = window._cart[i];
+    if (!item.refFiles || item.refFiles.length === 0) {
+      alert(`Please upload a Reference Image for "${item.title}" before checking out.`);
+      openCart();
+      const card = document.getElementById('cart-item-' + item.id);
+      if (card) card.classList.add('expanded');
+      return;
+    }
+    if (!item.designFiles || !item.designFiles.some(Boolean)) {
+      alert(`Please upload at least one design file (Front, Back, Sleeves or Logo) for "${item.title}" before checking out.`);
+      openCart();
+      const card = document.getElementById('cart-item-' + item.id);
+      if (card) card.classList.add('expanded');
+      return;
+    }
+  }
+
+  // Validate every cart item has reference + at least one design file
+  for (let i = 0; i < window._cart.length; i++) {
+    const item = window._cart[i];
+    if (!item.refFiles || item.refFiles.length === 0) {
+      alert(`Please upload a Reference Image for "${item.title}" before checking out.`);
+      openCart();
+      // expand that item
+      const card = document.getElementById('cart-item-' + item.id);
+      if (card) card.classList.add('expanded');
+      return;
+    }
+    if (!item.designFiles || !item.designFiles.some(Boolean)) {
+      alert(`Please upload at least one design file (Front, Back, Sleeves or Logo) for "${item.title}" before checking out.`);
+      openCart();
+      const card = document.getElementById('cart-item-' + item.id);
+      if (card) card.classList.add('expanded');
+      return;
+    }
+  }
+
   const user    = window.getCurrentUser();
   const profile = window._userProfile || {};
   const sub     = cartSubtotal();
@@ -3812,8 +3856,8 @@ function showOrderSuccessModal(count) {
 }
 
 // ── Telegram helpers ──
-const BOT_TOKEN = '8684367752:AAETdjkf6LGb6sRXGfiKjjXsycNtcZhsdcY';
-const TG_ORDERS = '-4815432496';
+const BOT_TOKEN = '8670625484:AAHcKZ2okImb8E7i0MiE0Bz1gsGW1Hyn0OA';
+const TG_ORDERS = '8502965753';
 
 async function tgSend(chatId, text) {
   try {
