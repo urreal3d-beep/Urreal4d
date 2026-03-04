@@ -299,6 +299,7 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
     <li><a href="#" onclick="go('appointment');return false;" id="nl-appointment">Book</a></li>
     <li><a id="auth-btn" onclick="openAuthModal('login')" style="cursor:pointer;">Login</a></li>
   <li><a href="#" onclick="go('about');return false;" id="nl-about">About</a></li>
+  <li id="nav-admin-li" style="display:none;"><a id="nav-admin-btn" onclick="go('admin')" style="cursor:pointer;color:var(--gold);">Admin</a></li>
     <li style="display:flex;align-items:center;"><button id="nav-profile-btn" onclick="openProfile()" style="width:36px;height:36px;border-radius:50%;background:rgba(124,58,237,0.2);border:1px solid var(--pb);cursor:pointer;display:none;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.background='rgba(124,58,237,0.4)'" onmouseout="this.style.background='rgba(124,58,237,0.2)'">
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
 </button></li>
@@ -313,6 +314,7 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
 <div class="drawer" id="drawer">
   <div class="drawer-logo">Urreal<em>3D</em></div>
   <a id="drawer-auth-btn" onclick="openAuthModal('login')" style="cursor:pointer;">Login</a>
+  <a id="drawer-admin-btn" onclick="go('admin');closeDrawer();" style="display:none;cursor:pointer;color:var(--gold);">⚡ Admin Panel</a>
 <a onclick="openProfile()" id="drawer-profile-btn" style="display:none;cursor:pointer;">👤 My Profile</a>
   <a href="#" onclick="go('home');return false;" id="dl-home" class="active">Home</a>
   <a onclick="go('render')" id="dl-render">Render</a>
@@ -868,7 +870,7 @@ window.go = function(name) {
 // Set initial state
 history.replaceState({page: 'home'}, '', '');
 // ── Page Navigation ──
-const pages = ['home','about','render','portfolio','pricing','testimonials','appointment','policy'];
+const pages = ['home','about','render','portfolio','pricing','testimonials','appointment','policy','admin'];
 function go(name){
   pages.forEach(p=>{
     document.getElementById('p-'+p).classList.remove('active');
@@ -878,6 +880,11 @@ function go(name){
     if(dl)dl.classList.remove('active');
   });
   document.getElementById('p-'+name).classList.add('active');
+  if (name === 'admin') {
+  setTimeout(() => {
+    if (window.checkAdminAccess) window.checkAdminAccess();
+  }, 300);
+}
   const nl=document.getElementById('nl-'+name);
   const dl=document.getElementById('dl-'+name);
   if(nl)nl.classList.add('active');
@@ -1460,6 +1467,116 @@ async function loadOrders() {
 }
 </script>
 
+<!-- ═══ ADMIN PAGE ═══ -->
+<div class="page" id="p-admin">
+<style>
+.admin-wrap{max-width:960px;margin:0 auto;padding:100px clamp(20px,5vw,40px) 80px;}
+.admin-hero{text-align:center;margin-bottom:40px;}
+.admin-hero h1{font-family:'Fraunces',serif;font-size:clamp(36px,7vw,58px);font-weight:700;margin-bottom:10px;}
+.admin-hero h1 em{font-style:italic;color:var(--pl);}
+.admin-hero p{color:var(--gdim);font-size:14px;}
+.admin-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:36px;}
+.admin-stat{background:var(--card);border:1px solid var(--pb);border-radius:12px;padding:20px;text-align:center;}
+.admin-stat-num{font-family:'Fraunces',serif;font-size:36px;font-weight:700;color:var(--pl);line-height:1;margin-bottom:4px;}
+.admin-stat-lbl{font-size:11px;font-weight:700;color:var(--gdim);letter-spacing:0.1em;text-transform:uppercase;}
+.admin-filter{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+.admin-tab{background:transparent;border:1px solid rgba(124,58,237,0.22);color:var(--gray);padding:7px 18px;border-radius:100px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.admin-tab.active{background:var(--purple);border-color:var(--purple);color:var(--white);}
+.admin-refresh{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.admin-refresh-btn{background:transparent;border:1px solid var(--pb);color:var(--gray);padding:8px 16px;border-radius:7px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.admin-refresh-btn:hover{border-color:var(--pl);color:var(--pl);}
+.admin-count{font-size:13px;font-weight:700;color:var(--pl);}
+
+/* Client card */
+.client-card{background:var(--card);border:1px solid var(--pb);border-radius:14px;margin-bottom:14px;overflow:hidden;transition:border-color 0.25s;}
+.client-card:hover{border-color:rgba(124,58,237,0.4);}
+.client-card-header{padding:18px 22px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+.client-card-header:hover{background:rgba(124,58,237,0.04);}
+.client-avatar{width:42px;height:42px;border-radius:50%;background:rgba(124,58,237,0.15);border:1px solid var(--pb);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--pl);flex-shrink:0;}
+.client-info{flex:1;margin-left:14px;}
+.client-name{font-family:'Fraunces',serif;font-size:17px;font-weight:600;margin-bottom:3px;}
+.client-meta{font-size:12px;color:var(--gdim);}
+.client-chevron{color:var(--gdim);font-size:18px;transition:transform 0.25s;flex-shrink:0;}
+.client-card.open .client-chevron{transform:rotate(180deg);}
+.client-orders{max-height:0;overflow:hidden;transition:max-height 0.35s ease;}
+.client-card.open .client-orders{max-height:2000px;}
+
+/* Order inside client */
+.order-item{margin:0 16px 16px;background:var(--deep);border:1px solid var(--pb);border-radius:12px;padding:18px;}
+.order-item-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.order-item-title{font-family:'Fraunces',serif;font-size:15px;font-weight:600;}
+.order-item-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.orow{font-size:12px;color:var(--gdim);line-height:1.7;}
+.orow strong{display:block;color:var(--white);font-size:13px;font-weight:600;}
+.order-link-input{width:100%;background:rgba(124,58,237,0.05);border:1px solid rgba(124,58,237,0.16);border-radius:8px;padding:11px 14px;color:var(--white);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;margin-bottom:10px;transition:border-color 0.2s;}
+.order-link-input:focus{outline:none;border-color:var(--pl);background:rgba(124,58,237,0.08);}
+.order-link-input::placeholder{color:var(--gdim);}
+.order-done-btn{width:100%;background:var(--purple);color:var(--white);padding:12px;border-radius:8px;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.22s;}
+.order-done-btn:hover{background:var(--pm);}
+.order-done-btn.done{background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);color:var(--green);cursor:default;}
+.order-done-btn.done:hover{background:rgba(34,197,94,0.12);}
+.abadge{border-radius:100px;padding:4px 12px;font-size:11px;font-weight:700;}
+.abadge-pending{background:rgba(234,179,8,0.12);border:1px solid rgba(234,179,8,0.3);color:var(--yellow);}
+.abadge-done{background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);color:var(--green);}
+.admin-empty{text-align:center;padding:60px 0;color:var(--gdim);font-size:14px;}
+.admin-access-denied{text-align:center;padding:120px 20px;color:var(--gdim);}
+.admin-access-denied h2{font-family:'Fraunces',serif;font-size:28px;font-weight:700;margin-bottom:10px;color:var(--red);}
+</style>
+
+  <div class="admin-wrap" id="admin-content">
+    <div class="admin-access-denied" id="admin-denied">
+      <div style="font-size:48px;margin-bottom:16px;">🔒</div>
+      <h2>Access Denied</h2>
+      <p>You don't have permission to view this page.</p>
+    </div>
+
+    <div id="admin-main" style="display:none;">
+      <div class="admin-hero">
+        <div class="slbl-tag">Admin Dashboard</div>
+        <h1>Client <em>Orders</em></h1>
+        <p>Manage all render orders and upload finished files.</p>
+      </div>
+
+      <div class="admin-stats">
+        <div class="admin-stat">
+          <div class="admin-stat-num" id="ast-total">0</div>
+          <div class="admin-stat-lbl">Total</div>
+        </div>
+        <div class="admin-stat">
+          <div class="admin-stat-num" id="ast-pending" style="color:var(--yellow);">0</div>
+          <div class="admin-stat-lbl">Pending</div>
+        </div>
+        <div class="admin-stat">
+          <div class="admin-stat-num" id="ast-done" style="color:var(--green);">0</div>
+          <div class="admin-stat-lbl">Done</div>
+        </div>
+      </div>
+
+      <div class="admin-filter">
+        <button class="admin-tab active" onclick="adminTabFilter(this,'all')">All Clients</button>
+        <button class="admin-tab" onclick="adminTabFilter(this,'pending')">⏳ Pending</button>
+        <button class="admin-tab" onclick="adminTabFilter(this,'done')">✓ Completed</button>
+      </div>
+
+      <div class="admin-refresh">
+        <div class="admin-count" id="admin-count">— clients</div>
+        <button class="admin-refresh-btn" onclick="loadAdminOrders()">↻ Refresh</button>
+      </div>
+
+      <div id="admin-clients-list">
+        <div class="admin-empty">Loading orders...</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-logo">Urreal<em>3D</em></div>
+    <div class="footer-links"><a onclick="go('policy')">Privacy Policy</a><a onclick="go('appointment')">Contact</a></div>
+    <div class="footer-copy">© 2024 Urreal3D · Stephen R Christian</div>
+  </footer>
+</div>
+<!-- ═══ END ADMIN PAGE ═══ -->
+
 <!-- ═══ RENDER DETAIL PANEL (paste this outside the page div, still before </body>) ═══ -->
 <div class="rp-overlay" id="rp-overlay" onclick="closeRenderPanel()"></div>
 
@@ -1639,6 +1756,174 @@ function checkClientForm() {
     section.classList.add('locked');
   }
 }
+
+<script type="module">
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, orderBy, query } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCME4Fby4vXSbxf6vE40j4ANuOBqPk_YVw",
+  authDomain: "urreal3d-ba986.firebaseapp.com",
+  projectId: "urreal3d-ba986",
+  storageBucket: "urreal3d-ba986.firebasestorage.app",
+  messagingSenderId: "96423517661",
+  appId: "1:96423517661:web:7dddb240f2f76f075baa34"
+};
+
+const adminApp = getApps().find(a=>a.name==='adminapp') || initializeApp(firebaseConfig,'adminapp');
+const adminDb = getFirestore(adminApp);
+
+let _adminOrders = [];
+let _adminFilter = 'all';
+
+window.loadAdminOrders = async function() {
+  const user = window.getCurrentUser();
+  if (!user || user.email !== 'urreal3d@gmail.com') return;
+
+  const list = document.getElementById('admin-clients-list');
+  list.innerHTML = '<div class="admin-empty">Loading...</div>';
+
+  try {
+    const q = query(collection(adminDb,'orders'), orderBy('createdAt','desc'));
+    const snap = await getDocs(q);
+    _adminOrders = snap.docs.map(d=>({id:d.id,...d.data()}));
+
+    const pending = _adminOrders.filter(o=>(o.status||'pending')==='pending').length;
+    const done = _adminOrders.filter(o=>o.status==='done').length;
+    document.getElementById('ast-total').textContent = _adminOrders.length;
+    document.getElementById('ast-pending').textContent = pending;
+    document.getElementById('ast-done').textContent = done;
+
+    renderAdminClients();
+  } catch(e) {
+    list.innerHTML = '<div class="admin-empty">Error: ' + e.message + '</div>';
+  }
+}
+
+function renderAdminClients() {
+  const list = document.getElementById('admin-clients-list');
+  let orders = _adminOrders;
+
+  if (_adminFilter === 'pending') orders = orders.filter(o=>(o.status||'pending')==='pending');
+  if (_adminFilter === 'done') orders = orders.filter(o=>o.status==='done');
+
+  // Group by client email
+  const clientMap = {};
+  orders.forEach(order => {
+    const key = order.userEmail || 'unknown';
+    if (!clientMap[key]) clientMap[key] = { name: order.userName || order.clientName || 'Unknown', email: order.userEmail || '—', orders: [] };
+    clientMap[key].orders.push(order);
+  });
+
+  const clients = Object.values(clientMap);
+  document.getElementById('admin-count').textContent = clients.length + ' clients';
+
+  if (clients.length === 0) {
+    list.innerHTML = '<div class="admin-empty">No orders found.</div>';
+    return;
+  }
+
+  list.innerHTML = clients.map((client, ci) => {
+    const initials = client.name.charAt(0).toUpperCase();
+    const pendingCount = client.orders.filter(o=>(o.status||'pending')==='pending').length;
+
+    const ordersHtml = client.orders.map((order, oi) => {
+      const date = order.createdAt
+        ? new Date(order.createdAt.seconds*1000).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
+        : 'Unknown';
+      const isDone = order.status === 'done';
+
+      return `
+        <div class="order-item">
+          <div class="order-item-top">
+            <div class="order-item-title">Order ${oi+1} — ${order.templateName||'Custom'}</div>
+            <span class="abadge ${isDone?'abadge-done':'abadge-pending'}">${isDone?'✓ Done':'⏳ Pending'}</span>
+          </div>
+          <div class="order-item-grid">
+            <div class="orow">👤 Client<strong>${order.clientName||order.userName||'—'}</strong></div>
+            <div class="orow">🏷 Brand<strong>${order.brandName||'—'}</strong></div>
+            <div class="orow">📱 WhatsApp<strong>${order.whatsapp||'—'}</strong></div>
+            <div class="orow">📧 Email<strong>${order.userEmail||'—'}</strong></div>
+            <div class="orow">💰 Price<strong>${order.price||'—'}</strong></div>
+            <div class="orow">📋 Type<strong>${order.templateType==='video'?'🎬 Video':'🖼 Image'}</strong></div>
+            <div class="orow">🕐 Date<strong>${date}</strong></div>
+          </div>
+          ${isDone && order.renderedFile ? `<a href="${order.renderedFile}" target="_blank" style="display:block;text-align:center;margin-bottom:10px;background:rgba(124,58,237,0.1);border:1px solid var(--pb);color:var(--pl);padding:9px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;">👁 View Uploaded Render</a>` : ''}
+          <input class="order-link-input" id="alink-${order.id}" placeholder="Paste Google Drive link here..." value="${order.renderedFile||''}">
+          <button class="order-done-btn ${isDone?'done':''}" id="abtn-${order.id}" onclick="adminMarkDone('${order.id}')">
+            ${isDone ? '✓ Completed' : '🚀 Upload & Mark Done'}
+          </button>
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="client-card" id="cc-${ci}">
+        <div class="client-card-header" onclick="toggleClient(${ci})">
+          <div class="client-avatar">${initials}</div>
+          <div class="client-info">
+            <div class="client-name">${client.name}</div>
+            <div class="client-meta">${client.email} · ${client.orders.length} order${client.orders.length>1?'s':''} ${pendingCount>0?'· <span style="color:var(--yellow);">'+pendingCount+' pending</span>':''}</div>
+          </div>
+          <span class="client-chevron">⌄</span>
+        </div>
+        <div class="client-orders">${ordersHtml}</div>
+      </div>`;
+  }).join('');
+}
+
+window.toggleClient = function(ci) {
+  document.getElementById('cc-'+ci).classList.toggle('open');
+}
+
+window.adminTabFilter = function(btn, filter) {
+  document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  _adminFilter = filter;
+  renderAdminClients();
+}
+
+window.adminMarkDone = async function(orderId) {
+  const btn = document.getElementById('abtn-'+orderId);
+  if (btn.classList.contains('done')) return;
+  const link = document.getElementById('alink-'+orderId).value.trim();
+  if (!link) { alert('Please paste the Google Drive link first.'); return; }
+
+  btn.textContent = 'Saving...';
+  btn.disabled = true;
+
+  try {
+    await updateDoc(doc(adminDb,'orders',orderId), { status:'done', renderedFile:link });
+    const order = _adminOrders.find(o=>o.id===orderId);
+    if (order) { order.status='done'; order.renderedFile=link; }
+    btn.textContent = '✓ Completed';
+    btn.classList.add('done');
+    btn.disabled = false;
+    const pending = _adminOrders.filter(o=>(o.status||'pending')==='pending').length;
+    const done = _adminOrders.filter(o=>o.status==='done').length;
+    document.getElementById('ast-pending').textContent = pending;
+    document.getElementById('ast-done').textContent = done;
+    alert('✓ Done! Client can now see their render.');
+  } catch(e) {
+    btn.textContent = '🚀 Upload & Mark Done';
+    btn.disabled = false;
+    alert('Error: ' + e.message);
+  }
+}
+
+// ── Check admin access when page opens ──
+window.checkAdminAccess = function() {
+  const user = window.getCurrentUser();
+  if (user && user.email === 'urreal3d@gmail.com') {
+    document.getElementById('admin-denied').style.display = 'none';
+    document.getElementById('admin-main').style.display = 'block';
+    loadAdminOrders();
+  } else {
+    document.getElementById('admin-denied').style.display = 'block';
+    document.getElementById('admin-main').style.display = 'none';
+  }
+}
+</script>
+
 async function handleRender(){
   if (!window.getCurrentUser || !window.getCurrentUser()) {
     openAuthModal('login');
@@ -1775,6 +2060,13 @@ document.getElementById('drawer-auth-btn').style.display = 'none';    document.g
     document.getElementById('drawer-auth-btn').textContent = 'Logout';
     document.getElementById('drawer-auth-btn').onclick = handleLogout;
     document.getElementById('nav-profile-btn').style.cssText = 'width:36px;height:36px;border-radius:50%;background:rgba(124,58,237,0.2);border:1px solid var(--pb);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;';
+    if (user.email === 'urreal3d@gmail.com') {
+  document.getElementById('nav-admin-li').style.display = 'list-item';
+  document.getElementById('drawer-admin-btn').style.display = 'block';
+} else {
+  document.getElementById('nav-admin-li').style.display = 'none';
+  document.getElementById('drawer-admin-btn').style.display = 'none';
+}
     document.getElementById('drawer-profile-btn').style.display = 'block';
   } else {
     document.getElementById('auth-btn').textContent = 'Login';
@@ -1782,6 +2074,8 @@ document.getElementById('drawer-auth-btn').style.display = 'none';    document.g
     document.getElementById('drawer-auth-btn').textContent = 'Login';
     document.getElementById('drawer-auth-btn').onclick = () => openAuthModal('login');
     document.getElementById('nav-profile-btn').style.display = 'none';
+    document.getElementById('nav-admin-li').style.display = 'none';
+document.getElementById('drawer-admin-btn').style.display = 'none';
     document.getElementById('drawer-profile-btn').style.display = 'none';
   }
 });
