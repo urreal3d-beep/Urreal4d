@@ -130,6 +130,27 @@ body{background:var(--black);color:var(--white);font-family:'Plus Jakarta Sans',
   font-family:'Plus Jakarta Sans',sans-serif;transition:all 0.2s;display:none;
 }
 .nav-logout-btn:hover{color:#f87171;border-color:rgba(248,113,113,0.3);}
+/* ── Cart Icon Button ── */
+.nav-cart-btn{
+  position:relative;
+  background:rgba(124,58,237,0.08);
+  border:1px solid rgba(124,58,237,0.22);
+  color:var(--white);width:36px;height:36px;
+  border-radius:8px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;flex-shrink:0;
+}
+.nav-cart-btn:hover{background:rgba(124,58,237,0.2);border-color:var(--pl);}
+.cart-badge{
+  position:absolute;top:-7px;right:-7px;
+  background:var(--purple);color:#fff;
+  font-size:9px;font-weight:800;
+  min-width:17px;height:17px;border-radius:9px;
+  display:none;align-items:center;justify-content:center;
+  padding:0 4px;border:2px solid var(--black);line-height:1;
+}
+.cart-badge.show{display:flex;}
+@keyframes spin{to{transform:rotate(360deg);}}
 
 /* ── HAMBURGER ── */
 .hbg{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:1px solid rgba(124,58,237,0.25);border-radius:8px;cursor:pointer;padding:8px 9px;z-index:400;width:38px;height:38px;transition:border-color 0.2s;}
@@ -1125,6 +1146,10 @@ setTimeout(function(){
     <button class="nav-admin-btn" id="nav-admin-btn" onclick="go('admin')" style="display:none;">⚡ Admin</button>
     <button class="nav-logout-btn" id="nav-admin-logout" onclick="handleLogout()" style="display:none;">Sign out</button>
     <button class="nav-login-btn" id="auth-btn" onclick="openAuthModal('login')">Log in</button>
+    <button class="nav-cart-btn" id="nav-cart-btn" onclick="openCart()" title="My Cart">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <span class="cart-badge" id="cart-badge">0</span>
+    </button>
     <button class="nav-render-btn" onclick="go('render')">Start Render →</button>
     <button class="nav-profile-circle" id="nav-profile-btn" onclick="openProfile()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
@@ -1184,7 +1209,7 @@ setTimeout(function(){
       <p class="hero-sub">Premium 3D clothing animations and renders for fashion brands, e-commerce, and independent designers. Realistic fabric physics — fast delivery.</p>
 
       <div class="hero-btns">
-        <button class="btn-p" onclick="go('portfolio')">View Portfolio →</button>
+        <button class="btn-p" onclick="go('render')">Render Now →</button>
         <button class="btn-g" onclick="go('pricing')">See Pricing</button>
       </div>
 
@@ -1529,10 +1554,10 @@ setTimeout(function(){
         <div class="pf"><span class="pf-check">✓</span>1 high-res render (4K)</div>
         <div class="pf"><span class="pf-check">✓</span>Clean background</div>
         <div class="pf"><span class="pf-check">✓</span>Color & material match</div>
-        <div class="pf"><span class="pf-check">✓</span>2 revision rounds</div>
-        <div class="pf"><span class="pf-check">✓</span>2–3 day delivery</div>
+        <div class="pf"><span class="pf-check">✓</span>5 revision rounds</div>
+        <div class="pf"><span class="pf-check">✓</span>Same-Day Delivery</div>
       </div>
-      <button class="price-cta" onclick="go('appointment')">Get Started</button>
+      <button class="price-cta" onclick="go('render')">Get Started</button>
     </div>
 
     <div class="price-card">
@@ -1548,7 +1573,7 @@ setTimeout(function(){
         <div class="pf"><span class="pf-check">✓</span>Custom scene & lighting</div>
         <div class="pf"><span class="pf-check">✓</span>Full garment modeling</div>
         <div class="pf"><span class="pf-check">✓</span>Multiple angles</div>
-        <div class="pf"><span class="pf-check">✓</span>3 revision rounds</div>
+        <div class="pf"><span class="pf-check">✓</span>10 revision rounds</div>
         <div class="pf"><span class="pf-check">✓</span>Commercial license</div>
       </div>
       <button class="price-cta" onclick="go('appointment')">Get a Quote</button>
@@ -1567,10 +1592,10 @@ setTimeout(function(){
         <div class="pf"><span class="pf-check">✓</span>10–30 sec animation</div>
         <div class="pf"><span class="pf-check">✓</span>1080p (4K available)</div>
         <div class="pf"><span class="pf-check">✓</span>Music optional</div>
-        <div class="pf"><span class="pf-check">✓</span>2 revision rounds</div>
-        <div class="pf"><span class="pf-check">✓</span>3–5 day delivery</div>
+        <div class="pf"><span class="pf-check">✓</span>5 revision rounds</div>
+        <div class="pf"><span class="pf-check">✓</span>Same-Day Delivery</div>
       </div>
-      <button class="price-cta" onclick="go('appointment')">Order Now</button>
+      <button class="price-cta" onclick="go('render')">Order Now</button>
     </div>
 
     <div class="price-card popular">
@@ -2250,6 +2275,21 @@ function filterTab(btn) {
   margin-bottom:3px;letter-spacing:-0.01em;
 }
 .rt-info p{color:var(--gdim);font-size:11px;line-height:1.5;}
+.rt-info-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;}
+.rt-quick-cart{
+  flex-shrink:0;
+  background:rgba(124,58,237,0.1);
+  border:1px solid rgba(124,58,237,0.22);
+  color:var(--pl);
+  border-radius:6px;padding:6px 12px;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:10.5px;font-weight:700;letter-spacing:0.05em;
+  cursor:pointer;transition:all 0.2s;
+  display:flex;align-items:center;gap:5px;white-space:nowrap;
+}
+.rt-quick-cart:hover{background:var(--purple);border-color:var(--purple);color:#fff;}
+.rt-quick-cart.added{background:rgba(34,197,94,0.12);border-color:rgba(34,197,94,0.3);color:#22c55e;}
+.rt-quick-cart.added:hover{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.25);color:#f87171;}
 </style>
 
   <!-- Hero -->
@@ -2280,7 +2320,16 @@ function filterTab(btn) {
           <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
           <div class="rt-price-chip">₹1,999</div>
         </div>
-        <div class="rt-info"><h4>Streetwear Float</h4><p>Floating tee with rim lighting, dark BG.</p></div>
+        <div class="rt-info">
+          <h4>Streetwear Float</h4><p>Floating tee with rim lighting, dark BG.</p>
+          <div class="rt-info-row">
+            <button class="rt-quick-cart" id="qcart-streetwear-float"
+              onclick="event.stopPropagation();quickAddToCart('video','Streetwear Float','Minimal streetwear piece drifting through space, illuminated with dramatic rim lighting.','videos/two.mp4','₹1,999',this)">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+              Add to Cart
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="rt-card" onclick="openRenderPanel('video','Garage Scene','Streetwear piece presented in a high-contrast garage scene for a rugged, authentic feel.','videos/three.mp4','₹1,999')">
@@ -2289,7 +2338,16 @@ function filterTab(btn) {
           <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
           <div class="rt-price-chip">₹1,999</div>
         </div>
-        <div class="rt-info"><h4>Garage Scene</h4><p>Urban environment, rugged &amp; authentic.</p></div>
+        <div class="rt-info">
+          <h4>Garage Scene</h4><p>Urban environment, rugged &amp; authentic.</p>
+          <div class="rt-info-row">
+            <button class="rt-quick-cart" id="qcart-garage-scene"
+              onclick="event.stopPropagation();quickAddToCart('video','Garage Scene','Streetwear piece presented in a high-contrast garage scene for a rugged, authentic feel.','videos/three.mp4','₹1,999',this)">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+              Add to Cart
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="rt-card" onclick="openRenderPanel('video','Multi Model','Multi-model presentation emphasising structure, drape, and realism from every angle.','videos/five.mp4','₹1,999')">
@@ -2298,7 +2356,16 @@ function filterTab(btn) {
           <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
           <div class="rt-price-chip">₹1,999</div>
         </div>
-        <div class="rt-info"><h4>Multi Model</h4><p>Every angle covered, oversized silhouette.</p></div>
+        <div class="rt-info">
+          <h4>Multi Model</h4><p>Every angle covered, oversized silhouette.</p>
+          <div class="rt-info-row">
+            <button class="rt-quick-cart" id="qcart-multi-model"
+              onclick="event.stopPropagation();quickAddToCart('video','Multi Model','Multi-model presentation emphasising structure, drape, and realism from every angle.','videos/five.mp4','₹1,999',this)">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+              Add to Cart
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="rt-card" onclick="openRenderPanel('video','Dynamic Motion','Dynamic animation with lifelike fabric movement and fluid physics simulation.','videos/six.mp4','₹1,999')">
@@ -2307,7 +2374,16 @@ function filterTab(btn) {
           <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
           <div class="rt-price-chip">₹1,999</div>
         </div>
-        <div class="rt-info"><h4>Dynamic Motion</h4><p>Fluid fabric physics, lifelike movement.</p></div>
+        <div class="rt-info">
+          <h4>Dynamic Motion</h4><p>Fluid fabric physics, lifelike movement.</p>
+          <div class="rt-info-row">
+            <button class="rt-quick-cart" id="qcart-dynamic-motion"
+              onclick="event.stopPropagation();quickAddToCart('video','Dynamic Motion','Dynamic animation with lifelike fabric movement and fluid physics simulation.','videos/six.mp4','₹1,999',this)">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+              Add to Cart
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="rt-card" onclick="openRenderPanel('video','Medival Age','A modern streetwear silhouette reimagined with medieval textures and atmospheric depth.','videos/seven.mp4','₹1,999')">
@@ -2316,7 +2392,16 @@ function filterTab(btn) {
           <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
           <div class="rt-price-chip">₹1,999</div>
         </div>
-        <div class="rt-info"><h4>Medival Age</h4><p>Streetwear with medieval atmospheric depth.</p></div>
+        <div class="rt-info">
+          <h4>Medival Age</h4><p>Streetwear with medieval atmospheric depth.</p>
+          <div class="rt-info-row">
+            <button class="rt-quick-cart" id="qcart-medival-age"
+              onclick="event.stopPropagation();quickAddToCart('video','Medival Age','A modern streetwear silhouette reimagined with medieval textures and atmospheric depth.','videos/seven.mp4','₹1,999',this)">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+              Add to Cart
+            </button>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -2348,7 +2433,16 @@ function filterTab(btn) {
     <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
     <div class="rt-price-chip">₹999</div>
   </div>
-  <div class="rt-info"><h4>Lookbook — Silk Wrap</h4><p>Clean BG, dramatic side lighting.</p></div>
+  <div class="rt-info">
+    <h4>Lookbook — Silk Wrap</h4><p>Clean BG, dramatic side lighting.</p>
+    <div class="rt-info-row">
+      <button class="rt-quick-cart" id="qcart-lookbook"
+        onclick="event.stopPropagation();quickAddToCart('image','Lookbook — Silk Wrap','High-res render for a luxury brand lookbook. Clean background with dramatic side light.',['images/one.jpg','images/one-2.jpg','images/one-3.jpg','images/one-4.jpg','images/one-5.jpg'],'₹999',this)">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        Add to Cart
+      </button>
+    </div>
+  </div>
 </div>
 
       <div class="rt-card" onclick="openRenderPanel('image','Product Render — Fire','Photorealistic still for e-commerce with stitch detail and fabric texture highlighted.',['images/two.png','images/two-2.png','images/two-3.png','images/two-4.png','images/two-5.png'],'₹999')">
@@ -2368,7 +2462,16 @@ function filterTab(btn) {
     <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
     <div class="rt-price-chip">₹999</div>
   </div>
-  <div class="rt-info"><h4>Product Render — Fire</h4><p>E-commerce ready, stitch &amp; texture detail.</p></div>
+  <div class="rt-info">
+    <h4>Product Render — Fire</h4><p>E-commerce ready, stitch &amp; texture detail.</p>
+    <div class="rt-info-row">
+      <button class="rt-quick-cart" id="qcart-product-fire"
+        onclick="event.stopPropagation();quickAddToCart('image','Product Render — Fire','Photorealistic still for e-commerce with stitch detail and fabric texture highlighted.',['images/two.png','images/two-2.png','images/two-3.png','images/two-4.png','images/two-5.png'],'₹999',this)">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        Add to Cart
+      </button>
+    </div>
+  </div>
 </div>
 
       <div class="rt-card" onclick="openRenderPanel('image','Fabric Feel','Flat lay render showing texture depth and colour accuracy for an outwear collection.',['images/three.jpg','images/three-2.jpg','images/three-3.jpg','images/three-4.jpg','images/three-5.jpg'],'₹999')">
@@ -2388,7 +2491,16 @@ function filterTab(btn) {
     <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
     <div class="rt-price-chip">₹999</div>
   </div>
-  <div class="rt-info"><h4>Fabric Feel</h4><p>Flat lay, texture depth, colour accuracy.</p></div>
+  <div class="rt-info">
+    <h4>Fabric Feel</h4><p>Flat lay, texture depth, colour accuracy.</p>
+    <div class="rt-info-row">
+      <button class="rt-quick-cart" id="qcart-fabric-feel"
+        onclick="event.stopPropagation();quickAddToCart('image','Fabric Feel','Flat lay render showing texture depth and colour accuracy for an outwear collection.',['images/three.jpg','images/three-2.jpg','images/three-3.jpg','images/three-4.jpg','images/three-5.jpg'],'₹999',this)">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        Add to Cart
+      </button>
+    </div>
+  </div>
 </div>
 
       <div class="rt-card" onclick="openRenderPanel('image','Campaign Still — Dramatic','Full scene render with character, t-shirt, and mood lighting for a clothing brand campaign.',['images/four.jpg','images/four-2.jpg','images/four-3.jpg','images/four-4.jpg','images/four-5.jpg'],'₹999')">
@@ -2408,7 +2520,16 @@ function filterTab(btn) {
     <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
     <div class="rt-price-chip">₹999</div>
   </div>
-  <div class="rt-info"><h4>Campaign Still — Dramatic</h4><p>Full scene, character &amp; mood lighting.</p></div>
+  <div class="rt-info">
+    <h4>Campaign Still — Dramatic</h4><p>Full scene, character &amp; mood lighting.</p>
+    <div class="rt-info-row">
+      <button class="rt-quick-cart" id="qcart-campaign-still"
+        onclick="event.stopPropagation();quickAddToCart('image','Campaign Still — Dramatic','Full scene render with character, t-shirt, and mood lighting for a clothing brand campaign.',['images/four.jpg','images/four-2.jpg','images/four-3.jpg','images/four-4.jpg','images/four-5.jpg'],'₹999',this)">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        Add to Cart
+      </button>
+    </div>
+  </div>
 </div>
 
       <div class="rt-card" onclick="openRenderPanel('image','Streetwear Editorial','Dark cinematic render for an urban streetwear brand social campaign.',['images/five.jpg','images/five-2.jpg','images/five-3.jpg','images/five-4.jpg','images/five-5.jpg'],'₹999')">
@@ -2428,7 +2549,16 @@ function filterTab(btn) {
     <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
     <div class="rt-price-chip">₹999</div>
   </div>
-  <div class="rt-info"><h4>Streetwear Editorial</h4><p>Dark cinematic, urban social campaign.</p></div>
+  <div class="rt-info">
+    <h4>Streetwear Editorial</h4><p>Dark cinematic, urban social campaign.</p>
+    <div class="rt-info-row">
+      <button class="rt-quick-cart" id="qcart-sw-editorial"
+        onclick="event.stopPropagation();quickAddToCart('image','Streetwear Editorial','Dark cinematic render for an urban streetwear brand social campaign.',['images/five.jpg','images/five-2.jpg','images/five-3.jpg','images/five-4.jpg','images/five-5.jpg'],'₹999',this)">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        Add to Cart
+      </button>
+    </div>
+  </div>
 </div>
 
     </div>
@@ -3199,33 +3329,10 @@ async function loadOrders() {
         <div class="rp-price-val" id="rp-price">₹1,999</div>
       </div>
 
-      <!-- Step 1: Your Details -->
-      <div class="rp-step">
+      <!-- Upload Design Files -->
+      <div class="rp-upload-section unlocked" id="rp-upload-section">
         <div class="rp-step-head">
           <div class="rp-step-num">1</div>
-          <div class="rp-step-title">Your Details</div>
-        </div>
-        <div class="rp-field">
-          <div class="rp-field-label">Full Name</div>
-          <input class="rp-text-input" type="text" id="client-name" placeholder="Your full name" oninput="checkClientForm()">
-        </div>
-        <div class="rp-field">
-          <div class="rp-field-label">Brand Name</div>
-          <input class="rp-text-input" type="text" id="client-brand" placeholder="Your brand / label name" oninput="checkClientForm()">
-        </div>
-        <div class="rp-field">
-          <div class="rp-field-label">WhatsApp Number</div>
-          <input class="rp-text-input" type="tel" id="client-wp" placeholder="+91 98765 43210" oninput="checkClientForm()">
-        </div>
-      </div>
-
-      <!-- Step 2: Upload Files -->
-      <div class="rp-upload-section locked" id="rp-upload-section">
-        <div class="rp-upload-lock-bar" id="rp-upload-lock-bar">
-          <span>🔒</span><span>Fill your details above to unlock uploads</span>
-        </div>
-        <div class="rp-step-head">
-          <div class="rp-step-num">2</div>
           <div class="rp-step-title">Upload Design Files</div>
           <div class="rp-step-sub">PNG · JPG · AI · PSD · PDF</div>
         </div>
@@ -3276,10 +3383,11 @@ async function loadOrders() {
 
       <!-- CTA -->
       <div class="rp-cta-wrap">
-        <button class="rp-render-btn" onclick="handleRender()">
-          Render My T-Shirt <span class="btn-arrow">→</span>
+        <button class="rp-render-btn" onclick="handleAddToCart()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          Add to Cart
         </button>
-        <div class="rp-note">Max 50MB per file · Reference image is mandatory · Files sent securely</div>
+        <div class="rp-note">Files saved in your cart · Pay only at checkout · Max 50MB per file</div>
       </div>
 
     </div>
@@ -3320,9 +3428,6 @@ document.getElementById('rp-price').textContent = detectedPrice;
   document.querySelectorAll('.rp-file-slot').forEach(el => el.classList.remove('has-file'));
   document.getElementById('rp-ref-slot').classList.remove('has-file');
   document.getElementById('ref-file-name').textContent = 'Upload up to 5 images — how you want it to look';
-  document.getElementById('client-name').value = '';
-  document.getElementById('client-brand').value = '';
-  document.getElementById('client-wp').value = '';
   document.getElementById('rp-upload-section').classList.add('locked');
   document.getElementById('rp-upload-section').classList.remove('unlocked');
 
@@ -3408,19 +3513,114 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
-function checkClientForm() {
-  const name  = document.getElementById('client-name').value.trim();
-  const brand = document.getElementById('client-brand').value.trim();
-  const wp    = document.getElementById('client-wp').value.trim();
-  const section = document.getElementById('rp-upload-section');
+// ── Add to Cart from render panel ──
+function handleAddToCart() {
+  if (!window.getCurrentUser || !window.getCurrentUser()) { openAuthModal('login'); return; }
 
-  if (name && brand && wp) {
-    section.classList.remove('locked');
-    section.classList.add('unlocked');
-  } else {
-    section.classList.remove('unlocked');
-    section.classList.add('locked');
+  const title        = document.getElementById('rp-title').textContent;
+  const price        = document.getElementById('rp-price').textContent;
+  const templateType = document.getElementById('rp-type-tag').textContent.includes('VIDEO') ? 'video' : 'image';
+  const refInput     = document.getElementById('ref-file-input');
+  const fileInputs   = document.querySelectorAll('.rp-file-slot input[type="file"]');
+
+  if (!refInput.files[0]) { alert('Please upload a Reference Image — it is required.'); return; }
+  let hasFile = false;
+  fileInputs.forEach(f => { if (f.files[0]) hasFile = true; });
+  if (!hasFile) { alert('Please upload at least one design file (Front, Back, Sleeves, or Logo).'); return; }
+
+  // Store files as FileList references (held in memory)
+  const item = {
+    id:           Date.now(),
+    title,
+    price,
+    templateType,
+    priceNum:     parseFloat(price.replace(/[^0-9.]/g,'').replace(',','')),
+    isINR:        price.includes('₹'),
+    refFiles:     Array.from(refInput.files),
+    designFiles:  Array.from(fileInputs).map(f => f.files[0] || null),
+    labels:       ['Front','Back','Sleeves','Logo'],
+    addedAt:      new Date().toLocaleTimeString()
+  };
+
+  window._cart = window._cart || [];
+  window._cart.push(item);
+  updateCartBadge();
+  closeRenderPanel();
+
+  // Brief toast then open cart
+  showCartToast(title);
+  setTimeout(() => openCart(), 600);
+}
+
+function showCartToast(title) {
+  let t = document.getElementById('cart-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'cart-toast';
+    t.style.cssText = `position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);
+      background:#0f0b1e;border:1px solid rgba(34,197,94,0.4);border-radius:8px;
+      padding:10px 20px;font-size:12.5px;font-weight:700;color:#22c55e;
+      z-index:9999;opacity:0;transition:all 0.3s;white-space:nowrap;
+      box-shadow:0 8px 32px rgba(0,0,0,0.5);pointer-events:none;`;
+    document.body.appendChild(t);
   }
+  t.textContent = '✓ ' + title + ' added to cart';
+  t.style.opacity = '1'; t.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(10px)'; }, 2000);
+}
+
+function updateCartBadge() {
+  const count = (window._cart || []).length;
+  const badge = document.getElementById('cart-badge');
+  if (!badge) return;
+  badge.textContent = count;
+  badge.classList.toggle('show', count > 0);
+}
+
+// ── Quick-add from render page (no panel needed) ──
+function quickAddToCart(type, title, desc, src, price, btn) {
+  if (!window.getCurrentUser || !window.getCurrentUser()) {
+    openAuthModal('login');
+    return;
+  }
+
+  // Check if already in cart
+  const already = (window._cart || []).find(i => i.title === title);
+  if (already) {
+    // If already added, open cart instead
+    openCart();
+    return;
+  }
+
+  const item = {
+    id:           Date.now(),
+    title,
+    desc,
+    src,
+    price,
+    templateType:  type,
+    priceNum:      parseFloat(price.replace(/[^0-9.]/g,'').replace(',','')),
+    isINR:         price.includes('₹'),
+    refFiles:      [],
+    designFiles:   [null, null, null, null],
+    labels:        ['Front','Back','Sleeves','Logo'],
+    addedAt:       new Date().toLocaleTimeString()
+  };
+
+  window._cart = window._cart || [];
+  window._cart.push(item);
+  updateCartBadge();
+
+  // Update button state → "✓ Added"
+  if (btn) {
+    btn.classList.add('added');
+    btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Added`;
+    btn.onclick = function(e) { e.stopPropagation(); openCart(); };
+    btn.title = 'Click to open cart';
+  }
+
+  showCartToast(title);
 }
 
 </script>
@@ -3429,121 +3629,201 @@ function checkClientForm() {
 
 
 <script>
-// ════════════════════════════════════════
-// RAZORPAY PAYMENT FLOW
-// Replace YOUR_RAZORPAY_KEY_ID with your actual key from Razorpay dashboard
-// ════════════════════════════════════════
-const RAZORPAY_KEY = 'rzp_live_SNEKjhQYXtiBNs';
+// ════════════════════════════════════════════════════════
+// CART CHECKOUT — RAZORPAY
+// ════════════════════════════════════════════════════════
+const RAZORPAY_KEY = 'rzp_test_SNGES9Kh3I7cSx';
+const DISCOUNT_THRESHOLD = 5000;
+const DISCOUNT_RATE      = 0.20;
+const COUPON_CODES       = { 'URREAL10': 0.10, 'LAUNCH20': 0.20 };
 
-async function handleRender() {
+window._cart    = window._cart    || [];
+window._coupon  = window._coupon  || null;
+
+function cartSubtotal() {
+  return (window._cart || []).reduce((s, i) => s + i.priceNum, 0);
+}
+function cartDiscount() {
+  let disc = 0;
+  const sub = cartSubtotal();
+  if (sub >= DISCOUNT_THRESHOLD) disc = sub * DISCOUNT_RATE;
+  if (window._coupon) disc = Math.max(disc, sub * COUPON_CODES[window._coupon]);
+  return disc;
+}
+function cartTotal() { return cartSubtotal() - cartDiscount(); }
+
+async function checkoutCart() {
   if (!window.getCurrentUser || !window.getCurrentUser()) { openAuthModal('login'); return; }
+  if (!window._cart || window._cart.length === 0) { alert('Your cart is empty.'); return; }
 
-  const title        = document.getElementById('rp-title').textContent;
-  const price        = document.getElementById('rp-price').textContent;
-  const clientName   = document.getElementById('client-name').value.trim();
-  const clientBrand  = document.getElementById('client-brand').value.trim();
-  const clientWp     = document.getElementById('client-wp').value.trim();
-  const templateType = document.getElementById('rp-type-tag').textContent.includes('VIDEO') ? 'video' : 'image';
-  const refFile      = document.getElementById('ref-file-input');
-
-  if (!refFile.files[0]) { alert('Please upload a reference image — it is mandatory.'); return; }
-  const files = document.querySelectorAll('.rp-file-slot input[type="file"]');
-  let filesSent = 0;
-  for (let i = 0; i < files.length; i++) { if (files[i].files[0]) filesSent++; }
-  if (filesSent === 0) { alert('Please upload at least one design file before ordering.'); return; }
-
-  // Hold files in memory — only sent to Telegram after payment is confirmed
-  window._pendingOrderFiles = {
-    files: Array.from(files).map(f => f.files[0] || null),
-    refFile: refFile.files[0],
-    title, price, clientName, clientBrand, clientWp, templateType
-  };
-
-  // Parse amount (₹999 → 99900 paise, $50 → 5000 cents)
-  const isINR   = price.includes('₹');
-  const amount  = parseFloat(price.replace(/[^0-9.]/g, '').replace(',', ''));
   const user    = window.getCurrentUser();
+  const profile = window._userProfile || {};
+  const sub     = cartSubtotal();
+  const total   = cartTotal();
+  const isINR   = window._cart[0].isINR;
+  const brand   = document.getElementById('cart-brand-input')?.value.trim() || '';
+
+  if (!brand) {
+    document.getElementById('cart-brand-input')?.focus();
+    document.getElementById('cart-brand-input')?.closest('.cart-brand-wrap')?.classList.add('shake');
+    setTimeout(() => document.getElementById('cart-brand-input')?.closest('.cart-brand-wrap')?.classList.remove('shake'), 500);
+    alert('Please enter your Brand / Label name before checking out.');
+    return;
+  }
 
   const options = {
-    key: RAZORPAY_KEY,
-    amount: Math.round(amount * 100),   // Razorpay needs smallest unit
-    currency: isINR ? 'INR' : 'USD',
-    name: 'Urreal3D',
-    description: title,
-    image: 'images/applogo.png',
+    key:         RAZORPAY_KEY,
+    amount:      Math.round(total * 100),
+    currency:    isINR ? 'INR' : 'USD',
+    name:        'Urreal3D',
+    description: window._cart.length + ' render' + (window._cart.length > 1 ? 's' : '') + ' — ' + (isINR ? '₹' : '$') + total.toLocaleString('en-IN'),
+    image:       'images/applogo.png',
     prefill: {
-      name: clientName,
-      email: user ? user.email : '',
-      contact: clientWp
+      name:    profile.name  || user.displayName || '',
+      email:   profile.email || user.email       || '',
+      contact: profile.phone || user.phoneNumber || ''
     },
-    theme: { color: '#7c3aed' },
-    handler: async function(response) {
-      // ✅ Payment SUCCESS — now save order + send files to Telegram
-      await onRazorpaySuccess(response);
-    },
-    modal: {
-      ondismiss: function() {
-        // ❌ User closed/cancelled — files stay in memory, nothing is sent
-        console.log('Razorpay dismissed — no order placed.');
-      }
-    }
+    theme:  { color: '#7c3aed' },
+    handler: async function(response) { await onCartPaymentSuccess(response, brand); },
+    modal:  { ondismiss: function() { console.log('Razorpay dismissed.'); } }
   };
 
   const rzp = new Razorpay(options);
   rzp.open();
 }
 
-async function onRazorpaySuccess(razorpayResponse) {
-  const d   = window._pendingOrderFiles;
-  const btn = document.querySelector('#rp-panel .rp-order-btn');
+async function onCartPaymentSuccess(rzpResponse, brand) {
+  const user    = window.getCurrentUser();
+  const profile = window._userProfile || {};
+  const name    = profile.name  || user?.displayName || '';
+  const phone   = profile.phone || user?.phoneNumber || '';
+  const email   = profile.email || user?.email       || '';
+  const payId   = rzpResponse.razorpay_payment_id;
+  const total   = cartTotal();
+  const sub     = cartSubtotal();
+  const disc    = cartDiscount();
+
   try {
-    if (btn) { btn.textContent = 'Processing…'; btn.disabled = true; }
+    // Close cart, show processing
+    closeCart();
+    showProcessingOverlay(true);
 
-    // Save confirmed order to Firestore
-    const orderId = await window.saveOrderToFirestore({
-      templateName:      d.title,
-      templateType:      d.templateType,
-      price:             d.price,
-      clientName:        d.clientName,
-      brandName:         d.clientBrand,
-      whatsapp:          d.clientWp,
-      paymentStatus:     'confirmed',
-      status:            'pending',
-      razorpayPaymentId: razorpayResponse.razorpay_payment_id
-    });
+    // Save each cart item as a separate order in Firestore
+    const orderIds = [];
+    for (const item of window._cart) {
+      const oid = await window.saveOrderToFirestore({
+        templateName:      item.title,
+        templateType:      item.templateType,
+        price:             item.price,
+        brandName:         brand,
+        paymentStatus:     'confirmed',
+        status:            'pending',
+        razorpayPaymentId: payId,
+        cartTotal:         total,
+        discount:          disc,
+        coupon:            window._coupon || null
+      });
+      orderIds.push(oid);
+    }
 
-    // Send files to Telegram — only reaches here after real payment
-    await window.sendOrderToTelegram(orderId, {
-      templateName:      d.title,
-      price:             d.price,
-      razorpayPaymentId: razorpayResponse.razorpay_payment_id,
-      clientName:        d.clientName,
-      brandName:         d.clientBrand,
-      whatsapp:          d.clientWp
-    }, d.files, d.refFile);
+    // Send summary message to Telegram
+    const cartLines = window._cart.map((item, i) =>
+      `📦 <b>Order ${i+1}:</b> ${item.title} — ${item.price}`
+    ).join('\n');
+    const discLine = disc > 0 ? `\n🎉 <b>Discount:</b> -₹${disc.toLocaleString('en-IN')}` : '';
+    const couponLine = window._coupon ? `\n🏷 <b>Coupon:</b> ${window._coupon}` : '';
+    const msg = `✅ <b>New Cart Order — Razorpay Confirmed</b>\n\n` +
+      `👤 <b>Name:</b> ${name}\n📱 <b>WhatsApp:</b> ${phone}\n📧 <b>Email:</b> ${email}\n🏷 <b>Brand:</b> ${brand}\n\n` +
+      `${cartLines}\n\n` +
+      `💰 <b>Subtotal:</b> ₹${sub.toLocaleString('en-IN')}${discLine}${couponLine}\n💳 <b>Total Paid:</b> ₹${total.toLocaleString('en-IN')}\n\n` +
+      `🔑 <b>Razorpay ID:</b> ${payId}`;
 
-    closeRenderPanel();
-    alert('✅ Payment confirmed! Your order is placed. We will deliver your render shortly.');
+    await tgSend(TG_ORDERS, msg);
+
+    // Send files per cart item
+    for (let i = 0; i < window._cart.length; i++) {
+      const item = window._cart[i];
+      await tgSend(TG_ORDERS, `━━━━━━━━━━━━━━━━\n📦 Files for Order ${i+1}: <b>${item.title}</b>`);
+      for (const ref of item.refFiles) {
+        if (ref) await tgSendFile(TG_ORDERS, ref, `📸 Reference`);
+      }
+      const labels = ['👕 Front','🔄 Back','💪 Sleeves','🏷 Logo'];
+      for (let j = 0; j < item.designFiles.length; j++) {
+        if (item.designFiles[j]) await tgSendFile(TG_ORDERS, item.designFiles[j], labels[j] || `📁 File ${j+1}`);
+      }
+    }
+
+    // Clear cart
+    window._cart   = [];
+    window._coupon = null;
+    updateCartBadge();
+    showProcessingOverlay(false);
+    showOrderSuccessModal(window._cart.length || orderIds.length);
+
   } catch(e) {
-    alert('⚠️ Payment received but order save failed. Please contact us on WhatsApp with Payment ID: ' + razorpayResponse.razorpay_payment_id);
+    showProcessingOverlay(false);
+    alert('⚠️ Payment received but order save failed. Please contact us with Payment ID: ' + payId);
     console.error(e);
   }
-  if (btn) { btn.textContent = 'Render My T‑Shirt →'; btn.disabled = false; }
 }
 
-// ── Telegram — Single group (files only sent after confirmed payment) ──
+function showProcessingOverlay(show) {
+  let el = document.getElementById('processing-overlay');
+  if (!el && show) {
+    el = document.createElement('div');
+    el.id = 'processing-overlay';
+    el.style.cssText = `position:fixed;inset:0;background:rgba(6,4,15,0.92);z-index:9998;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+      backdrop-filter:blur(12px);`;
+    el.innerHTML = `
+      <div style="width:44px;height:44px;border:3px solid rgba(124,58,237,0.2);border-top-color:var(--pl);border-radius:50%;animation:spin 0.9s linear infinite;"></div>
+      <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:var(--white);">Processing your order…</div>
+      <div style="font-size:12px;color:var(--gdim);">Please don't close this tab</div>`;
+    document.body.appendChild(el);
+  }
+  if (el) el.style.display = show ? 'flex' : 'none';
+}
+
+function showOrderSuccessModal(count) {
+  let el = document.getElementById('order-success-modal');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'order-success-modal';
+    el.style.cssText = `position:fixed;inset:0;background:rgba(6,4,15,0.92);z-index:9999;
+      display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px);`;
+    document.body.appendChild(el);
+  }
+  el.innerHTML = `
+    <div style="background:linear-gradient(160deg,#110e26,#0c0919);border:1px solid rgba(34,197,94,0.3);
+      border-radius:16px;padding:40px 36px;max-width:380px;width:92%;text-align:center;">
+      <div style="font-size:44px;margin-bottom:16px;">🎉</div>
+      <div style="font-family:'Fraunces',serif;font-size:24px;font-weight:700;margin-bottom:8px;color:var(--white);">Order Placed!</div>
+      <div style="font-size:13px;color:var(--gdim);line-height:1.7;margin-bottom:28px;">
+        Your ${count > 1 ? count + ' renders have' : 'render has'} been confirmed and paid.<br>
+        We'll deliver to your profile within the estimated time.
+      </div>
+      <button onclick="document.getElementById('order-success-modal').style.display='none';openProfile();"
+        style="width:100%;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;padding:14px;
+        border-radius:8px;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;
+        font-weight:800;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;
+        box-shadow:0 4px 20px rgba(124,58,237,0.4);">View My Orders →</button>
+    </div>`;
+  el.style.display = 'flex';
+}
+
+// ── Telegram helpers ──
 const BOT_TOKEN = '8684367752:AAETdjkf6LGb6sRXGfiKjjXsycNtcZhsdcY';
-const TG_ORDERS = '-4815432496';   // your main orders group
+const TG_ORDERS = '-4815432496';
 
 async function tgSend(chatId, text) {
   try {
     const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' })
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ chat_id:chatId, text, parse_mode:'HTML' })
     });
     const data = await res.json();
-    return data.result ? data.result.message_id : null;
-  } catch(e) { console.error('Telegram error:', e); return null; }
+    return data.result?.message_id || null;
+  } catch(e) { console.error('Telegram error:',e); return null; }
 }
 
 async function tgSendFile(chatId, file, caption) {
@@ -3553,35 +3833,15 @@ async function tgSendFile(chatId, file, caption) {
     if (caption) form.append('caption', caption);
     form.append('document', file, file.name);
     const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
-      method: 'POST', body: form
+      method:'POST', body: form
     });
     const data = await res.json();
-    return data.result ? data.result.message_id : null;
-  } catch(e) { console.error('Telegram file error:', e); return null; }
+    return data.result?.message_id || null;
+  } catch(e) { console.error('Telegram file error:',e); return null; }
 }
 
-async function tgForward(fromChatId, toChatId, messageId) {
-  try {
-    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/forwardMessage`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: toChatId, from_chat_id: fromChatId, message_id: messageId })
-    });
-  } catch(e) { console.error('Telegram forward error:', e); }
-}
-
-function orderMsg(order, prefix) {
-  return `${prefix}\n\n🎽 <b>Template:</b> ${order.templateName||'—'}\n💰 <b>Price:</b> ${order.price||'—'}\n💳 <b>Razorpay ID:</b> ${order.razorpayPaymentId||'—'}\n\n👤 <b>Name:</b> ${order.clientName||order.userName||'—'}\n🏷 <b>Brand:</b> ${order.brandName||'—'}\n📱 <b>WhatsApp:</b> ${order.whatsapp||'—'}\n📧 <b>Email:</b> ${order.userEmail||'—'}`;
-}
-
-// Send order + files to Telegram immediately after confirmed Razorpay payment
-window.sendOrderToTelegram = async function(orderId, orderData, files, refFile) {
-  await tgSend(TG_ORDERS, orderMsg(orderData, '✅ <b>New Order — Payment Confirmed via Razorpay</b>'));
-  if (refFile) await tgSendFile(TG_ORDERS, refFile, '📎 Reference Image');
-  const labels = ['Front', 'Back', 'Sleeves', 'Logo'];
-  for (let i = 0; i < files.length; i++) {
-    if (files[i]) await tgSendFile(TG_ORDERS, files[i], `📁 ${labels[i] || 'File ' + (i + 1)}`);
-  }
-}
+// Keep for backwards compatibility
+window.sendOrderToTelegram = async function() {};
 
 function filterRender(btn, type) {
   document.querySelectorAll('.render-pill-btn').forEach(b => b.classList.remove('active'));
@@ -3596,8 +3856,14 @@ function filterRender(btn, type) {
 <!-- ═══ FIREBASE AUTH ═══ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+import {
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  signOut, onAuthStateChanged, updateProfile, sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+import {
+  getFirestore, collection, addDoc, doc, setDoc, getDoc,
+  query, where, orderBy, getDocs, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCME4Fby4vXSbxf6vE40j4ANuOBqPk_YVw",
@@ -3610,105 +3876,147 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
+const db   = getFirestore(app);
 
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    // Hide login btn, show profile circle
-    const authBtn = document.getElementById('auth-btn');
-    const drawerAuth = document.getElementById('drawer-auth-btn');
-    const profileBtn = document.getElementById('nav-profile-btn');
-    const drawerProfile = document.getElementById('drawer-profile-btn');
-    const adminBtn = document.getElementById('nav-admin-btn');
-    const drawerAdmin = document.getElementById('drawer-admin-btn');
-    const logoutBtn = document.getElementById('nav-admin-logout');
+// ── Expose auth instance so OTP controller (plain <script>) can use it ──
+window._firebaseAuth = auth;
 
-    if(authBtn) authBtn.style.display = 'none';
-    if(drawerAuth) { drawerAuth.style.display = 'none'; }
-    if(profileBtn) profileBtn.style.display = 'flex';
-    if(drawerProfile) drawerProfile.style.display = 'flex';
-
-    if (user.email === 'urreal3d@gmail.com') {
-      if(adminBtn) adminBtn.style.display = 'block';
-      if(drawerAdmin) drawerAdmin.style.display = 'block';
-      if(logoutBtn) logoutBtn.style.display = 'block';
+// ── Save / update user profile in Firestore users collection ──
+window._saveUserProfile = async function(user, overrideName) {
+  try {
+    const name    = overrideName || user.displayName || '';
+    const phone   = user.phoneNumber || '';
+    const email   = user.email || '';
+    const ref     = doc(db, 'users', user.uid);
+    const snap    = await getDoc(ref);
+    if (!snap.exists()) {
+      await setDoc(ref, { name, phone, email, createdAt: serverTimestamp() });
     } else {
-      if(adminBtn) adminBtn.style.display = 'none';
-      if(drawerAdmin) drawerAdmin.style.display = 'none';
-      if(logoutBtn) logoutBtn.style.display = 'none';
+      // Only update fields that arrived with this login
+      const updates = {};
+      if (name  && !snap.data().name)  updates.name  = name;
+      if (phone && !snap.data().phone) updates.phone = phone;
+      if (email && !snap.data().email) updates.email = email;
+      if (Object.keys(updates).length) await setDoc(ref, updates, { merge: true });
     }
-  } else {
-    const authBtn = document.getElementById('auth-btn');
-    const drawerAuth = document.getElementById('drawer-auth-btn');
-    const profileBtn = document.getElementById('nav-profile-btn');
-    const drawerProfile = document.getElementById('drawer-profile-btn');
-    const adminBtn = document.getElementById('nav-admin-btn');
-    const drawerAdmin = document.getElementById('drawer-admin-btn');
-    const logoutBtn = document.getElementById('nav-admin-logout');
+    // Cache in memory so other scripts can read instantly
+    window._userProfile = { name: overrideName || snap.data()?.name || name, phone: snap.data()?.phone || phone, email };
+  } catch(e) { console.log('Profile save error:', e); }
+}
 
-    if(authBtn) { authBtn.style.display = 'inline-flex'; authBtn.textContent = 'Log in'; authBtn.onclick = () => openAuthModal('login'); }
-    if(drawerAuth) { drawerAuth.style.display = 'flex'; drawerAuth.textContent = 'Log in'; drawerAuth.onclick = () => openAuthModal('login'); }
-    if(profileBtn) profileBtn.style.display = 'none';
-    if(drawerProfile) drawerProfile.style.display = 'none';
-    if(adminBtn) adminBtn.style.display = 'none';
-    if(drawerAdmin) drawerAdmin.style.display = 'none';
-    if(logoutBtn) logoutBtn.style.display = 'none';
+// ── Load user profile from Firestore into window._userProfile ──
+async function loadUserProfile(uid) {
+  try {
+    const snap = await getDoc(doc(db, 'users', uid));
+    if (snap.exists()) window._userProfile = snap.data();
+  } catch(e) {}
+}
+
+// ── Auth state listener ──
+onAuthStateChanged(auth, async (user) => {
+  const authBtn      = document.getElementById('auth-btn');
+  const drawerAuth   = document.getElementById('drawer-auth-btn');
+  const profileBtn   = document.getElementById('nav-profile-btn');
+  const drawerProf   = document.getElementById('drawer-profile-btn');
+  const adminBtn     = document.getElementById('nav-admin-btn');
+  const drawerAdmin  = document.getElementById('drawer-admin-btn');
+  const logoutBtn    = document.getElementById('nav-admin-logout');
+
+  if (user) {
+    await loadUserProfile(user.uid);
+
+    if (authBtn)    authBtn.style.display    = 'none';
+    if (drawerAuth) drawerAuth.style.display = 'none';
+    if (profileBtn) profileBtn.style.display = 'flex';
+    if (drawerProf) drawerProf.style.display = 'flex';
+
+    const isAdmin = user.email === 'urreal3d@gmail.com';
+    if (adminBtn)    adminBtn.style.display    = isAdmin ? 'block' : 'none';
+    if (drawerAdmin) drawerAdmin.style.display = isAdmin ? 'block' : 'none';
+    if (logoutBtn)   logoutBtn.style.display   = isAdmin ? 'block' : 'none';
+
+    // Update profile panel name if open
+    const nameEl = document.getElementById('profile-user-name');
+    if (nameEl) nameEl.textContent = window._userProfile?.name || user.displayName || 'User';
+
+  } else {
+    window._userProfile = null;
+    if (authBtn)    { authBtn.style.display = 'inline-flex'; authBtn.textContent = 'Log in'; authBtn.onclick = () => openAuthModal('login'); }
+    if (drawerAuth) { drawerAuth.style.display = 'flex'; drawerAuth.textContent = 'Log in'; drawerAuth.onclick = () => openAuthModal('login'); }
+    if (profileBtn) profileBtn.style.display = 'none';
+    if (drawerProf) drawerProf.style.display = 'none';
+    if (adminBtn)    adminBtn.style.display    = 'none';
+    if (drawerAdmin) drawerAdmin.style.display = 'none';
+    if (logoutBtn)   logoutBtn.style.display   = 'none';
   }
 });
 
+// ── Email signup ──
 window.handleSignup = async function() {
   const name  = document.getElementById('auth-name').value.trim();
   const email = document.getElementById('auth-email').value.trim();
-  const phone = document.getElementById('auth-phone').value.trim();
   const pass  = document.getElementById('auth-pass').value;
-  const msg   = document.getElementById('auth-msg');
-  if (!name || !email || !phone || !pass) { msg.textContent = 'Please fill in all fields.'; msg.style.color = '#f87171'; return; }
-  if (pass.length < 6) { msg.textContent = 'Password must be at least 6 characters.'; msg.style.color = '#f87171'; return; }
+  if (!name || !email || !pass) { setMsg('auth-msg','Please fill in all fields.','error'); return; }
+  if (pass.length < 6) { setMsg('auth-msg','Password must be at least 6 characters.','error'); return; }
+  const btn = document.getElementById('auth-submit-btn');
+  btn.disabled = true; btn.textContent = 'Creating…';
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     await updateProfile(cred.user, { displayName: name });
-    if (phone) localStorage.setItem('ph_' + cred.user.uid, phone);
-    msg.textContent = 'Account created! Welcome ' + name;
-    msg.style.color = 'var(--green)';
-    setTimeout(() => closeAuthModal(), 1500);
+    await window._saveUserProfile(cred.user, name);
+    setMsg('auth-msg', '✅ Account created! Welcome ' + name, 'success');
+    setTimeout(() => closeAuthModal(), 1200);
   } catch(e) {
-    msg.textContent = e.message.replace('Firebase: ', '');
-    msg.style.color = '#f87171';
+    setMsg('auth-msg', e.message.replace('Firebase: ','').replace(/\(auth.*\)/,'').trim(), 'error');
   }
+  btn.disabled = false;
 }
 
+// ── Email login ──
 window.handleLogin = async function() {
   const email = document.getElementById('auth-email').value.trim();
   const pass  = document.getElementById('auth-pass').value;
-  const msg   = document.getElementById('auth-msg');
-  if (!email || !pass) { msg.textContent = 'Please enter email and password.'; msg.style.color = '#f87171'; return; }
+  if (!email || !pass) { setMsg('auth-msg','Please enter email and password.','error'); return; }
+  const btn = document.getElementById('auth-submit-btn');
+  btn.disabled = true; btn.textContent = 'Signing in…';
   try {
     await signInWithEmailAndPassword(auth, email, pass);
-    msg.textContent = 'Logged in!';
-    msg.style.color = 'var(--green)';
-    setTimeout(() => closeAuthModal(), 1500);
+    setMsg('auth-msg', '✅ Signed in!', 'success');
+    setTimeout(() => closeAuthModal(), 900);
   } catch(e) {
-    msg.textContent = 'Wrong email or password.';
-    msg.style.color = '#f87171';
+    setMsg('auth-msg', 'Incorrect email or password.', 'error');
   }
+  btn.disabled = false;
 }
 
-window.handleLogout = async function() {
-  await signOut(auth);
+window.handleLogout = async function() { await signOut(auth); }
+window.getCurrentUser = function() { return auth.currentUser; }
+window._firebaseSendPasswordReset = async function(email) { await sendPasswordResetEmail(auth, email); }
+
+// ── Google login ──
+window.handleGoogleLogin = async function() {
+  const btn = document.querySelector('#panel-google .auth-google-btn');
+  if (btn) { btn.textContent = 'Opening Google…'; btn.disabled = true; }
+  try {
+    const { GoogleAuthProvider, signInWithPopup } = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js");
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+    const result = await signInWithPopup(auth, provider);
+    if (result.user) {
+      await window._saveUserProfile(result.user);
+      closeAuthModal();
+    }
+  } catch(e) {
+    setMsg('google-msg', 'Google sign-in failed. Please try again.', 'error');
+  }
+  if (btn) { btn.textContent = 'Continue with Google'; btn.disabled = false; }
 }
 
-window.getCurrentUser = function() {
-  return auth.currentUser;
-}
-
-window._firebaseSendPasswordReset = async function(email) {
-  await sendPasswordResetEmail(auth, email);
-}
-
+// ── Reviews ──
 window._saveReview = async function(reviewData) {
   await addDoc(collection(db, 'reviews'), {
     ...reviewData,
-    userId: auth.currentUser ? auth.currentUser.uid : null,
+    userId:    auth.currentUser ? auth.currentUser.uid  : null,
     userEmail: auth.currentUser ? auth.currentUser.email : null,
     approved: false,
     createdAt: serverTimestamp()
@@ -3716,43 +4024,31 @@ window._saveReview = async function(reviewData) {
 }
 
 window.isAdminUser = function() {
-  const user = auth.currentUser;
-  return user && user.email === 'urreal3d@gmail.com';
+  return auth.currentUser?.email === 'urreal3d@gmail.com';
 }
 
-window.handleGoogleLogin = async function() {
-  try {
-    const { GoogleAuthProvider, signInWithPopup } = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js");
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
-    const result = await signInWithPopup(auth, provider);
-    if (result.user) { closeAuthModal(); }
-  } catch(e) {
-    console.log(e);
-    document.getElementById('auth-msg').textContent = 'Google login failed: ' + e.message;
-    document.getElementById('auth-msg').style.color = '#f87171';
-  }
-}
-
+// ── Save order ──
 window.saveOrderToFirestore = async function(orderData) {
+  const user    = auth.currentUser;
+  const profile = window._userProfile || {};
   try {
     const docRef = await addDoc(collection(db, 'orders'), {
       ...orderData,
-      userId: auth.currentUser.uid,
-      userEmail: auth.currentUser.email,
-      userName: auth.currentUser.displayName,
+      userId:    user.uid,
+      userEmail: user.email || profile.email || '',
+      userName:  user.displayName || profile.name || '',
+      userPhone: user.phoneNumber || profile.phone || '',
       createdAt: serverTimestamp(),
-      status: orderData.status || 'pending',
-      paymentStatus: orderData.paymentStatus || 'confirmed',
+      status:            orderData.status        || 'pending',
+      paymentStatus:     orderData.paymentStatus || 'confirmed',
       razorpayPaymentId: orderData.razorpayPaymentId || null,
       renderedFile: null
     });
     return docRef.id;
-  } catch(e) {
-    console.log('Order save failed:', e);
-  }
+  } catch(e) { console.log('Order save failed:', e); }
 }
 
+// ── Load user orders ──
 window.loadUserOrders = async function() {
   try {
     const q = query(
@@ -3760,12 +4056,9 @@ window.loadUserOrders = async function() {
       where('userId', '==', auth.currentUser.uid),
       orderBy('createdAt', 'desc')
     );
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  } catch(e) {
-    console.log('Load orders failed:', e);
-    return [];
-  }
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch(e) { console.log('Load orders failed:', e); return []; }
 }
 </script>
 
@@ -4038,175 +4331,662 @@ window.checkAdminAccess = function() {
 </script>
 <!-- ═══ AUTH MODAL ═══ -->
 <style>
-.auth-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:590;opacity:0;pointer-events:none;transition:opacity 0.28s;backdrop-filter:blur(8px);}
+/* ── Overlay ── */
+.auth-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:590;opacity:0;pointer-events:none;transition:opacity 0.3s;backdrop-filter:blur(12px);}
 .auth-overlay.open{opacity:1;pointer-events:all;}
+
+/* ── Modal shell ── */
 .auth-modal{
-  position:fixed;top:50%;left:50%;transform:translate(-50%,-56%);z-index:610;
-  background:var(--deep);border:1px solid rgba(124,58,237,0.2);
-  border-radius:6px;padding:36px 32px;
-  width:min(400px,92vw);
-  transition:transform 0.32s cubic-bezier(0.22,1,0.36,1),opacity 0.28s;
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-54%);
+  z-index:610;
+  background:linear-gradient(160deg,#110e26 0%,#0c0919 60%,#0a0717 100%);
+  border:1px solid rgba(124,58,237,0.22);
+  border-radius:16px;
+  padding:0;
+  width:min(420px,94vw);
+  max-height:92vh;
+  overflow-y:auto;
+  transition:transform 0.34s cubic-bezier(0.22,1,0.36,1),opacity 0.3s;
   opacity:0;pointer-events:none;
+  box-shadow:0 32px 80px rgba(0,0,0,0.6),0 0 0 1px rgba(124,58,237,0.06);
 }
 .auth-modal.open{transform:translate(-50%,-50%);opacity:1;pointer-events:all;}
-.auth-modal-logo{
-  display:flex;align-items:center;gap:8px;margin-bottom:24px;
-  font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--white);
+
+/* ── Modal header band ── */
+.auth-header{
+  padding:28px 28px 0;
+  position:relative;
 }
-.auth-modal-logo em{font-style:normal;color:var(--pl);}
-.auth-modal-title{font-family:'Fraunces',serif;font-size:24px;font-weight:700;margin-bottom:4px;line-height:1.1;}
-.auth-modal-sub{color:var(--gdim);font-size:12px;margin-bottom:24px;line-height:1.6;}
-.auth-tabs{
-  display:flex;gap:0;margin-bottom:24px;
-  border-bottom:1px solid rgba(124,58,237,0.12);
-}
-.auth-tab{
-  flex:1;padding:10px;border:none;background:transparent;
-  color:var(--gdim);font-family:'Plus Jakarta Sans',sans-serif;
-  font-size:12px;font-weight:700;letter-spacing:0.06em;
-  cursor:pointer;border-bottom:2px solid transparent;
-  transition:all 0.2s;margin-bottom:-1px;
-}
-.auth-tab.active{color:var(--white);border-bottom-color:var(--pl);}
-.auth-field{margin-bottom:14px;}
-.auth-field label{display:block;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gdim);margin-bottom:6px;}
-.auth-field input{
-  width:100%;background:rgba(124,58,237,0.04);
-  border:1px solid rgba(124,58,237,0.14);border-radius:3px;
-  padding:11px 14px;color:var(--white);
-  font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;
-  transition:border-color 0.2s;
-}
-.auth-field input:focus{outline:none;border-color:var(--pl);background:rgba(124,58,237,0.08);}
-.auth-field input::placeholder{color:var(--gdim);}
-.auth-submit-btn{
-  width:100%;background:var(--purple);color:var(--white);
-  padding:13px;border-radius:3px;border:none;
-  font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:700;
-  letter-spacing:0.1em;text-transform:uppercase;
-  cursor:pointer;transition:all 0.22s;margin-top:6px;
-}
-.auth-submit-btn:hover{background:var(--pm);}
-.auth-msg{text-align:center;font-size:12px;margin-top:12px;min-height:18px;}
 .auth-close{
-  position:absolute;top:16px;right:16px;
-  background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.16);
-  border-radius:50%;width:30px;height:30px;
+  position:absolute;top:20px;right:20px;
+  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);
+  border-radius:8px;width:32px;height:32px;
   display:flex;align-items:center;justify-content:center;
   cursor:pointer;color:var(--gdim);font-size:13px;transition:all 0.2s;
 }
-.auth-close:hover{background:rgba(124,58,237,0.2);color:var(--white);}
-.auth-user-bar{display:none;align-items:center;gap:10px;}
-.auth-user-bar span{font-size:13px;font-weight:600;color:var(--pl);}
+.auth-close:hover{background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.25);color:#f87171;}
+.auth-brand{
+  display:flex;align-items:center;gap:9px;margin-bottom:20px;
+  font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--white);
+  letter-spacing:-0.01em;
+}
+.auth-brand em{font-style:normal;color:var(--pl);}
+.auth-modal-title{
+  font-family:'Fraunces',serif;font-size:26px;font-weight:700;
+  line-height:1.05;letter-spacing:-0.02em;margin-bottom:6px;
+}
+.auth-modal-sub{color:var(--gdim);font-size:12px;line-height:1.65;margin-bottom:24px;}
+
+/* ── Method tabs ── */
+.auth-method-tabs{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:0;border-bottom:1px solid rgba(124,58,237,0.12);
+  margin:0 -28px;padding:0 28px;
+}
+.auth-method-tab{
+  padding:11px 0;border:none;background:transparent;
+  color:var(--gdim);font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:11px;font-weight:700;letter-spacing:0.05em;
+  cursor:pointer;border-bottom:2px solid transparent;
+  transition:all 0.22s;margin-bottom:-1px;text-align:center;
+  white-space:nowrap;
+}
+.auth-method-tab:hover{color:var(--white);}
+.auth-method-tab.active{color:var(--white);border-bottom-color:var(--pl);}
+.auth-method-tab .tab-icon{display:block;font-size:16px;margin-bottom:3px;}
+
+/* ── Body ── */
+.auth-body{padding:24px 28px 28px;}
+
+/* ── Panels ── */
+.auth-panel{display:none;}
+.auth-panel.active{display:block;}
+
+/* ── OTP steps ── */
+.otp-step{display:none;}
+.otp-step.active{display:block;}
+
+/* ── Input group ── */
+.auth-input-group{margin-bottom:16px;}
+.auth-input-label{
+  display:block;font-size:9.5px;font-weight:800;
+  letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--gdim);margin-bottom:7px;
+}
+.auth-input-wrap{position:relative;display:flex;align-items:center;}
+.auth-input{
+  width:100%;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(124,58,237,0.18);
+  border-radius:8px;
+  padding:13px 16px;
+  color:var(--white);
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:13.5px;
+  transition:border-color 0.22s,background 0.22s,box-shadow 0.22s;
+  outline:none;
+}
+.auth-input:focus{
+  border-color:rgba(124,58,237,0.6);
+  background:rgba(124,58,237,0.05);
+  box-shadow:0 0 0 3px rgba(124,58,237,0.08);
+}
+.auth-input::placeholder{color:rgba(106,88,128,0.7);font-size:12.5px;}
+.auth-input-prefix{
+  position:absolute;left:14px;
+  font-size:13px;font-weight:700;color:var(--white);
+  pointer-events:none;
+}
+.auth-input.has-prefix{padding-left:48px;}
+
+/* ── Country code selector ── */
+.country-selector{
+  position:relative;flex-shrink:0;
+}
+.country-selector-btn{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(124,58,237,0.18);
+  border-right:none;
+  border-radius:8px 0 0 8px;
+  padding:0 12px;height:100%;
+  cursor:pointer;transition:background 0.2s;
+  min-width:82px;white-space:nowrap;
+  color:var(--white);
+}
+.country-selector-btn:hover{background:rgba(124,58,237,0.08);}
+.country-flag{font-size:18px;line-height:1;}
+.country-dial{font-size:12.5px;font-weight:700;color:var(--white);}
+.country-chevron{font-size:9px;color:var(--gdim);margin-left:2px;transition:transform 0.2s;}
+.country-selector.open .country-chevron{transform:rotate(180deg);}
+
+/* ── Dropdown ── */
+.country-dropdown{
+  position:absolute;top:calc(100% + 6px);left:0;
+  width:280px;max-height:280px;
+  background:#110e26;
+  border:1px solid rgba(124,58,237,0.22);
+  border-radius:10px;
+  box-shadow:0 16px 48px rgba(0,0,0,0.6);
+  z-index:800;
+  display:none;
+  flex-direction:column;
+  overflow:hidden;
+}
+.country-selector.open .country-dropdown{display:flex;}
+.country-search{
+  padding:10px 12px;
+  border-bottom:1px solid rgba(124,58,237,0.1);
+  flex-shrink:0;
+}
+.country-search input{
+  width:100%;background:rgba(255,255,255,0.04);
+  border:1px solid rgba(124,58,237,0.16);
+  border-radius:6px;padding:8px 12px;
+  color:var(--white);font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:12.5px;outline:none;
+}
+.country-search input::placeholder{color:var(--gdim);font-size:12px;}
+.country-search input:focus{border-color:rgba(124,58,237,0.5);}
+.country-list{
+  overflow-y:auto;flex:1;
+  scrollbar-width:thin;scrollbar-color:rgba(124,58,237,0.2) transparent;
+}
+.country-opt{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;cursor:pointer;
+  transition:background 0.15s;font-size:13px;
+}
+.country-opt:hover{background:rgba(124,58,237,0.1);}
+.country-opt.selected{background:rgba(124,58,237,0.14);}
+.country-opt-flag{font-size:17px;flex-shrink:0;}
+.country-opt-name{flex:1;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.country-opt-code{color:var(--pl);font-weight:700;font-size:12px;flex-shrink:0;}
+
+/* ── Phone input joined to selector ── */
+.auth-input.phone-field{
+  border-radius:0 8px 8px 0;
+  border-left:none;
+  flex:1;
+}
+.phone-input-row{display:flex;align-items:stretch;}
+
+/* ── OTP boxes ── */
+.otp-boxes{display:flex;gap:8px;justify-content:center;margin:4px 0 8px;}
+.otp-box{
+  width:44px;height:52px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(124,58,237,0.2);
+  border-radius:8px;
+  text-align:center;
+  font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--white);
+  outline:none;caret-color:var(--pl);
+  transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;
+}
+.otp-box:focus{
+  border-color:var(--pl);
+  background:rgba(124,58,237,0.07);
+  box-shadow:0 0 0 3px rgba(124,58,237,0.1);
+}
+.otp-box.filled{border-color:rgba(124,58,237,0.5);background:rgba(124,58,237,0.06);}
+
+/* ── Primary button ── */
+.auth-primary-btn{
+  width:100%;
+  background:linear-gradient(135deg,#7c3aed 0%,#5b21b6 100%);
+  color:#fff;padding:14px 20px;
+  border-radius:8px;border:none;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:12px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;
+  cursor:pointer;transition:all 0.25s;margin-top:4px;
+  box-shadow:0 4px 20px rgba(124,58,237,0.35);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.auth-primary-btn:hover{
+  background:linear-gradient(135deg,#8b46f0 0%,#7c3aed 100%);
+  box-shadow:0 6px 32px rgba(124,58,237,0.55);
+  transform:translateY(-1px);
+}
+.auth-primary-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+
+/* ── Secondary/Ghost button ── */
+.auth-ghost-btn{
+  width:100%;background:transparent;color:var(--gray);
+  padding:12px;border-radius:8px;
+  border:1px solid rgba(124,58,237,0.18);
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;
+  cursor:pointer;transition:all 0.2s;margin-top:8px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.auth-ghost-btn:hover{border-color:rgba(124,58,237,0.4);color:var(--white);background:rgba(124,58,237,0.06);}
+
+/* ── Google button ── */
+.auth-google-btn{
+  width:100%;background:#fff;color:#1f1f1f;
+  padding:13px 20px;border-radius:8px;border:none;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;font-weight:700;
+  cursor:pointer;transition:all 0.22s;margin-bottom:0;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.3);
+}
+.auth-google-btn:hover{background:#f8f8f8;box-shadow:0 4px 18px rgba(0,0,0,0.4);transform:translateY(-1px);}
+
+/* ── Divider ── */
+.auth-divider{
+  display:flex;align-items:center;gap:12px;
+  margin:18px 0;
+}
+.auth-divider-line{flex:1;height:1px;background:rgba(124,58,237,0.1);}
+.auth-divider-text{font-size:9.5px;font-weight:800;letter-spacing:0.14em;color:var(--gdim);text-transform:uppercase;}
+
+/* ── Status msg ── */
+.auth-msg{
+  font-size:12px;min-height:18px;
+  padding:0 2px;margin-top:12px;
+  text-align:center;line-height:1.6;
+}
+.auth-msg.success{color:var(--green);}
+.auth-msg.error{color:#f87171;}
+
+/* ── Small link ── */
+.auth-link{
+  font-size:11px;color:var(--gdim);cursor:pointer;
+  text-decoration:underline;text-underline-offset:3px;
+  transition:color 0.2s;display:inline-block;
+}
+.auth-link:hover{color:var(--pl);}
+
+/* ── Phone display in OTP step ── */
+.auth-phone-display{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);
+  border-radius:6px;padding:6px 12px;
+  font-size:13px;font-weight:700;color:var(--white);
+  margin-bottom:20px;
+}
+.auth-phone-display span{font-size:10px;color:var(--gdim);font-weight:600;}
+
+/* ── Recaptcha container (invisible) ── */
+#recaptcha-container{margin-top:12px;}
 </style>
 
 <div class="auth-overlay" id="auth-overlay" onclick="closeAuthModal()"></div>
 <div class="auth-modal" id="auth-modal">
-  <button class="auth-close" onclick="closeAuthModal()">✕</button>
-  <div class="auth-modal-logo">
-    <svg width="20" height="20" viewBox="0 0 30 30" fill="none"><path d="M15 3 L26 9 L26 21 L15 27 L4 21 L4 9 Z" stroke="#7c3aed" stroke-width="1.2" fill="none" opacity="0.5"/><path d="M15 3 L26 9 L15 15 L4 9 Z" fill="#7c3aed" opacity="0.3"/><circle cx="15" cy="15" r="2" fill="#a78bfa"/></svg>
-    Urreal<em>3D</em>
-  </div>
-  <div class="auth-modal-title">Welcome back</div>
-  <div class="auth-modal-sub">Login or create an account to place a render order.</div>
-  <div class="auth-tabs">
-    <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Login</button>
-    <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Create Account</button>
-  </div>
-  <div id="auth-name-field" class="auth-field" style="display:none;">
-    <label>Full Name</label>
-    <input type="text" id="auth-name" placeholder="Your name">
-  </div>
-  <div class="auth-field">
-    <label>Email</label>
-    <input type="email" id="auth-email" placeholder="you@email.com">
-  </div>
-  <div id="auth-phone-field" class="auth-field" style="display:none;">
-    <label>Phone Number</label>
-    <input type="tel" id="auth-phone" placeholder="+91 98765 43210">
-  </div>
-  <div class="auth-field">
-    <label>Password</label>
-    <input type="password" id="auth-pass" placeholder="Min 6 characters">
-  </div>
-  <button class="auth-submit-btn" id="auth-submit-btn" onclick="handleLogin()">Login →</button>
-  <div id="auth-forgot-link" style="text-align:right;margin-top:10px;">
-    <span onclick="showForgotPassword()" style="font-size:11px;color:var(--gdim);cursor:pointer;text-decoration:underline;transition:color 0.2s;" onmouseover="this.style.color='var(--pl)'" onmouseout="this.style.color='var(--gdim)'">Forgot password?</span>
-  </div>
-  <div id="auth-forgot-section" style="display:none;margin-top:10px;background:rgba(124,58,237,0.05);border:1px solid rgba(124,58,237,0.14);border-radius:3px;padding:14px;">
-    <div style="font-size:12px;font-weight:700;color:var(--white);margin-bottom:8px;">Reset Password</div>
-    <div style="font-size:11px;color:var(--gdim);margin-bottom:10px;">Enter your email and we'll send you a reset link.</div>
-    <input type="email" id="auth-reset-email" placeholder="you@email.com" style="width:100%;background:rgba(124,58,237,0.04);border:1px solid rgba(124,58,237,0.14);border-radius:3px;padding:10px 12px;color:var(--white);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;outline:none;margin-bottom:10px;">
-    <div style="display:flex;gap:8px;">
-      <button onclick="hideForgotPassword()" style="flex:1;background:transparent;color:var(--gdim);padding:9px;border-radius:3px;border:1px solid rgba(124,58,237,0.14);font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;cursor:pointer;">Cancel</button>
-      <button id="auth-reset-btn" onclick="handleForgotPassword()" style="flex:2;background:var(--purple);color:var(--white);padding:9px;border-radius:3px;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:700;cursor:pointer;">Send Reset Link →</button>
+
+  <!-- Header -->
+  <div class="auth-header">
+    <button class="auth-close" onclick="closeAuthModal()">✕</button>
+    <div class="auth-brand">
+      <svg width="18" height="18" viewBox="0 0 30 30" fill="none"><path d="M15 3 L26 9 L26 21 L15 27 L4 21 L4 9 Z" stroke="#7c3aed" stroke-width="1.2" fill="none" opacity="0.5"/><path d="M15 3 L26 9 L15 15 L4 9 Z" fill="#7c3aed" opacity="0.3"/><circle cx="15" cy="15" r="2" fill="#a78bfa"/></svg>
+      Urreal<em>3D</em>
+    </div>
+    <div class="auth-modal-title" id="auth-modal-title">Sign in to continue</div>
+    <div class="auth-modal-sub" id="auth-modal-sub">Place render orders, track projects, and get your files delivered.</div>
+
+    <!-- Method Tabs -->
+    <div class="auth-method-tabs">
+      <button class="auth-method-tab active" id="mtab-phone" onclick="switchAuthMethod('phone')">
+        <span class="tab-icon">📱</span>Phone
+      </button>
+      <button class="auth-method-tab" id="mtab-google" onclick="switchAuthMethod('google')">
+        <span class="tab-icon">G</span>Google
+      </button>
+      <button class="auth-method-tab" id="mtab-email" onclick="switchAuthMethod('email')">
+        <span class="tab-icon">✉</span>Email
+      </button>
     </div>
   </div>
-  <div class="auth-msg" id="auth-msg"></div>
-  <div style="display:flex;align-items:center;gap:10px;margin-top:16px;">
-    <div style="flex:1;height:1px;background:rgba(124,58,237,0.12);"></div>
-    <span style="font-size:10px;color:var(--gdim);font-weight:700;letter-spacing:0.1em;">OR</span>
-    <div style="flex:1;height:1px;background:rgba(124,58,237,0.12);"></div>
-  </div>
-  <button id="google-signin-btn" onclick="handleGoogleLogin()" style="width:100%;margin-top:12px;background:white;color:#1f1f1f;padding:12px;border-radius:3px;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all 0.22s;">
-    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:18px;height:18px;">
-    Continue with Google
-  </button>
-</div>
+
+  <!-- Body -->
+  <div class="auth-body">
+
+    <!-- ══ PHONE PANEL ══ -->
+    <div class="auth-panel active" id="panel-phone">
+
+      <!-- Step 1: Enter phone -->
+      <div class="otp-step active" id="otp-step-phone">
+        <div class="auth-input-group">
+          <label class="auth-input-label">Mobile Number</label>
+          <div class="phone-input-row">
+            <!-- Country selector -->
+            <div class="country-selector" id="country-selector">
+              <button type="button" class="country-selector-btn" id="country-selector-btn"
+                onclick="toggleCountryDropdown()">
+                <span class="country-flag" id="selected-flag">🇮🇳</span>
+                <span class="country-dial" id="selected-dial">+91</span>
+                <span class="country-chevron">▼</span>
+              </button>
+              <div class="country-dropdown" id="country-dropdown">
+                <div class="country-search">
+                  <input type="text" id="country-search-input" placeholder="Search country…"
+                    oninput="filterCountries(this.value)" onclick="event.stopPropagation()">
+                </div>
+                <div class="country-list" id="country-list"></div>
+              </div>
+            </div>
+            <!-- Number input -->
+            <input class="auth-input phone-field" type="tel" id="phone-number-input"
+              placeholder="Enter phone number"
+              oninput="this.value=this.value.replace(/\D/g,'')">
+          </div>
+          <div style="font-size:10px;color:var(--gdim);margin-top:7px;line-height:1.6;">
+            We'll send a 6-digit OTP to verify. This number becomes your WhatsApp contact for order updates.
+          </div>
+        </div>
+        <div id="recaptcha-container"></div>
+        <button class="auth-primary-btn" id="send-otp-btn" onclick="handleSendOTP()">
+          Send OTP <span style="font-size:14px;">→</span>
+        </button>
+        <div class="auth-msg" id="phone-msg"></div>
+      </div>
+
+      <!-- Step 2: Enter OTP -->
+      <div class="otp-step" id="otp-step-verify">
+        <div style="margin-bottom:20px;">
+          <div id="auth-phone-display" class="auth-phone-display">
+            <span>Sent to</span> <strong id="display-phone-num">+91 —</strong>
+          </div>
+          <div style="font-size:12px;color:var(--gdim);line-height:1.6;">Enter the 6-digit OTP sent via SMS.</div>
+        </div>
+        <div class="otp-boxes" id="otp-boxes">
+          <input class="otp-box" type="tel" maxlength="1" oninput="otpNext(this,0)">
+          <input class="otp-box" type="tel" maxlength="1" oninput="otpNext(this,1)">
+          <input class="otp-box" type="tel" maxlength="1" oninput="otpNext(this,2)">
+          <input class="otp-box" type="tel" maxlength="1" oninput="otpNext(this,3)">
+          <input class="otp-box" type="tel" maxlength="1" oninput="otpNext(this,4)">
+          <input class="otp-box" type="tel" maxlength="1" oninput="otpNext(this,5)">
+        </div>
+        <button class="auth-primary-btn" id="verify-otp-btn" onclick="handleVerifyOTP()">
+          Verify &amp; Continue <span style="font-size:14px;">→</span>
+        </button>
+        <div style="text-align:center;margin-top:14px;">
+          <span class="auth-link" onclick="backToPhone()">← Change number</span>
+          <span style="color:var(--gdim);margin:0 8px;font-size:11px;">·</span>
+          <span class="auth-link" id="resend-link" onclick="handleSendOTP(true)">Resend OTP</span>
+        </div>
+        <div class="auth-msg" id="otp-msg"></div>
+      </div>
+
+      <!-- Step 3: Set username (new users only) -->
+      <div class="otp-step" id="otp-step-username">
+        <div style="margin-bottom:18px;">
+          <div style="font-size:22px;margin-bottom:8px;">👋</div>
+          <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-bottom:4px;">One last step</div>
+          <div style="font-size:12px;color:var(--gdim);line-height:1.6;">Set a display name for your account. This is shown in your orders.</div>
+        </div>
+        <div class="auth-input-group">
+          <label class="auth-input-label">Your Name</label>
+          <input class="auth-input" type="text" id="new-username-input" placeholder="e.g. Arjun / XYZ Brand">
+        </div>
+        <button class="auth-primary-btn" onclick="handleSetUsername()">
+          Complete Setup <span style="font-size:14px;">→</span>
+        </button>
+        <div class="auth-msg" id="username-msg"></div>
+      </div>
+
+    </div><!-- /panel-phone -->
+
+    <!-- ══ GOOGLE PANEL ══ -->
+    <div class="auth-panel" id="panel-google">
+      <div style="text-align:center;padding:8px 0 20px;">
+        <div style="font-size:36px;margin-bottom:12px;">G</div>
+        <div style="font-family:'Fraunces',serif;font-size:17px;font-weight:700;margin-bottom:6px;">Continue with Google</div>
+        <div style="font-size:12px;color:var(--gdim);line-height:1.6;margin-bottom:20px;">Your Google name and profile will be used for your account.</div>
+      </div>
+      <button class="auth-google-btn" onclick="handleGoogleLogin()">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:18px;height:18px;">
+        Continue with Google
+      </button>
+      <div class="auth-msg" id="google-msg"></div>
+    </div><!-- /panel-google -->
+
+    <!-- ══ EMAIL PANEL ══ -->
+    <div class="auth-panel" id="panel-email">
+      <!-- Login / Signup sub-tabs -->
+      <div style="display:flex;gap:0;border-bottom:1px solid rgba(124,58,237,0.1);margin-bottom:20px;">
+        <button class="auth-method-tab active" id="etab-login" style="flex:1;font-size:11.5px;"
+          onclick="switchEmailTab('login')">Login</button>
+        <button class="auth-method-tab" id="etab-signup" style="flex:1;font-size:11.5px;"
+          onclick="switchEmailTab('signup')">Create Account</button>
+      </div>
+
+      <div id="email-name-group" class="auth-input-group" style="display:none;">
+        <label class="auth-input-label">Full Name</label>
+        <input class="auth-input" type="text" id="auth-name" placeholder="Your name">
+      </div>
+      <div class="auth-input-group">
+        <label class="auth-input-label">Email Address</label>
+        <input class="auth-input" type="email" id="auth-email" placeholder="you@email.com">
+      </div>
+      <div class="auth-input-group">
+        <label class="auth-input-label">Password</label>
+        <input class="auth-input" type="password" id="auth-pass" placeholder="Min 6 characters">
+      </div>
+
+      <button class="auth-primary-btn" id="auth-submit-btn" onclick="handleLogin()">
+        Login <span style="font-size:14px;">→</span>
+      </button>
+
+      <div id="auth-forgot-link" style="text-align:right;margin-top:12px;">
+        <span class="auth-link" onclick="showForgotPassword()">Forgot password?</span>
+      </div>
+      <div id="auth-forgot-section" style="display:none;margin-top:12px;background:rgba(124,58,237,0.05);border:1px solid rgba(124,58,237,0.14);border-radius:8px;padding:16px;">
+        <div style="font-size:12px;font-weight:700;color:var(--white);margin-bottom:6px;">Reset Password</div>
+        <div style="font-size:11px;color:var(--gdim);margin-bottom:12px;">We'll email you a reset link.</div>
+        <input class="auth-input" type="email" id="auth-reset-email" placeholder="you@email.com" style="margin-bottom:10px;">
+        <div style="display:flex;gap:8px;">
+          <button onclick="hideForgotPassword()" class="auth-ghost-btn" style="margin:0;flex:1;padding:10px;">Cancel</button>
+          <button id="auth-reset-btn" onclick="handleForgotPassword()" class="auth-primary-btn" style="margin:0;flex:2;padding:10px;">Send Link →</button>
+        </div>
+      </div>
+      <div class="auth-msg" id="auth-msg"></div>
+
+    </div><!-- /panel-email -->
+
+  </div><!-- /auth-body -->
+</div><!-- /auth-modal -->
 
 <script>
+// ══════════════════════════════════════════
+// AUTH MODAL — CONTROLLER
+// ══════════════════════════════════════════
+let _confirmationResult = null;
+
 function openAuthModal(mode) {
   document.getElementById('auth-overlay').classList.add('open');
   document.getElementById('auth-modal').classList.add('open');
-  switchAuthTab(mode || 'login');
+  switchAuthMethod('phone');
 }
 function closeAuthModal() {
   document.getElementById('auth-overlay').classList.remove('open');
   document.getElementById('auth-modal').classList.remove('open');
-  document.getElementById('auth-msg').textContent = '';
-  hideForgotPassword();
+  _confirmationResult = null;
 }
-function switchAuthTab(tab) {
+
+// Switch between Phone / Google / Email tabs
+function switchAuthMethod(method) {
+  ['phone','google','email'].forEach(m => {
+    document.getElementById('panel-' + m).classList.toggle('active', m === method);
+    document.getElementById('mtab-' + m).classList.toggle('active', m === method);
+  });
+  // Reset OTP flow to step 1 when switching away and back
+  if (method === 'phone') showOtpStep('phone');
+  clearAuthMsgs();
+}
+
+function clearAuthMsgs() {
+  ['phone-msg','otp-msg','username-msg','google-msg','auth-msg'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = ''; el.className = 'auth-msg'; }
+  });
+}
+
+function showOtpStep(step) {
+  ['phone','verify','username'].forEach(s => {
+    document.getElementById('otp-step-' + s).classList.toggle('active', s === step);
+  });
+}
+
+function setMsg(id, text, type) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text;
+  el.className = 'auth-msg ' + (type || '');
+}
+
+// ── OTP input navigation ──
+function otpNext(input, idx) {
+  input.value = input.value.replace(/\D/g,'');
+  if (input.value) {
+    input.classList.add('filled');
+    const boxes = document.querySelectorAll('.otp-box');
+    if (idx < 5) boxes[idx + 1].focus();
+    else handleVerifyOTP(); // auto-verify on last digit
+  } else {
+    input.classList.remove('filled');
+  }
+}
+
+// Handle backspace on OTP
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Backspace' && e.target.classList.contains('otp-box')) {
+    if (!e.target.value) {
+      const boxes = Array.from(document.querySelectorAll('.otp-box'));
+      const idx = boxes.indexOf(e.target);
+      if (idx > 0) { boxes[idx - 1].value = ''; boxes[idx - 1].classList.remove('filled'); boxes[idx - 1].focus(); }
+    }
+  }
+});
+
+function backToPhone() {
+  showOtpStep('phone');
+  document.querySelectorAll('.otp-box').forEach(b => { b.value = ''; b.classList.remove('filled'); });
+}
+
+// ── Phone OTP send ──
+async function handleSendOTP(isResend) {
+  const raw  = document.getElementById('phone-number-input').value.trim();
+  const dial = document.getElementById('selected-dial')?.textContent || '+91';
+  if (!raw || raw.length < 4) { setMsg('phone-msg', 'Please enter a valid phone number.', 'error'); return; }
+  const phone = dial + raw;
+  const btn = document.getElementById('send-otp-btn');
+  btn.disabled = true; btn.textContent = 'Sending OTP…';
+  setMsg('phone-msg', '', '');
+
+  try {
+    if (!window._recaptchaVerifier) {
+      const { RecaptchaVerifier } = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js");
+      window._recaptchaVerifier = new RecaptchaVerifier(window._firebaseAuth, 'recaptcha-container', { size: 'invisible' });
+    }
+    const { signInWithPhoneNumber } = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js");
+    _confirmationResult = await signInWithPhoneNumber(window._firebaseAuth, phone, window._recaptchaVerifier);
+    document.getElementById('display-phone-num').textContent = phone;
+    showOtpStep('verify');
+    document.querySelectorAll('.otp-box')[0].focus();
+    setMsg('otp-msg', '✓ OTP sent to ' + phone, 'success');
+  } catch(e) {
+    setMsg('phone-msg', 'Failed to send OTP: ' + (e.message || 'Please try again.'), 'error');
+    window._recaptchaVerifier = null;
+  }
+  btn.disabled = false; btn.textContent = 'Send OTP →';
+}
+
+// ── Verify OTP ──
+async function handleVerifyOTP() {
+  const boxes = document.querySelectorAll('.otp-box');
+  const code = Array.from(boxes).map(b => b.value).join('');
+  if (code.length !== 6) { setMsg('otp-msg', 'Please enter all 6 digits.', 'error'); return; }
+  if (!_confirmationResult) { setMsg('otp-msg', 'Session expired. Please resend OTP.', 'error'); return; }
+
+  const btn = document.getElementById('verify-otp-btn');
+  btn.disabled = true; btn.textContent = 'Verifying…';
+  setMsg('otp-msg', '', '');
+
+  try {
+    const result = await _confirmationResult.confirm(code);
+    const user = result.user;
+    const isNewUser = !user.displayName;
+
+    if (isNewUser) {
+      // Save phone to profile store; ask for name
+      window._pendingPhoneUser = user;
+      showOtpStep('username');
+      setTimeout(() => document.getElementById('new-username-input').focus(), 100);
+    } else {
+      // Existing user — save phone to Firestore profile if not already
+      await window._saveUserProfile(user);
+      closeAuthModal();
+    }
+  } catch(e) {
+    const msg = e.code === 'auth/invalid-verification-code'
+      ? 'Incorrect OTP. Please check and try again.'
+      : 'Verification failed. Please try again.';
+    setMsg('otp-msg', msg, 'error');
+    boxes.forEach(b => { b.value = ''; b.classList.remove('filled'); });
+    boxes[0].focus();
+  }
+  btn.disabled = false; btn.textContent = 'Verify & Continue →';
+}
+
+// ── Set username for new phone users ──
+async function handleSetUsername() {
+  const name = document.getElementById('new-username-input').value.trim();
+  if (!name || name.length < 2) { setMsg('username-msg', 'Please enter your name (min 2 characters).', 'error'); return; }
+  const user = window._pendingPhoneUser || window._firebaseAuth?.currentUser;
+  if (!user) { setMsg('username-msg', 'Session error. Please try again.', 'error'); return; }
+
+  try {
+    const { updateProfile } = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js");
+    await updateProfile(user, { displayName: name });
+    await window._saveUserProfile(user, name);
+    window._pendingPhoneUser = null;
+    closeAuthModal();
+  } catch(e) {
+    setMsg('username-msg', 'Could not save name. Please try again.', 'error');
+  }
+}
+
+// ── Email sub-tabs ──
+function switchEmailTab(tab) {
   const isSignup = tab === 'signup';
-  document.getElementById('tab-login').classList.toggle('active', !isSignup);
-  document.getElementById('tab-signup').classList.toggle('active', isSignup);
-  document.getElementById('auth-name-field').style.display  = isSignup ? 'block' : 'none';
-  document.getElementById('auth-phone-field').style.display = isSignup ? 'block' : 'none';
-  document.getElementById('auth-submit-btn').textContent    = isSignup ? 'Create Account →' : 'Login →';
-  document.getElementById('auth-submit-btn').onclick        = isSignup ? handleSignup : handleLogin;
+  document.getElementById('etab-login').classList.toggle('active', !isSignup);
+  document.getElementById('etab-signup').classList.toggle('active', isSignup);
+  document.getElementById('email-name-group').style.display = isSignup ? 'block' : 'none';
+  const btn = document.getElementById('auth-submit-btn');
+  btn.innerHTML = isSignup ? 'Create Account <span style="font-size:14px">→</span>' : 'Login <span style="font-size:14px">→</span>';
+  btn.onclick = isSignup ? handleSignup : handleLogin;
   document.getElementById('auth-msg').textContent = '';
-  // Show forgot password link only on login tab
   document.getElementById('auth-forgot-link').style.display = isSignup ? 'none' : 'block';
   hideForgotPassword();
 }
+
+// ── Forgot password ──
 function showForgotPassword() {
   document.getElementById('auth-forgot-section').style.display = 'block';
   document.getElementById('auth-forgot-link').style.display = 'none';
   document.getElementById('auth-reset-email').value = document.getElementById('auth-email').value || '';
   document.getElementById('auth-reset-email').focus();
-  document.getElementById('auth-msg').textContent = '';
 }
 function hideForgotPassword() {
-  document.getElementById('auth-forgot-section').style.display = 'none';
-  document.getElementById('auth-forgot-link').style.display = 'block';
-  document.getElementById('auth-msg').textContent = '';
+  const s = document.getElementById('auth-forgot-section');
+  const l = document.getElementById('auth-forgot-link');
+  if(s) s.style.display = 'none';
+  if(l) l.style.display = 'block';
 }
 async function handleForgotPassword() {
   const email = document.getElementById('auth-reset-email').value.trim();
-  const msg = document.getElementById('auth-msg');
   const btn = document.getElementById('auth-reset-btn');
-  if (!email) { msg.textContent = 'Please enter your email.'; msg.style.color = '#f87171'; return; }
-  btn.textContent = 'Sending...'; btn.disabled = true;
+  if (!email) { setMsg('auth-msg','Please enter your email.','error'); return; }
+  btn.textContent = 'Sending…'; btn.disabled = true;
   try {
     await window._firebaseSendPasswordReset(email);
     hideForgotPassword();
-    msg.textContent = '✅ Reset link sent! Check your email.';
-    msg.style.color = 'var(--green)';
+    setMsg('auth-msg','✅ Reset link sent! Check your email.','success');
   } catch(e) {
-    msg.textContent = 'Email not found. Please check and try again.';
-    msg.style.color = '#f87171';
+    setMsg('auth-msg','Email not found. Please check and try again.','error');
   }
-  btn.textContent = 'Send Reset Link →'; btn.disabled = false;
+  btn.textContent = 'Send Link →'; btn.disabled = false;
 }
 </script>
 <!-- ═══ END AUTH ═══ -->
@@ -4526,6 +5306,654 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <!-- ═══ END LAZY LOADING + VIDEO PERFORMANCE ═══ -->
+
+<!-- ════════════════════════════════════════════════════════
+     CART PANEL
+════════════════════════════════════════════════════════ -->
+<style>
+/* ── Overlay ── */
+.cart-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.72);
+  z-index:490;opacity:0;pointer-events:none;
+  transition:opacity 0.3s;backdrop-filter:blur(8px);
+}
+.cart-overlay.open{opacity:1;pointer-events:all;}
+
+/* ── Panel ── */
+.cart-panel{
+  position:fixed;top:0;right:0;bottom:0;
+  width:min(480px,100vw);
+  background:linear-gradient(180deg,#110e26 0%,#0c0919 100%);
+  border-left:1px solid rgba(124,58,237,0.18);
+  z-index:500;
+  transform:translateX(100%);
+  transition:transform 0.36s cubic-bezier(0.22,1,0.36,1);
+  display:flex;flex-direction:column;
+  box-shadow:-24px 0 80px rgba(0,0,0,0.5);
+}
+.cart-panel.open{transform:translateX(0);}
+
+/* ── Header ── */
+.cart-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px 24px 18px;
+  border-bottom:1px solid rgba(124,58,237,0.1);
+  flex-shrink:0;
+}
+.cart-title{
+  font-family:'Fraunces',serif;font-size:22px;font-weight:700;
+  letter-spacing:-0.02em;display:flex;align-items:center;gap:10px;
+}
+.cart-item-count{
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:800;
+  background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.25);
+  color:var(--pl);border-radius:6px;padding:3px 9px;letter-spacing:0.06em;
+}
+.cart-close-btn{
+  width:32px;height:32px;border-radius:8px;
+  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);
+  color:var(--gdim);cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;transition:all 0.2s;
+}
+.cart-close-btn:hover{background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.25);color:#f87171;}
+
+/* ── Discount progress bar ── */
+.cart-progress-wrap{
+  padding:14px 24px;
+  border-bottom:1px solid rgba(124,58,237,0.07);
+  flex-shrink:0;
+}
+.cart-progress-bar-track{
+  height:4px;background:rgba(124,58,237,0.1);border-radius:2px;
+  overflow:hidden;margin-bottom:6px;
+}
+.cart-progress-bar-fill{
+  height:100%;border-radius:2px;
+  background:linear-gradient(90deg,var(--purple),var(--pl));
+  transition:width 0.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+.cart-progress-text{
+  font-size:11px;color:var(--gdim);line-height:1.5;
+}
+.cart-progress-text strong{color:var(--white);}
+.cart-progress-text.unlocked{color:#22c55e;}
+
+/* ── Body (scrollable) ── */
+.cart-body{
+  flex:1;overflow-y:auto;padding:16px 24px;
+  scrollbar-width:thin;scrollbar-color:rgba(124,58,237,0.2) transparent;
+}
+
+/* ── Empty state ── */
+.cart-empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100%;padding:60px 0;gap:14px;text-align:center;
+}
+.cart-empty-icon{font-size:40px;opacity:0.4;}
+.cart-empty-title{font-family:'Fraunces',serif;font-size:18px;font-weight:600;color:var(--gray);}
+.cart-empty-sub{font-size:12px;color:var(--gdim);line-height:1.6;}
+.cart-empty-btn{
+  margin-top:8px;
+  background:var(--purple);color:#fff;
+  padding:11px 22px;border-radius:7px;border:none;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:11.5px;font-weight:700;
+  letter-spacing:0.06em;cursor:pointer;transition:all 0.2s;
+}
+.cart-empty-btn:hover{background:var(--pm);}
+
+/* ── Cart Item card ── */
+.cart-item-card{
+  background:rgba(124,58,237,0.04);
+  border:1px solid rgba(124,58,237,0.12);
+  border-radius:10px;margin-bottom:10px;
+  overflow:hidden;transition:border-color 0.2s;
+}
+.cart-item-card.files-complete{border-color:rgba(34,197,94,0.3);}
+.cart-item-head{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;cursor:pointer;
+  transition:background 0.18s;
+}
+.cart-item-head:hover{background:rgba(124,58,237,0.04);}
+.cart-item-thumb{
+  width:36px;height:44px;border-radius:5px;overflow:hidden;
+  background:var(--card);flex-shrink:0;
+  border:1px solid rgba(124,58,237,0.15);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;
+}
+.cart-item-info{flex:1;min-width:0;}
+.cart-item-name{
+  font-size:13.5px;font-weight:700;color:var(--white);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  margin-bottom:2px;
+}
+.cart-item-meta{font-size:11px;color:var(--gdim);}
+.cart-item-price{
+  font-family:'Fraunces',serif;font-size:17px;font-weight:700;
+  color:var(--pl);flex-shrink:0;
+}
+.cart-item-chevron{
+  color:var(--gdim);font-size:11px;flex-shrink:0;
+  transition:transform 0.22s;margin-left:4px;
+}
+.cart-item-card.expanded .cart-item-chevron{transform:rotate(180deg);}
+.cart-item-remove{
+  width:24px;height:24px;border-radius:5px;
+  background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);
+  color:#f87171;cursor:pointer;font-size:11px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.18s;flex-shrink:0;
+}
+.cart-item-remove:hover{background:rgba(239,68,68,0.18);border-color:rgba(239,68,68,0.35);}
+
+/* ── Item expandable file upload area ── */
+.cart-item-files{
+  display:none;padding:0 16px 16px;
+  border-top:1px solid rgba(124,58,237,0.08);
+}
+.cart-item-card.expanded .cart-item-files{display:block;}
+.cart-file-label{
+  font-size:9.5px;font-weight:800;letter-spacing:0.18em;
+  text-transform:uppercase;color:var(--gdim);
+  margin-bottom:10px;margin-top:14px;display:flex;align-items:center;gap:8px;
+}
+.cart-file-label::after{content:'';flex:1;height:1px;background:rgba(124,58,237,0.1);}
+.cart-file-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.cart-file-slot{
+  background:rgba(255,255,255,0.02);
+  border:1px dashed rgba(124,58,237,0.2);
+  border-radius:7px;padding:9px 11px;
+  cursor:pointer;transition:all 0.18s;
+  display:flex;flex-direction:column;gap:3px;
+}
+.cart-file-slot:hover{border-color:rgba(124,58,237,0.5);background:rgba(124,58,237,0.06);}
+.cart-file-slot.has-file{border-style:solid;border-color:rgba(124,58,237,0.4);background:rgba(124,58,237,0.05);}
+.cart-file-slot input[type="file"]{display:none;}
+.cart-file-icon{font-size:15px;line-height:1;}
+.cart-file-lbl{font-size:10px;font-weight:700;color:var(--gray);}
+.cart-file-name{font-size:9.5px;color:var(--pl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* ref slot */
+.cart-ref-slot{
+  background:rgba(255,255,255,0.02);
+  border:1px dashed rgba(167,139,250,0.3);
+  border-radius:7px;padding:11px 13px;
+  cursor:pointer;transition:all 0.18s;
+  display:flex;align-items:center;gap:11px;
+  margin-bottom:8px;
+}
+.cart-ref-slot:hover{border-color:var(--pl);background:rgba(124,58,237,0.07);}
+.cart-ref-slot.has-file{border-style:solid;border-color:var(--pl);background:rgba(124,58,237,0.07);}
+.cart-ref-slot input[type="file"]{display:none;}
+.cart-ref-badge{margin-left:auto;font-size:9px;font-weight:800;color:#f87171;
+  background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.2);
+  border-radius:3px;padding:2px 6px;flex-shrink:0;}
+.cart-status-dot{
+  width:7px;height:7px;border-radius:50%;flex-shrink:0;
+  background:rgba(107,114,128,0.4);transition:background 0.3s;
+}
+.cart-status-dot.done{background:#22c55e;}
+
+/* ── Footer ── */
+.cart-footer{
+  padding:18px 24px 24px;
+  border-top:1px solid rgba(124,58,237,0.1);
+  flex-shrink:0;
+  background:linear-gradient(0deg,#0a0717 0%,transparent 100%);
+}
+
+/* ── Brand input ── */
+.cart-brand-wrap{margin-bottom:14px;}
+.cart-brand-label{
+  font-size:9.5px;font-weight:800;letter-spacing:0.16em;
+  text-transform:uppercase;color:var(--gdim);margin-bottom:6px;display:block;
+}
+#cart-brand-input{
+  width:100%;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(124,58,237,0.18);
+  border-radius:8px;padding:11px 14px;color:var(--white);
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;
+  transition:border-color 0.2s;outline:none;
+}
+#cart-brand-input:focus{border-color:rgba(124,58,237,0.5);background:rgba(124,58,237,0.05);}
+#cart-brand-input::placeholder{color:rgba(106,88,128,0.6);}
+@keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-5px);}40%,80%{transform:translateX(5px);}}
+.cart-brand-wrap.shake #cart-brand-input{animation:shake 0.4s;}
+
+/* ── Coupon ── */
+.cart-coupon-row{
+  display:flex;gap:8px;margin-bottom:16px;
+}
+.cart-coupon-input{
+  flex:1;background:rgba(255,255,255,0.03);
+  border:1px solid rgba(124,58,237,0.15);
+  border-radius:7px;padding:10px 13px;color:var(--white);
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;
+  outline:none;transition:border-color 0.2s;
+  text-transform:uppercase;letter-spacing:0.06em;
+}
+.cart-coupon-input:focus{border-color:rgba(124,58,237,0.5);}
+.cart-coupon-input::placeholder{color:rgba(106,88,128,0.6);text-transform:none;letter-spacing:0;}
+.cart-coupon-btn{
+  background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.22);
+  color:var(--pl);padding:10px 16px;border-radius:7px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:11.5px;font-weight:700;
+  cursor:pointer;transition:all 0.2s;white-space:nowrap;
+}
+.cart-coupon-btn:hover{background:rgba(124,58,237,0.22);}
+.cart-coupon-msg{font-size:11px;margin-top:-10px;margin-bottom:12px;min-height:14px;}
+
+/* ── Summary ── */
+.cart-summary{margin-bottom:16px;}
+.cart-summary-row{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:12.5px;color:var(--gray);padding:4px 0;
+}
+.cart-summary-row.discount{color:#22c55e;}
+.cart-summary-row.total{
+  font-size:17px;font-weight:800;color:var(--white);
+  padding-top:10px;margin-top:6px;
+  border-top:1px solid rgba(124,58,237,0.1);
+}
+.cart-summary-row.total span:last-child{
+  font-family:'Fraunces',serif;color:var(--pl);
+}
+
+/* ── Checkout button ── */
+.cart-checkout-btn{
+  width:100%;
+  background:linear-gradient(135deg,#7c3aed 0%,#5b21b6 100%);
+  color:#fff;padding:15px 20px;border-radius:8px;border:none;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;font-weight:800;
+  letter-spacing:0.1em;text-transform:uppercase;
+  cursor:pointer;transition:all 0.25s;
+  box-shadow:0 4px 24px rgba(124,58,237,0.4);
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.cart-checkout-btn:hover{
+  background:linear-gradient(135deg,#8b46f0,#7c3aed);
+  box-shadow:0 6px 36px rgba(124,58,237,0.6);
+  transform:translateY(-1px);
+}
+.cart-checkout-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+</style>
+
+<!-- Cart Overlay + Panel -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+<div class="cart-panel" id="cart-panel">
+
+  <!-- Header -->
+  <div class="cart-header">
+    <div class="cart-title">
+      My Cart
+      <span class="cart-item-count" id="cart-count-label">0 items</span>
+    </div>
+    <button class="cart-close-btn" onclick="closeCart()">✕</button>
+  </div>
+
+  <!-- Discount Progress -->
+  <div class="cart-progress-wrap" id="cart-progress-wrap">
+    <div class="cart-progress-bar-track">
+      <div class="cart-progress-bar-fill" id="cart-progress-fill" style="width:0%"></div>
+    </div>
+    <div class="cart-progress-text" id="cart-progress-text">
+      Add <strong id="cart-progress-needed">₹5,000</strong> more to unlock <strong>20% off</strong> your entire order
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="cart-body" id="cart-body">
+    <div class="cart-empty" id="cart-empty">
+      <div class="cart-empty-icon">🛒</div>
+      <div class="cart-empty-title">Your cart is empty</div>
+      <div class="cart-empty-sub">Browse templates and add them here.<br>Upload files for each, then checkout together.</div>
+      <button class="cart-empty-btn" onclick="closeCart();go('render');">Browse Templates →</button>
+    </div>
+    <div id="cart-items-list"></div>
+  </div>
+
+  <!-- Footer -->
+  <div class="cart-footer" id="cart-footer" style="display:none;">
+
+    <!-- Brand name (one per order) -->
+    <div class="cart-brand-wrap" id="cart-brand-wrap">
+      <label class="cart-brand-label">Brand / Label Name</label>
+      <input type="text" id="cart-brand-input" placeholder="e.g. XYZ Streetwear" oninput="renderCartSummary()">
+    </div>
+
+    <!-- Coupon -->
+    <div class="cart-coupon-row">
+      <input type="text" class="cart-coupon-input" id="cart-coupon-input" placeholder="Coupon code" oninput="this.value=this.value.toUpperCase()">
+      <button class="cart-coupon-btn" onclick="applyCoupon()">Apply</button>
+    </div>
+    <div class="cart-coupon-msg" id="cart-coupon-msg"></div>
+
+    <!-- Summary -->
+    <div class="cart-summary" id="cart-summary"></div>
+
+    <!-- Checkout -->
+    <button class="cart-checkout-btn" id="cart-checkout-btn" onclick="checkoutCart()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Pay &amp; Place Order
+    </button>
+  </div>
+
+</div>
+
+<script>
+// ════════════════════════════════════════════
+// CART PANEL — UI CONTROLLER
+// ════════════════════════════════════════════
+window._cart   = window._cart   || [];
+window._coupon = window._coupon || null;
+
+function openCart() {
+  document.getElementById('cart-overlay').classList.add('open');
+  document.getElementById('cart-panel').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  renderCart();
+}
+function closeCart() {
+  document.getElementById('cart-overlay').classList.remove('open');
+  document.getElementById('cart-panel').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function renderCart() {
+  const cart  = window._cart || [];
+  const empty = document.getElementById('cart-empty');
+  const list  = document.getElementById('cart-items-list');
+  const footer = document.getElementById('cart-footer');
+
+  document.getElementById('cart-count-label').textContent = cart.length + (cart.length === 1 ? ' item' : ' items');
+
+  if (cart.length === 0) {
+    empty.style.display  = 'flex';
+    list.innerHTML       = '';
+    footer.style.display = 'none';
+    renderCartProgress(0);
+    return;
+  }
+
+  empty.style.display  = 'none';
+  footer.style.display = 'block';
+
+  list.innerHTML = cart.map((item, idx) => {
+    const icon = item.templateType === 'video' ? '🎬' : '🖼';
+    const filesCount = (item.refFiles?.length || 0) + (item.designFiles?.filter(Boolean).length || 0);
+    const complete = filesCount > 0;
+    return `
+    <div class="cart-item-card${complete ? ' files-complete':''}" id="cart-item-${item.id}">
+      <div class="cart-item-head" onclick="toggleCartItem(${item.id})">
+        <div class="cart-item-thumb">${icon}</div>
+        <div class="cart-item-info">
+          <div class="cart-item-name">${item.title}</div>
+          <div class="cart-item-meta">${item.templateType === 'video' ? 'Video' : 'Still Render'} · ${filesCount} file${filesCount !== 1 ? 's' : ''} uploaded</div>
+        </div>
+        <div class="cart-item-price">${item.price}</div>
+        <span class="cart-status-dot${complete?' done':''}"></span>
+        <div class="cart-item-chevron">▼</div>
+        <button class="cart-item-remove" onclick="event.stopPropagation();removeCartItem(${item.id})" title="Remove">✕</button>
+      </div>
+      <div class="cart-item-files">
+        <div class="cart-file-label">Reference Image</div>
+        <div class="cart-ref-slot${item.refFiles?.length ? ' has-file' : ''}"
+          id="cart-ref-slot-${item.id}"
+          onclick="document.getElementById('cart-ref-input-${item.id}').click()">
+          <span style="font-size:20px">📸</span>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--white);">Reference Image</div>
+            <div style="font-size:10px;color:var(--gdim);" id="cart-ref-name-${item.id}">${item.refFiles?.length ? item.refFiles.length + ' image' + (item.refFiles.length > 1 ? 's' : '') + ' ✓' : 'Up to 5 images — how you want it to look'}</div>
+          </div>
+          <div class="cart-ref-badge">REQUIRED</div>
+          <input type="file" id="cart-ref-input-${item.id}" accept="image/*" multiple
+            onchange="cartUpdateRef(this,${item.id})">
+        </div>
+        <div class="cart-file-label">Design Files</div>
+        <div class="cart-file-grid">
+          ${['👕 Front','🔄 Back','💪 Sleeves','🏷 Logo'].map((lbl, fi) => {
+            const [ico, name] = lbl.split(' ');
+            const hasF = item.designFiles?.[fi];
+            return `<div class="cart-file-slot${hasF ? ' has-file' : ''}" id="cart-slot-${item.id}-${fi}"
+              onclick="document.getElementById('cart-file-${item.id}-${fi}').click()">
+              <span class="cart-file-icon">${ico}</span>
+              <div class="cart-file-lbl">${name}</div>
+              <div class="cart-file-name" id="cart-fname-${item.id}-${fi}">${hasF ? hasF.name : 'Choose file…'}</div>
+              <input type="file" id="cart-file-${item.id}-${fi}" accept="image/*,.ai,.psd,.pdf"
+                onchange="cartUpdateFile(this,${item.id},${fi})">
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  renderCartProgress(cartSubtotal());
+  renderCartSummary();
+}
+
+function toggleCartItem(id) {
+  const card = document.getElementById('cart-item-' + id);
+  if (card) card.classList.toggle('expanded');
+}
+
+function removeCartItem(id) {
+  window._cart = (window._cart || []).filter(i => i.id !== id);
+  updateCartBadge();
+  renderCart();
+}
+
+function cartUpdateRef(input, itemId) {
+  const item = (window._cart || []).find(i => i.id === itemId);
+  if (!item) return;
+  const n = input.files.length;
+  if (n > 5) { alert('Max 5 reference images.'); input.value = ''; return; }
+  item.refFiles = Array.from(input.files);
+  document.getElementById('cart-ref-name-' + itemId).textContent = n + ' image' + (n > 1 ? 's' : '') + ' selected ✓';
+  document.getElementById('cart-ref-slot-' + itemId).classList.add('has-file');
+  checkCartItemComplete(itemId);
+}
+
+function cartUpdateFile(input, itemId, fi) {
+  const item = (window._cart || []).find(i => i.id === itemId);
+  if (!item) return;
+  if (!item.designFiles) item.designFiles = [null,null,null,null];
+  item.designFiles[fi] = input.files[0] || null;
+  const nameEl = document.getElementById('cart-fname-' + itemId + '-' + fi);
+  const slot   = document.getElementById('cart-slot-' + itemId + '-' + fi);
+  if (nameEl) nameEl.textContent = input.files[0] ? input.files[0].name : 'Choose file…';
+  if (slot)   slot.classList.toggle('has-file', !!input.files[0]);
+  checkCartItemComplete(itemId);
+}
+
+function checkCartItemComplete(itemId) {
+  const item = (window._cart || []).find(i => i.id === itemId);
+  if (!item) return;
+  const card    = document.getElementById('cart-item-' + itemId);
+  const dot     = card?.querySelector('.cart-status-dot');
+  const filesOk = item.refFiles?.length > 0 && item.designFiles?.some(Boolean);
+  if (card) card.classList.toggle('files-complete', filesOk);
+  if (dot)  dot.classList.toggle('done', filesOk);
+  // Update meta text
+  const metaEl = card?.querySelector('.cart-item-meta');
+  if (metaEl) {
+    const count = (item.refFiles?.length || 0) + (item.designFiles?.filter(Boolean).length || 0);
+    metaEl.textContent = (item.templateType === 'video' ? 'Video' : 'Still Render') + ' · ' + count + ' file' + (count !== 1 ? 's' : '') + ' uploaded';
+  }
+}
+
+function renderCartProgress(subtotal) {
+  const pct   = Math.min((subtotal / DISCOUNT_THRESHOLD) * 100, 100);
+  const fill  = document.getElementById('cart-progress-fill');
+  const text  = document.getElementById('cart-progress-text');
+  const needed = Math.max(0, DISCOUNT_THRESHOLD - subtotal);
+  if (fill) fill.style.width = pct + '%';
+  if (!text) return;
+  if (subtotal >= DISCOUNT_THRESHOLD) {
+    text.className = 'cart-progress-text unlocked';
+    text.innerHTML = '🎉 <strong>20% discount unlocked!</strong> Saving ₹' + Math.round(subtotal * DISCOUNT_RATE).toLocaleString('en-IN') + ' on your order';
+  } else {
+    text.className = 'cart-progress-text';
+    text.innerHTML = 'Add <strong>₹' + needed.toLocaleString('en-IN') + '</strong> more to unlock <strong>20% off</strong> your entire order';
+  }
+}
+
+function renderCartSummary() {
+  const sub   = cartSubtotal();
+  const disc  = cartDiscount();
+  const total = cartTotal();
+  const isINR = (window._cart?.[0]?.isINR !== false);
+  const sym   = isINR ? '₹' : '$';
+  const fmt   = n => sym + n.toLocaleString('en-IN');
+  let html = `<div class="cart-summary-row"><span>Subtotal (${window._cart?.length || 0} items)</span><span>${fmt(sub)}</span></div>`;
+  if (disc > 0) html += `<div class="cart-summary-row discount"><span>Discount${window._coupon ? ' (' + window._coupon + ')' : ' (20% off)'}</span><span>−${fmt(Math.round(disc))}</span></div>`;
+  html += `<div class="cart-summary-row total"><span>Total</span><span>${fmt(Math.round(total))}</span></div>`;
+  const el = document.getElementById('cart-summary');
+  if (el) el.innerHTML = html;
+  renderCartProgress(sub);
+}
+
+function applyCoupon() {
+  const code = (document.getElementById('cart-coupon-input')?.value || '').trim().toUpperCase();
+  const msg  = document.getElementById('cart-coupon-msg');
+  if (!code) { msg.textContent = 'Enter a coupon code.'; msg.style.color = '#f87171'; return; }
+  if (COUPON_CODES[code]) {
+    window._coupon = code;
+    msg.textContent = '✓ Coupon applied — ' + (COUPON_CODES[code] * 100) + '% off!';
+    msg.style.color = '#22c55e';
+  } else {
+    window._coupon = null;
+    msg.textContent = 'Invalid coupon code.';
+    msg.style.color = '#f87171';
+  }
+  renderCartSummary();
+}
+</script>
+<!-- ═══ END CART PANEL ═══ -->
+
+<!-- ═══ COUNTRY SELECTOR ═══ -->
+<script>
+const COUNTRIES = [
+  {flag:'🇮🇳',name:'India',dial:'+91'},
+  {flag:'🇺🇸',name:'United States',dial:'+1'},
+  {flag:'🇬🇧',name:'United Kingdom',dial:'+44'},
+  {flag:'🇦🇺',name:'Australia',dial:'+61'},
+  {flag:'🇨🇦',name:'Canada',dial:'+1'},
+  {flag:'🇦🇪',name:'UAE',dial:'+971'},
+  {flag:'🇸🇦',name:'Saudi Arabia',dial:'+966'},
+  {flag:'🇸🇬',name:'Singapore',dial:'+65'},
+  {flag:'🇲🇾',name:'Malaysia',dial:'+60'},
+  {flag:'🇳🇿',name:'New Zealand',dial:'+64'},
+  {flag:'🇩🇪',name:'Germany',dial:'+49'},
+  {flag:'🇫🇷',name:'France',dial:'+33'},
+  {flag:'🇮🇹',name:'Italy',dial:'+39'},
+  {flag:'🇪🇸',name:'Spain',dial:'+34'},
+  {flag:'🇳🇱',name:'Netherlands',dial:'+31'},
+  {flag:'🇸🇪',name:'Sweden',dial:'+46'},
+  {flag:'🇳🇴',name:'Norway',dial:'+47'},
+  {flag:'🇩🇰',name:'Denmark',dial:'+45'},
+  {flag:'🇧🇪',name:'Belgium',dial:'+32'},
+  {flag:'🇨🇭',name:'Switzerland',dial:'+41'},
+  {flag:'🇦🇹',name:'Austria',dial:'+43'},
+  {flag:'🇵🇱',name:'Poland',dial:'+48'},
+  {flag:'🇵🇹',name:'Portugal',dial:'+351'},
+  {flag:'🇬🇷',name:'Greece',dial:'+30'},
+  {flag:'🇷🇺',name:'Russia',dial:'+7'},
+  {flag:'🇹🇷',name:'Turkey',dial:'+90'},
+  {flag:'🇺🇦',name:'Ukraine',dial:'+380'},
+  {flag:'🇯🇵',name:'Japan',dial:'+81'},
+  {flag:'🇰🇷',name:'South Korea',dial:'+82'},
+  {flag:'🇨🇳',name:'China',dial:'+86'},
+  {flag:'🇮🇩',name:'Indonesia',dial:'+62'},
+  {flag:'🇵🇭',name:'Philippines',dial:'+63'},
+  {flag:'🇹🇭',name:'Thailand',dial:'+66'},
+  {flag:'🇻🇳',name:'Vietnam',dial:'+84'},
+  {flag:'🇧🇩',name:'Bangladesh',dial:'+880'},
+  {flag:'🇵🇰',name:'Pakistan',dial:'+92'},
+  {flag:'🇱🇰',name:'Sri Lanka',dial:'+94'},
+  {flag:'🇳🇵',name:'Nepal',dial:'+977'},
+  {flag:'🇲🇻',name:'Maldives',dial:'+960'},
+  {flag:'🇮🇶',name:'Iraq',dial:'+964'},
+  {flag:'🇮🇷',name:'Iran',dial:'+98'},
+  {flag:'🇮🇱',name:'Israel',dial:'+972'},
+  {flag:'🇯🇴',name:'Jordan',dial:'+962'},
+  {flag:'🇰🇼',name:'Kuwait',dial:'+965'},
+  {flag:'🇶🇦',name:'Qatar',dial:'+974'},
+  {flag:'🇧🇭',name:'Bahrain',dial:'+973'},
+  {flag:'🇴🇲',name:'Oman',dial:'+968'},
+  {flag:'🇪🇬',name:'Egypt',dial:'+20'},
+  {flag:'🇿🇦',name:'South Africa',dial:'+27'},
+  {flag:'🇳🇬',name:'Nigeria',dial:'+234'},
+  {flag:'🇰🇪',name:'Kenya',dial:'+254'},
+  {flag:'🇬🇭',name:'Ghana',dial:'+233'},
+  {flag:'🇧🇷',name:'Brazil',dial:'+55'},
+  {flag:'🇲🇽',name:'Mexico',dial:'+52'},
+  {flag:'🇦🇷',name:'Argentina',dial:'+54'},
+  {flag:'🇨🇴',name:'Colombia',dial:'+57'},
+  {flag:'🇨🇱',name:'Chile',dial:'+56'},
+];
+
+let _selectedCountry = COUNTRIES[0]; // India default
+let _filteredCountries = [...COUNTRIES];
+
+function renderCountryList(list) {
+  const el = document.getElementById('country-list');
+  if (!el) return;
+  el.innerHTML = list.map((c, i) => `
+    <div class="country-opt${c.dial === _selectedCountry.dial && c.name === _selectedCountry.name ? ' selected' : ''}"
+      onclick="selectCountry(${COUNTRIES.indexOf(c)})">
+      <span class="country-opt-flag">${c.flag}</span>
+      <span class="country-opt-name">${c.name}</span>
+      <span class="country-opt-code">${c.dial}</span>
+    </div>`).join('');
+}
+
+function toggleCountryDropdown() {
+  const sel = document.getElementById('country-selector');
+  const wasOpen = sel.classList.contains('open');
+  // Close on second click
+  if (wasOpen) { sel.classList.remove('open'); return; }
+  sel.classList.add('open');
+  renderCountryList(COUNTRIES);
+  _filteredCountries = [...COUNTRIES];
+  const search = document.getElementById('country-search-input');
+  if (search) { search.value = ''; search.focus(); }
+  // Scroll selected into view
+  setTimeout(() => {
+    const selected = document.querySelector('.country-opt.selected');
+    if (selected) selected.scrollIntoView({ block: 'nearest' });
+  }, 50);
+}
+
+function selectCountry(idx) {
+  _selectedCountry = COUNTRIES[idx];
+  document.getElementById('selected-flag').textContent = _selectedCountry.flag;
+  document.getElementById('selected-dial').textContent = _selectedCountry.dial;
+  document.getElementById('country-selector').classList.remove('open');
+  document.getElementById('phone-number-input').focus();
+}
+
+function filterCountries(query) {
+  const q = query.toLowerCase();
+  _filteredCountries = COUNTRIES.filter(c =>
+    c.name.toLowerCase().includes(q) || c.dial.includes(q)
+  );
+  renderCountryList(_filteredCountries);
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  const sel = document.getElementById('country-selector');
+  if (sel && !sel.contains(e.target)) sel.classList.remove('open');
+});
+
+// Init on load
+document.addEventListener('DOMContentLoaded', function() {
+  renderCountryList(COUNTRIES);
+});
+</script>
+<!-- ═══ END COUNTRY SELECTOR ═══ -->
 
 </body>
 </html>
