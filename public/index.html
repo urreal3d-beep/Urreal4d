@@ -880,10 +880,10 @@ function go(name){
     if(dl)dl.classList.remove('active');
   });
   document.getElementById('p-'+name).classList.add('active');
- if (name === 'admin') {
+if (name === 'admin') {
   setTimeout(() => {
     if (window.checkAdminAccess) window.checkAdminAccess();
-  }, 1000);
+  }, 500);
 }
   const nl=document.getElementById('nl-'+name);
   const dl=document.getElementById('dl-'+name);
@@ -1912,26 +1912,35 @@ window.adminMarkDone = async function(orderId) {
 
 // ── Check admin access when page opens ──
 window.checkAdminAccess = function() {
+  const show = () => {
+    document.getElementById('admin-denied').style.display = 'none';
+    document.getElementById('admin-main').style.display = 'block';
+    loadAdminOrders();
+  }
+  const deny = () => {
+    document.getElementById('admin-denied').style.display = 'block';
+    document.getElementById('admin-main').style.display = 'none';
+  }
+
+  const user = window.getCurrentUser();
+  if (user && user.email === 'urreal3d@gmail.com') {
+    show(); return;
+  }
+
   let attempts = 0;
   const check = setInterval(() => {
     attempts++;
-    const user = window.getCurrentUser();
-    if (user && user.email === 'urreal3d@gmail.com') {
-      clearInterval(check);
-      document.getElementById('admin-denied').style.display = 'none';
-      document.getElementById('admin-main').style.display = 'block';
-      loadAdminOrders();
-    } else if (user && user.email !== 'urreal3d@gmail.com') {
-      clearInterval(check);
-      document.getElementById('admin-denied').style.display = 'block';
-      document.getElementById('admin-main').style.display = 'none';
-    } else if (attempts > 10) {
-      clearInterval(check);
-      document.getElementById('admin-denied').style.display = 'block';
-      document.getElementById('admin-main').style.display = 'none';
+    const u = window.getCurrentUser();
+    if (u && u.email === 'urreal3d@gmail.com') {
+      clearInterval(check); show();
+    } else if (u) {
+      clearInterval(check); deny();
+    } else if (attempts > 15) {
+      clearInterval(check); deny();
     }
-  }, 300);
+  }, 200);
 }
+
 </script>
 
 <script>
@@ -2133,6 +2142,11 @@ window.handleLogout = async function() {
 
 window.getCurrentUser = function() {
   return auth.currentUser;
+}
+
+window.isAdminUser = function() {
+  const user = auth.currentUser;
+  return user && user.email === 'urreal3d@gmail.com';
 }
 
 window.handleGoogleLogin = async function() {
