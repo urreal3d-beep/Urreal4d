@@ -300,6 +300,7 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
     <li><a id="auth-btn" onclick="openAuthModal('login')" style="cursor:pointer;">Login</a></li>
   <li><a href="#" onclick="go('about');return false;" id="nl-about">About</a></li>
 <li id="nav-admin-li" style="display:none;margin:0;padding:0;"><a id="nav-admin-btn" onclick="go('admin')" style="cursor:pointer;color:var(--gold);">Admin</a></li>
+<li id="nav-admin-logout" style="display:none;"><a onclick="handleLogout()" style="cursor:pointer;color:var(--red);">Logout</a></li>
     <li style="display:flex;align-items:center;"><button id="nav-profile-btn" onclick="openProfile()" style="width:36px;height:36px;border-radius:50%;background:rgba(124,58,237,0.2);border:1px solid var(--pb);cursor:pointer;display:none;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.background='rgba(124,58,237,0.4)'" onmouseout="this.style.background='rgba(124,58,237,0.2)'">
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
 </button></li>
@@ -314,7 +315,7 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
 <div class="drawer" id="drawer">
   <div class="drawer-logo">Urreal<em>3D</em></div>
   <a id="drawer-auth-btn" onclick="openAuthModal('login')" style="cursor:pointer;">Login</a>
-  <a id="drawer-admin-btn" onclick="go('admin');closeDrawer();" style="display:none;cursor:pointer;color:var(--gold);">⚡ Admin Panel</a>
+<a id="drawer-admin-btn" onclick="go('admin');closeDrawer();" style="display:none;cursor:pointer;color:var(--gold);">⚡ Admin Panel</a>
 <a onclick="openProfile()" id="drawer-profile-btn" style="display:none;cursor:pointer;">👤 My Profile</a>
   <a href="#" onclick="go('home');return false;" id="dl-home" class="active">Home</a>
   <a onclick="go('render')" id="dl-render">Render</a>
@@ -514,7 +515,7 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
       <p class="price-desc">Pre-built 3D render scenes. You send your garment design, we drop it in, adjust materials and colors, and deliver a clean high-res image — fast.</p>
       <div class="price-amount">
         <div class="price-from">Starting at</div>
-        <div class="price-num">$50<em>/image</em></div>
+        <div class="price-num">₹999<em>/image</em></div>
       </div>
       <div class="price-divider"></div>
       <div class="price-features">
@@ -534,7 +535,7 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
       <p class="price-desc">Full custom render built from scratch. We model the scene, set the lighting, and position the garment exactly how you'd imagine it in a campaign shoot — without the shoot.</p>
       <div class="price-amount">
         <div class="price-from">Starting at</div>
-        <div class="price-num">$200<em>–$300</em></div>
+        <div class="price-num">₹1,999<em>–₹4,999</em></div>
       </div>
       <div class="price-divider"></div>
       <div class="price-features">
@@ -555,7 +556,7 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
       <p class="price-desc">Ready-made animation templates with your garment dropped in. Great for product launches, social content, and e-commerce pages where you need quality fast.</p>
       <div class="price-amount">
         <div class="price-from">Starting at</div>
-        <div class="price-num">$100<em>/video</em></div>
+        <div class="price-num">₹1,999<em>/video</em></div>
       </div>
       <div class="price-divider"></div>
       <div class="price-features">
@@ -576,7 +577,7 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
       <p class="price-desc">Fully custom clothing animation built around your brief. More complex animations with detailed fabric behavior take more time — price reflects that honestly.</p>
       <div class="price-amount">
         <div class="price-from">Starting at</div>
-        <div class="price-num">$300<em>–$500</em></div>
+        <div class="price-num">₹4,999<em>–₹14,999</em></div>
         <div class="price-range">Final price depends on animation complexity & length</div>
       </div>
       <div class="price-divider"></div>
@@ -872,6 +873,7 @@ history.replaceState({page: 'home'}, '', '');
 // ── Page Navigation ──
 const pages = ['home','about','render','portfolio','pricing','testimonials','appointment','policy','admin'];
 function go(name){
+document.querySelector('nav').style.display='flex';
   pages.forEach(p=>{
     document.getElementById('p-'+p).classList.remove('active');
     const nl=document.getElementById('nl-'+p);
@@ -880,27 +882,39 @@ function go(name){
     if(dl)dl.classList.remove('active');
   });
   document.getElementById('p-'+name).classList.add('active');
-window.checkAdminAccess = function() {
-  const user = window.getCurrentUser();
-  alert('Logged in as: ' + (user ? user.email : 'NOT LOGGED IN'));
-  if (user && user.email === 'urreal3d@gmail.com') {
-    document.getElementById('admin-denied').style.display = 'none';
-    document.getElementById('admin-main').style.display = 'block';
-    loadAdminOrders();
-  } else {
-    document.getElementById('admin-denied').style.display = 'block';
-    document.getElementById('admin-main').style.display = 'none';
-  }
-}
-}
   const nl=document.getElementById('nl-'+name);
   const dl=document.getElementById('dl-'+name);
   if(nl)nl.classList.add('active');
   if(dl)dl.classList.add('active');
   window.scrollTo(0,0);
   closeDrawer();
+  if(name==='admin'){
+    document.getElementById('admin-loading').style.display='block';
+    document.getElementById('admin-denied').style.display='none';
+    document.getElementById('admin-main').style.display='none';
+    let tries=0;
+    const interval=setInterval(()=>{
+      tries++;
+      const user=window.getCurrentUser?window.getCurrentUser():null;
+      if(user && user.email==='urreal3d@gmail.com'){
+        clearInterval(interval);
+        document.getElementById('admin-loading').style.display='none';
+        document.getElementById('admin-main').style.display='block';
+        if(window.loadAdminOrders)window.loadAdminOrders();
+        document.querySelector('nav').style.display='none';
+      } else if(user){
+        clearInterval(interval);
+        document.getElementById('admin-loading').style.display='none';
+        document.getElementById('admin-denied').style.display='block';
+        document.querySelector('nav').style.display='flex';
+      } else if(tries>20){
+        clearInterval(interval);
+        document.getElementById('admin-loading').style.display='none';
+        document.getElementById('admin-denied').style.display='block';
+      }
+    },300);
+  }
 }
-
 // ── Drawer ──
 function toggleDrawer(){
   const d=document.getElementById('drawer');
@@ -1476,6 +1490,104 @@ async function loadOrders() {
 </script>
 
 <!-- ═══ ADMIN PAGE ═══ -->
+
+<!-- ═══ ADMIN PAGE ═══ -->
+<div class="page" id="p-admin">
+<style>
+.admin-wrap{max-width:960px;margin:0 auto;padding:100px clamp(20px,5vw,40px) 80px;}
+.admin-hero{text-align:center;margin-bottom:40px;}
+.admin-hero h1{font-family:'Fraunces',serif;font-size:clamp(36px,7vw,58px);font-weight:700;margin-bottom:10px;}
+.admin-hero h1 em{font-style:italic;color:var(--pl);}
+.admin-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:36px;}
+.admin-stat{background:var(--card);border:1px solid var(--pb);border-radius:12px;padding:20px;text-align:center;}
+.admin-stat-num{font-family:'Fraunces',serif;font-size:36px;font-weight:700;color:var(--pl);line-height:1;margin-bottom:4px;}
+.admin-stat-lbl{font-size:11px;font-weight:700;color:var(--gdim);letter-spacing:0.1em;text-transform:uppercase;}
+.admin-filter{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+.admin-tab{background:transparent;border:1px solid rgba(124,58,237,0.22);color:var(--gray);padding:7px 18px;border-radius:100px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.admin-tab.active{background:var(--purple);border-color:var(--purple);color:var(--white);}
+.admin-refresh{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.admin-refresh-btn{background:transparent;border:1px solid var(--pb);color:var(--gray);padding:8px 16px;border-radius:7px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.admin-refresh-btn:hover{border-color:var(--pl);color:var(--pl);}
+.admin-count{font-size:13px;font-weight:700;color:var(--pl);}
+.client-card{background:var(--card);border:1px solid var(--pb);border-radius:14px;margin-bottom:14px;overflow:hidden;transition:border-color 0.25s;}
+.client-card:hover{border-color:rgba(124,58,237,0.4);}
+.client-card-header{padding:18px 22px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+.client-avatar{width:42px;height:42px;border-radius:50%;background:rgba(124,58,237,0.15);border:1px solid var(--pb);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--pl);flex-shrink:0;}
+.client-info{flex:1;margin-left:14px;}
+.client-name{font-family:'Fraunces',serif;font-size:17px;font-weight:600;margin-bottom:3px;}
+.client-meta{font-size:12px;color:var(--gdim);}
+.client-chevron{color:var(--gdim);font-size:18px;transition:transform 0.25s;flex-shrink:0;}
+.client-card.open .client-chevron{transform:rotate(180deg);}
+.client-orders{max-height:0;overflow:hidden;transition:max-height 0.35s ease;}
+.client-card.open .client-orders{max-height:2000px;}
+.order-item{margin:0 16px 16px;background:var(--deep);border:1px solid var(--pb);border-radius:12px;padding:18px;}
+.order-item-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.order-item-title{font-family:'Fraunces',serif;font-size:15px;font-weight:600;}
+.order-item-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.orow{font-size:12px;color:var(--gdim);line-height:1.7;}
+.orow strong{display:block;color:var(--white);font-size:13px;font-weight:600;}
+.order-link-input{width:100%;background:rgba(124,58,237,0.05);border:1px solid rgba(124,58,237,0.16);border-radius:8px;padding:11px 14px;color:var(--white);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;margin-bottom:10px;transition:border-color 0.2s;}
+.order-link-input:focus{outline:none;border-color:var(--pl);}
+.order-link-input::placeholder{color:var(--gdim);}
+.order-done-btn{width:100%;background:var(--purple);color:var(--white);padding:12px;border-radius:8px;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.22s;}
+.order-done-btn:hover{background:var(--pm);}
+.order-done-btn.done{background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);color:var(--green);cursor:default;}
+.abadge{border-radius:100px;padding:4px 12px;font-size:11px;font-weight:700;}
+.abadge-pending{background:rgba(234,179,8,0.12);border:1px solid rgba(234,179,8,0.3);color:var(--yellow);}
+.abadge-done{background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);color:var(--green);}
+.admin-empty{text-align:center;padding:60px 0;color:var(--gdim);font-size:14px;}
+.admin-access-denied{text-align:center;padding:120px 20px;color:var(--gdim);}
+.admin-access-denied h2{font-family:'Fraunces',serif;font-size:28px;font-weight:700;margin-bottom:10px;color:var(--red);}
+</style>
+
+  <div class="admin-wrap">
+
+    <div id="admin-loading" style="display:none;text-align:center;padding:120px 20px;color:var(--gdim);">
+      <div style="font-size:48px;margin-bottom:16px;">⏳</div>
+      <p>Checking access...</p>
+    </div>
+
+    <div class="admin-access-denied" id="admin-denied" style="display:none;">
+      <div style="font-size:48px;margin-bottom:16px;">🔒</div>
+      <h2>Access Denied</h2>
+      <p>You don't have permission to view this page.</p>
+    </div>
+
+    <div id="admin-main" style="display:none;">
+      <div class="admin-hero">
+        <div class="slbl-tag">Admin Dashboard</div>
+        <h1>Client <em>Orders</em></h1>
+        <p>Manage all render orders and upload finished files.</p>
+      </div>
+      <div class="admin-stats">
+        <div class="admin-stat"><div class="admin-stat-num" id="ast-total">0</div><div class="admin-stat-lbl">Total</div></div>
+        <div class="admin-stat"><div class="admin-stat-num" id="ast-pending" style="color:var(--yellow);">0</div><div class="admin-stat-lbl">Pending</div></div>
+        <div class="admin-stat"><div class="admin-stat-num" id="ast-done" style="color:var(--green);">0</div><div class="admin-stat-lbl">Done</div></div>
+      </div>
+      <div class="admin-filter">
+        <button class="admin-tab active" onclick="adminTabFilter(this,'all')">All Clients</button>
+        <button class="admin-tab" onclick="adminTabFilter(this,'pending')">⏳ Pending</button>
+        <button class="admin-tab" onclick="adminTabFilter(this,'done')">✓ Completed</button>
+      </div>
+      <div class="admin-refresh">
+        <div class="admin-count" id="admin-count">— clients</div>
+        <button class="admin-refresh-btn" onclick="loadAdminOrders()">↻ Refresh</button>
+      </div>
+      <div id="admin-clients-list">
+        <div class="admin-empty">Loading orders...</div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <div class="footer-logo">Urreal<em>3D</em></div>
+    <div class="footer-links"><a onclick="go('policy')">Privacy Policy</a><a onclick="go('appointment')">Contact</a></div>
+    <div class="footer-copy">© 2024 Urreal3D · Stephen R Christian</div>
+  </footer>
+</div>
+<!-- ═══ END ADMIN PAGE ═══ -->
+
 <!-- ═══ END ADMIN PAGE ═══ -->
 
 <!-- ═══ RENDER DETAIL PANEL (paste this outside the page div, still before </body>) ═══ -->
@@ -1882,6 +1994,15 @@ document.getElementById('drawer-auth-btn').style.display = 'none';    document.g
     document.getElementById('drawer-auth-btn').onclick = handleLogout;
     document.getElementById('nav-profile-btn').style.cssText = 'width:36px;height:36px;border-radius:50%;background:rgba(124,58,237,0.2);border:1px solid var(--pb);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;';
     if (user.email === 'urreal3d@gmail.com') {
+  document.querySelectorAll('.nav-links li').forEach(li => li.style.display = 'none');
+  document.getElementById('nav-admin-li').style.display = 'list-item';
+  document.getElementById('nl-home') && (document.getElementById('nl-home').parentElement.style.display = 'list-item');
+  document.querySelectorAll('.drawer a').forEach(a => a.style.display = 'none');
+  document.getElementById('nav-profile-btn').style.cssText = 'width:36px;height:36px;border-radius:50%;background:rgba(124,58,237,0.2);border:1px solid var(--pb);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;';
+  document.getElementById('drawer-admin-btn').style.display = 'block';
+  document.getElementById('nav-admin-logout').style.display = 'list-item';
+}
+    if (user.email === 'urreal3d@gmail.com') {
   document.getElementById('nav-admin-li').style.display = 'list-item';
   document.getElementById('drawer-admin-btn').style.display = 'block';
 } else {
@@ -1895,6 +2016,17 @@ document.getElementById('drawer-auth-btn').style.display = 'none';    document.g
     document.getElementById('drawer-auth-btn').textContent = 'Login';
     document.getElementById('drawer-auth-btn').onclick = () => openAuthModal('login');
     document.getElementById('nav-profile-btn').style.display = 'none';
+document.querySelectorAll('.nav-links li').forEach(li => li.style.display = '');
+document.querySelectorAll('.drawer a').forEach(a => a.style.display = '');
+document.getElementById('nav-admin-logout').style.display = 'none';
+document.getElementById('nav-admin-li').style.display = 'none';
+document.getElementById('drawer-admin-btn').style.display = 'none';
+document.getElementById('nav-profile-btn').style.display = 'none';
+document.getElementById('auth-btn').style.display = 'inline';
+document.getElementById('drawer-auth-btn').style.display = 'block';
+    document.getElementById('nav-admin-logout').style.display = 'none';
+document.getElementById('nav-admin-li').style.display = 'none';
+document.getElementById('drawer-admin-btn').style.display = 'none';
     document.getElementById('nav-admin-li').style.display = 'none';
 document.getElementById('drawer-admin-btn').style.display = 'none';
     document.getElementById('drawer-profile-btn').style.display = 'none';
