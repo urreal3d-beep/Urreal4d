@@ -312,17 +312,8 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
 <div class="drawer-overlay" id="doverlay" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-logo">Urreal<em>3D</em></div>
-  <div id="drawer-profile-box" style="display:none;margin:16px 28px;background:rgba(124,58,237,0.1);border:1px solid var(--pb);border-radius:12px;padding:16px;cursor:pointer;" onclick="openProfile();closeDrawer();">
-  <div style="display:flex;align-items:center;gap:14px;">
-    <div style="width:48px;height:48px;border-radius:50%;background:rgba(124,58,237,0.2);border:1px solid var(--pb);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-    </div>
-    <div>
-      <div id="drawer-profile-name" style="font-family:'Fraunces',serif;font-size:16px;font-weight:700;color:var(--white);">My Profile</div>
-      <div id="drawer-profile-email" style="font-size:11px;color:var(--gdim);margin-top:2px;">View projects & account</div>
-    </div>
-  </div>
-</div>
+  <a id="drawer-auth-btn" onclick="openAuthModal('login')" style="cursor:pointer;">Login</a>
+<a onclick="openProfile()" id="drawer-profile-btn" style="display:none;cursor:pointer;">👤 My Profile</a>
   <a href="#" onclick="go('home');return false;" id="dl-home" class="active">Home</a>
   <a onclick="go('render')" id="dl-render">Render</a>
   <a href="#" onclick="go('portfolio');return false;" id="dl-portfolio">Portfolio</a>
@@ -877,7 +868,7 @@ window.go = function(name) {
 // Set initial state
 history.replaceState({page: 'home'}, '', '');
 // ── Page Navigation ──
-const pages = ['home','about','render','portfolio','pricing','testimonials','appointment','policy'];
+const pages = ['home','about','render','portfolio','pricing','testimonials','appointment','policy','admin'];
 function go(name){
   pages.forEach(p=>{
     document.getElementById('p-'+p).classList.remove('active');
@@ -1313,6 +1304,79 @@ function filterTab(btn) {
 </div>
 <!-- ═══ END RENDER PAGE ═══ -->
 
+<!-- ═══ ADMIN PAGE ═══ -->
+<div class="page" id="p-admin">
+<style>
+.admin-wrap{max-width:900px;margin:0 auto;padding:100px clamp(20px,5vw,40px) 80px;}
+.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:36px;padding-bottom:20px;border-bottom:1px solid var(--pb);}
+.admin-header h1{font-family:'Fraunces',serif;font-size:32px;font-weight:700;}
+.admin-order-card{background:var(--card);border:1px solid var(--pb);border-radius:12px;padding:24px;margin-bottom:16px;transition:all 0.25s;}
+.admin-order-card:hover{border-color:rgba(124,58,237,0.35);}
+.admin-order-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.admin-order-title{font-family:'Fraunces',serif;font-size:18px;font-weight:600;}
+.admin-order-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.admin-info-row{font-size:12px;color:var(--gdim);}
+.admin-info-row span{color:var(--white);font-weight:600;}
+.admin-link-row{display:flex;gap:10px;margin-top:12px;}
+.admin-link-input{flex:1;background:rgba(124,58,237,0.05);border:1px solid rgba(124,58,237,0.16);border-radius:7px;padding:10px 14px;color:var(--white);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;}
+.admin-link-input:focus{outline:none;border-color:var(--pl);}
+.admin-link-input::placeholder{color:var(--gdim);}
+.admin-done-btn{background:var(--purple);color:var(--white);padding:10px 20px;border-radius:7px;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.admin-done-btn:hover{background:var(--pm);}
+.admin-done-btn.completed{background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);color:#22c55e;cursor:default;}
+.admin-empty{text-align:center;padding:60px 0;color:var(--gdim);font-size:14px;}
+.admin-password-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.admin-password-box{background:var(--card);border:1px solid var(--pb);border-radius:16px;padding:40px;width:min(400px,100%);}
+.admin-password-box h2{font-family:'Fraunces',serif;font-size:26px;font-weight:700;margin-bottom:6px;}
+.admin-password-box p{color:var(--gdim);font-size:13px;margin-bottom:24px;}
+.admin-filter-bar{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+.admin-ftab{background:transparent;border:1px solid rgba(124,58,237,0.22);color:var(--gray);padding:7px 18px;border-radius:100px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.admin-ftab:hover,.admin-ftab.active{background:var(--purple);border-color:var(--purple);color:var(--white);}
+</style>
+
+<!-- Password Screen -->
+<div id="admin-password-screen" class="admin-password-wrap">
+  <div class="admin-password-box">
+    <div style="font-size:32px;margin-bottom:16px;">🔐</div>
+    <h2>Admin Access</h2>
+    <p>Enter your password to access the admin panel.</p>
+    <div class="fgroup">
+      <label class="flabel">Password</label>
+      <input class="finput" type="password" id="admin-pass-input" placeholder="Enter password" onkeydown="if(event.key==='Enter')checkAdminPass()">
+    </div>
+    <button class="btn-p" style="width:100%;margin-top:8px;" onclick="checkAdminPass()">Enter →</button>
+    <div id="admin-pass-msg" style="text-align:center;font-size:13px;margin-top:12px;color:#f87171;"></div>
+  </div>
+</div>
+
+<!-- Admin Dashboard -->
+<div id="admin-dashboard" style="display:none;">
+  <div class="admin-wrap">
+    <div class="admin-header">
+      <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.18em;color:var(--gold);text-transform:uppercase;margin-bottom:4px;">Dashboard</div>
+        <h1>All Orders</h1>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div id="admin-order-count" style="background:rgba(124,58,237,0.12);border:1px solid var(--pb);border-radius:100px;padding:6px 16px;font-size:13px;font-weight:700;color:var(--pl);">0 orders</div>
+        <button onclick="loadAllOrders()" style="background:transparent;border:1px solid var(--pb);color:var(--gray);padding:8px 16px;border-radius:7px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">↻ Refresh</button>
+      </div>
+    </div>
+
+    <div class="admin-filter-bar">
+      <button class="admin-ftab active" onclick="adminFilter(this,'all')">All</button>
+      <button class="admin-ftab" onclick="adminFilter(this,'pending')">⏳ Pending</button>
+      <button class="admin-ftab" onclick="adminFilter(this,'done')">✓ Completed</button>
+    </div>
+
+    <div id="admin-orders-list">
+      <div class="admin-empty">Loading orders...</div>
+    </div>
+  </div>
+</div>
+</div>
+<!-- ═══ END ADMIN PAGE ═══ -->
+
 <!-- ═══ PROFILE PANEL ═══ -->
 <div class="auth-overlay" id="profile-overlay" onclick="closeProfile()"></div>
 <div id="profile-panel" style="position:fixed;top:0;right:0;bottom:0;width:min(480px,100vw);background:var(--deep);border-left:1px solid var(--pb);z-index:600;transform:translateX(100%);transition:transform 0.32s cubic-bezier(0.4,0,0.2,1);overflow-y:auto;padding:0 0 40px;">
@@ -1634,6 +1698,25 @@ function slideCard(btn, dir) {
   imgs[current].style.opacity = '1';
   if(dots[current]) dots[current].classList.add('active');
 }
+function checkAdminPass() {
+  const pass = document.getElementById('admin-pass-input').value;
+  if (pass === 'Urreal3D') {
+    document.getElementById('admin-password-screen').style.display = 'none';
+    document.getElementById('admin-dashboard').style.display = 'block';
+    loadAllOrders();
+  } else {
+    document.getElementById('admin-pass-msg').textContent = 'Wrong password. Try again.';
+  }
+}
+
+// Auto open admin if hash is #admin
+window.addEventListener('hashchange', function() {
+  if (window.location.hash === '#admin') go('admin');
+});
+if (window.location.hash === '#admin') {
+  setTimeout(() => go('admin'), 300);
+}
+
 function checkClientForm() {
   const name  = document.getElementById('client-name').value.trim();
   const brand = document.getElementById('client-brand').value.trim();
@@ -1648,6 +1731,103 @@ function checkClientForm() {
     section.classList.add('locked');
   }
 }
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, orderBy, query } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCME4Fby4vXSbxf6vE40j4ANuOBqPk_YVw",
+  authDomain: "urreal3d-ba986.firebaseapp.com",
+  projectId: "urreal3d-ba986",
+  storageBucket: "urreal3d-ba986.firebasestorage.app",
+  messagingSenderId: "96423517661",
+  appId: "1:96423517661:web:7dddb240f2f76f075baa34"
+};
+
+const app2 = initializeApp(firebaseConfig, 'admin');
+const db2 = getFirestore(app2);
+
+window.loadAllOrders = async function() {
+  const list = document.getElementById('admin-orders-list');
+  list.innerHTML = '<div class="admin-empty">Loading...</div>';
+  try {
+    const q = query(collection(db2, 'orders'), orderBy('createdAt', 'desc'));
+    const snapshot = await getDocs(q);
+    const orders = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    document.getElementById('admin-order-count').textContent = orders.length + ' orders';
+    window._allAdminOrders = orders;
+    renderAdminOrders(orders);
+  } catch(e) {
+    list.innerHTML = '<div class="admin-empty">Error loading orders: ' + e.message + '</div>';
+  }
+}
+
+window.renderAdminOrders = function(orders) {
+  const list = document.getElementById('admin-orders-list');
+  if (orders.length === 0) {
+    list.innerHTML = '<div class="admin-empty">No orders found.</div>';
+    return;
+  }
+  list.innerHTML = orders.map((order, i) => {
+    const date = order.createdAt
+      ? new Date(order.createdAt.seconds * 1000).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
+      : 'Unknown';
+    const isDone = order.status === 'done';
+    return `
+      <div class="admin-order-card" data-status="${order.status || 'pending'}" id="aoc-${order.id}">
+        <div class="admin-order-top">
+          <div class="admin-order-title">${order.templateName || 'Custom Order'}</div>
+          ${isDone
+            ? '<span class="order-status-done">✓ Completed</span>'
+            : '<span class="order-status-pending">⏳ Pending</span>'}
+        </div>
+        <div class="admin-order-grid">
+          <div class="admin-info-row">👤 Name: <span>${order.clientName || order.userName || '—'}</span></div>
+          <div class="admin-info-row">🏷 Brand: <span>${order.brandName || '—'}</span></div>
+          <div class="admin-info-row">📱 WhatsApp: <span>${order.whatsapp || '—'}</span></div>
+          <div class="admin-info-row">📧 Email: <span>${order.userEmail || '—'}</span></div>
+          <div class="admin-info-row">💰 Price: <span>${order.price || '—'}</span></div>
+          <div class="admin-info-row">🕐 Date: <span>${date}</span></div>
+          <div class="admin-info-row">📋 Type: <span>${order.templateType || '—'}</span></div>
+        </div>
+        ${isDone && order.renderedFile
+          ? `<div style="font-size:12px;color:var(--green);margin-bottom:10px;">✓ Render uploaded: <a href="${order.renderedFile}" target="_blank" style="color:var(--pl);">View file</a></div>`
+          : ''}
+        <div class="admin-link-row">
+          <input class="admin-link-input" id="link-${order.id}" placeholder="Paste Google Drive link here..." value="${order.renderedFile || ''}">
+          <button class="admin-done-btn ${isDone ? 'completed' : ''}" id="btn-${order.id}" onclick="markOrderDone('${order.id}')">
+            ${isDone ? '✓ Done' : 'Mark Done'}
+          </button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+window.markOrderDone = async function(orderId) {
+  const link = document.getElementById('link-' + orderId).value.trim();
+  if (!link) { alert('Please paste the Google Drive link first.'); return; }
+  try {
+    await updateDoc(doc(db2, 'orders', orderId), {
+      status: 'done',
+      renderedFile: link
+    });
+    document.getElementById('btn-' + orderId).textContent = '✓ Done';
+    document.getElementById('btn-' + orderId).classList.add('completed');
+    document.getElementById('aoc-' + orderId).setAttribute('data-status', 'done');
+    alert('Order marked as done! Client can now see their render.');
+  } catch(e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+window.adminFilter = function(btn, type) {
+  document.querySelectorAll('.admin-ftab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const orders = window._allAdminOrders || [];
+  if (type === 'all') renderAdminOrders(orders);
+  else renderAdminOrders(orders.filter(o => (o.status || 'pending') === type));
+}
+</script>
 async function handleRender(){
   if (!window.getCurrentUser || !window.getCurrentUser()) {
     openAuthModal('login');
@@ -1780,19 +1960,13 @@ const db = getFirestore(app);
 onAuthStateChanged(auth, (user) => {
   if (user) {
 document.getElementById('auth-btn').style.display = 'none';
-document.getElementById('drawer-auth-btn').style.display = 'none';
-document.getElementById('drawer-profile-box').style.display = 'block';
-document.getElementById('drawer-profile-name').textContent = user.displayName || 'My Profile';
-document.getElementById('drawer-profile-email').textContent = user.email;
-    document.getElementById('auth-btn').onclick = handleLogout;
+document.getElementById('drawer-auth-btn').style.display = 'none';    document.getElementById('auth-btn').onclick = handleLogout;
     document.getElementById('drawer-auth-btn').textContent = 'Logout';
     document.getElementById('drawer-auth-btn').onclick = handleLogout;
     document.getElementById('nav-profile-btn').style.cssText = 'width:36px;height:36px;border-radius:50%;background:rgba(124,58,237,0.2);border:1px solid var(--pb);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;';
     document.getElementById('drawer-profile-btn').style.display = 'block';
   } else {
-document.getElementById('auth-btn').style.display = 'inline';
-document.getElementById('drawer-auth-btn').style.display = 'block';
-document.getElementById('drawer-profile-box').style.display = 'none';
+    document.getElementById('auth-btn').textContent = 'Login';
     document.getElementById('auth-btn').onclick = () => openAuthModal('login');
     document.getElementById('drawer-auth-btn').textContent = 'Login';
     document.getElementById('drawer-auth-btn').onclick = () => openAuthModal('login');
