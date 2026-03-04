@@ -3316,7 +3316,7 @@ document.getElementById('rp-price').textContent = detectedPrice;
   }
 
   document.querySelectorAll('.rp-file-name').forEach(el => el.textContent = 'Choose file…');
-  document.querySelectorAll('.rp-file-btn input[type="file"]').forEach(el => el.value = '');
+  document.querySelectorAll('.rp-file-slot input[type="file"]').forEach(el => el.value = '');
   document.querySelectorAll('.rp-file-slot').forEach(el => el.classList.remove('has-file'));
   document.getElementById('rp-ref-slot').classList.remove('has-file');
   document.getElementById('ref-file-name').textContent = 'Upload up to 5 images — how you want it to look';
@@ -3433,7 +3433,7 @@ function checkClientForm() {
 // RAZORPAY PAYMENT FLOW
 // Replace YOUR_RAZORPAY_KEY_ID with your actual key from Razorpay dashboard
 // ════════════════════════════════════════
-const RAZORPAY_KEY = 'rzp_live_SNEKjhQYXtiBNs';
+const RAZORPAY_KEY = 'YOUR_RAZORPAY_KEY_ID';
 
 async function handleRender() {
   if (!window.getCurrentUser || !window.getCurrentUser()) { openAuthModal('login'); return; }
@@ -3447,7 +3447,7 @@ async function handleRender() {
   const refFile      = document.getElementById('ref-file-input');
 
   if (!refFile.files[0]) { alert('Please upload a reference image — it is mandatory.'); return; }
-  const files = document.querySelectorAll('.rp-file-btn input[type="file"]');
+  const files = document.querySelectorAll('.rp-file-slot input[type="file"]');
   let filesSent = 0;
   for (let i = 0; i < files.length; i++) { if (files[i].files[0]) filesSent++; }
   if (filesSent === 0) { alert('Please upload at least one design file before ordering.'); return; }
