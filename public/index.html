@@ -1785,7 +1785,7 @@ const firebaseConfig = {
   appId: "1:96423517661:web:7dddb240f2f76f075baa34"
 };
 
-const adminApp = getApps().find(a=>a.name==='adminapp') || initializeApp(firebaseConfig,'adminapp');
+const adminApp = initializeApp(firebaseConfig,'adminapp');
 const adminDb = getFirestore(adminApp);
 let _adminOrders = [];
 let _adminFilter = 'all';
