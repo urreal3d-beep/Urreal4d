@@ -27,7 +27,7 @@ body{background:var(--black);color:var(--white);font-family:'Plus Jakarta Sans',
 ::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:var(--black);}::-webkit-scrollbar-thumb{background:var(--purple);}
 
 /* ── NAV ── */
-nav{
+#main-nav{
   position:fixed;top:0;left:0;right:0;z-index:300;
   display:flex;justify-content:space-between;align-items:center;
   padding:0 40px;height:68px;
@@ -37,7 +37,7 @@ nav{
   border-bottom:1px solid rgba(124,58,237,0.12);
   transition:all 0.3s ease;
 }
-nav.scrolled{
+#main-nav.scrolled{
   height:60px;
   background:rgba(6,4,15,0.97);
   border-bottom-color:rgba(124,58,237,0.25);
@@ -984,7 +984,10 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
 }
 @media(max-width:640px){
   .hbg{display:flex;}
-  nav{padding:0 20px;}
+  .nav-center{display:none;}
+  .nav-render-btn{display:none;}
+  .nav-login-btn{display:none;}
+  #main-nav{padding:0 20px;}
   .hero{grid-template-columns:1fr;}
   .hero-content{padding:96px 20px 36px;}
   .hero-video-wrap{height:60vw;min-height:240px;}
@@ -1009,6 +1012,9 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
 }
 @media(min-width:641px) and (max-width:900px){
   .hbg{display:flex;}
+  .nav-center{display:none;}
+  .nav-render-btn{display:none;}
+  .nav-login-btn{display:none;}
 }
 @media(max-width:380px){.hero h1{font-size:40px;}}
 </style>
@@ -1090,8 +1096,7 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
     <a href="#" onclick="go('portfolio');return false;" id="dl-portfolio"><span class="drawer-icon">◈</span>Portfolio</a>
     <a href="#" onclick="go('pricing');return false;" id="dl-pricing"><span class="drawer-icon">◎</span>Pricing</a>
     <a href="#" onclick="go('testimonials');return false;" id="dl-testimonials"><span class="drawer-icon">★</span>Reviews</a>
-    <div class="drawer-divider"></div>
-    <a href="#" onclick="go('appointment');return false;" id="dl-appointment"><span class="drawer-icon">📅</span>Book a Call</a>
+    <a href="#" onclick="go('appointment');return false;" id="dl-appointment"><span class="drawer-icon">◌</span>Book a Call</a>
     <a href="#" onclick="go('about');return false;" id="dl-about"><span class="drawer-icon">◉</span>About</a>
     <a href="#" onclick="go('policy');return false;" id="dl-policy"><span class="drawer-icon">§</span>Policy</a>
   </nav>
@@ -1809,7 +1814,7 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
 const pages = ['home','about','render','portfolio','pricing','testimonials','appointment','policy','admin'];
 
 function go(name, pushToHistory = true){
-  document.querySelector('nav').style.display = 'flex';
+  document.getElementById('main-nav').style.display = 'flex';
   pages.forEach(p => {
     document.getElementById('p-'+p).classList.remove('active');
     const nl = document.getElementById('nl-'+p);
@@ -1838,12 +1843,12 @@ function go(name, pushToHistory = true){
         document.getElementById('admin-loading').style.display = 'none';
         document.getElementById('admin-main').style.display = 'block';
         if(window.loadAdminOrders) window.loadAdminOrders();
-        document.querySelector('nav').style.display = 'none';
+        document.getElementById('main-nav').style.display = 'none';
       } else if(user){
         clearInterval(interval);
         document.getElementById('admin-loading').style.display = 'none';
         document.getElementById('admin-denied').style.display = 'block';
-        document.querySelector('nav').style.display = 'flex';
+        document.getElementById('main-nav').style.display = 'flex';
       } else if(tries > 20){
         clearInterval(interval);
         document.getElementById('admin-loading').style.display = 'none';
