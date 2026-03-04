@@ -1804,6 +1804,38 @@ function checkClientForm() {
 
 
 <script>
+// ── Single Bot, 3 Group Chats ──
+const TG_BOT      = '8684367752:AAETdjkf6LGb6sRXGfiKjjXsycNtcZhsdcY';
+const TG_AWAITING  = '-4815432496';
+const TG_CONFIRMED = '-5150343945';
+const TG_REJECTED  = '-5149184468';
+
+async function tgSendMessage(chatId, text) {
+  const res = await fetch('https://api.telegram.org/bot' + TG_BOT + '/sendMessage', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({chat_id: chatId, text: text})
+  });
+  const data = await res.json();
+  return data.result ? data.result.message_id : null;
+}
+
+async function tgSendFile(chatId, file, filename, caption) {
+  const fd = new FormData();
+  fd.append('chat_id', chatId);
+  fd.append('document', file, filename);
+  fd.append('caption', caption);
+  const res = await fetch('https://api.telegram.org/bot' + TG_BOT + '/sendDocument', {method:'POST', body: fd});
+  const data = await res.json();
+  return data.result ? data.result.message_id : null;
+}
+
+async function tgForwardMessage(fromChatId, toChatId, messageId) {
+  await fetch('https://api.telegram.org/bot' + TG_BOT + '/forwardMessage', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({chat_id: toChatId, from_chat_id: fromChatId, message_id: messageId})
+  });
+}
+
 async function handleRender(){
   if (!window.getCurrentUser || !window.getCurrentUser()) { openAuthModal('login'); return; }
   const title = document.getElementById('rp-title').textContent;
@@ -1815,16 +1847,14 @@ async function handleRender(){
   const refFile = document.getElementById('ref-file-input');
   if (!refFile.files[0]) { alert('Please upload a reference image — it is mandatory.'); return; }
   const files = document.querySelectorAll('.rp-file-btn input[type="file"]');
-  let filesSent = 0;
-  for(let i = 0; i < files.length; i++){ if(files[i].files[0]) filesSent++; }
-  if(filesSent === 0){ alert('Please upload at least one design file before ordering.'); return; }
-  // Store files in memory — sent to Telegram only after admin confirms payment
+  let fileCount = 0;
+  for(let i = 0; i < files.length; i++){ if(files[i].files[0]) fileCount++; }
+  if(fileCount === 0){ alert('Please upload at least one design file before ordering.'); return; }
   window._pendingOrderFiles = {
     files: Array.from(files).map(f => f.files[0] || null),
     refFile: refFile.files[0],
     title, price, clientName, clientBrand, clientWp, templateType
   };
-  // Show payment modal
   document.getElementById('pay-amount').textContent = price;
   document.getElementById('pay-utr').value = '';
   document.getElementById('pay-msg').textContent = '';
@@ -1840,11 +1870,36 @@ async function submitPayment() {
   btn.textContent = 'Submitting...'; btn.disabled = true;
   const d = window._pendingOrderFiles;
   try {
+    // 1. Send details message to Awaiting group — save message ID
+    const typeLabel = d.templateType === 'video' ? 'Video' : 'Image';
+    const detailsText = '⏳ NEW ORDER — AWAITING PAYMENT CONFIRMATION\n\n' +
+      'Template: ' + d.title + '\nType: ' + typeLabel + '\nPrice: ' + d.price + '\nUTR: ' + utr + '\n\n' +
+      'Name: ' + d.clientName + '\nBrand: ' + d.clientBrand + '\nWhatsApp: ' + d.clientWp +
+      '\nEmail: ' + window.getCurrentUser().email + '\n\nFiles below:';
+    const detailsMsgId = await tgSendMessage(TG_AWAITING, detailsText);
+
+    // 2. Send each file to Awaiting group — save all message IDs
+    const labels = ['Front', 'Back', 'Sleeves', 'Logo'];
+    const fileMsgIds = [];
+    for (let i = 0; i < d.files.length; i++) {
+      if (d.files[i]) {
+        const mid = await tgSendFile(TG_AWAITING, d.files[i], labels[i] + '_' + d.files[i].name, labels[i] + ' — ' + d.title);
+        if (mid) fileMsgIds.push(mid);
+      }
+    }
+    // 3. Send reference file — save message ID
+    const refMid = await tgSendFile(TG_AWAITING, d.refFile, 'Reference_' + d.refFile.name, 'Reference — ' + d.title);
+    if (refMid) fileMsgIds.push(refMid);
+
+    // 4. Save order to Firebase with all message IDs
     await window.saveOrderToFirestore({
       templateName: d.title, templateType: d.templateType, price: d.price,
       clientName: d.clientName, brandName: d.clientBrand, whatsapp: d.clientWp,
-      utrId: utr, paymentStatus: 'payment_pending'
+      utrId: utr, paymentStatus: 'payment_pending',
+      tgDetailsMsgId: detailsMsgId,
+      tgFileMsgIds: fileMsgIds
     });
+
     document.getElementById('payment-overlay').classList.remove('open');
     document.getElementById('payment-modal').classList.remove('open');
     closeRenderPanel();
@@ -1852,6 +1907,7 @@ async function submitPayment() {
   } catch(e) {
     msg.textContent = 'Error submitting. Please try again.';
     msg.style.color = '#f87171';
+    console.error(e);
   }
   btn.textContent = 'Confirm Payment →'; btn.disabled = false;
 }
@@ -1861,15 +1917,19 @@ function closePaymentModal() {
   document.getElementById('payment-modal').classList.remove('open');
 }
 
-// Called by admin — sends files to Telegram after confirming payment
-window.sendOrderToTelegram = async function(orderId) {
-  const BOT_TOKEN = '8670625484:AAHcKZ2okImb8E7i0MiE0Bz1gsGW1Hyn0OA';
-  const CHAT_ID = '8502965753';
-  const order = window._adminOrders ? window._adminOrders.find(o => o.id === orderId) : null;
-  if (!order) { alert('Order data not found. Please refresh.'); return; }
-  const labels = ['Front', 'Back', 'Sleeves', 'Logo'];
-  const message = `✅ Payment Confirmed — Order Started!\n\n🎽 Template: ${order.templateName}\n💰 Price: ${order.price}\n🔖 UTR: ${order.utrId||'—'}\n\n👤 Name: ${order.clientName||order.userName}\n🏷 Brand: ${order.brandName||'—'}\n📱 WhatsApp: ${order.whatsapp||'—'}\n📧 Email: ${order.userEmail||'—'}`;
-  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({chat_id: CHAT_ID, text: message}) });
+// Forward all saved messages from Awaiting to target group
+window.tgForwardOrder = async function(order, targetChatId, headerText) {
+  await tgSendMessage(targetChatId, headerText);
+  // Forward details message
+  if (order.tgDetailsMsgId) {
+    await tgForwardMessage(TG_AWAITING, targetChatId, order.tgDetailsMsgId);
+  }
+  // Forward all file messages
+  if (order.tgFileMsgIds && order.tgFileMsgIds.length > 0) {
+    for (const mid of order.tgFileMsgIds) {
+      await tgForwardMessage(TG_AWAITING, targetChatId, mid);
+    }
+  }
 }
 
 function filterRender(btn, type) {
@@ -2044,10 +2104,13 @@ window.saveOrderToFirestore = async function(orderData) {
       status: 'payment_pending',
       paymentStatus: orderData.paymentStatus || 'payment_pending',
       utrId: orderData.utrId || null,
+      tgDetailsMsgId: orderData.tgDetailsMsgId || null,
+      tgFileMsgIds: orderData.tgFileMsgIds || [],
       renderedFile: null
     });
   } catch(e) {
     console.log('Order save failed:', e);
+    throw e;
   }
 }
 
@@ -2143,26 +2206,29 @@ function renderPaymentsList() {
 }
 
 window.adminConfirmPayment = async function(orderId) {
-  if (!confirm('Confirm this payment? This will approve the order and notify the client.')) return;
+  if (!confirm('Confirm this payment? Files will be forwarded to Confirmed group.')) return;
   try {
     await updateDoc(doc(adminDb, 'orders', orderId), { paymentStatus: 'confirmed', status: 'pending' });
     const order = _adminOrders.find(o => o.id === orderId);
     if (order) { order.paymentStatus = 'confirmed'; order.status = 'pending'; }
-    // Send Telegram notification
-    if (window.sendOrderToTelegram) await window.sendOrderToTelegram(orderId);
-    alert('✅ Payment confirmed! Order is now active.');
+    const header = '✅ PAYMENT CONFIRMED — START THIS ORDER\n\nUTR: ' + (order.utrId||'—') + '\nClient: ' + (order.clientName||order.userName||'—') + '\nWhatsApp: ' + (order.whatsapp||'—');
+    if (window.tgForwardOrder) await window.tgForwardOrder(order, '-5150343945', header);
+    alert('✅ Confirmed! Files forwarded to Confirmed group.');
     window.loadAdminOrders();
   } catch(e) { alert('Error: ' + e.message); }
 }
 
 window.adminRejectOrder = async function(orderId, reason) {
   const label = reason === 'payment_failed' ? 'mark as Payment Failed' : 'Reject this order';
-  if (!confirm(`Are you sure you want to ${label}? Client will see this status.`)) return;
+  if (!confirm('Are you sure you want to ' + label + '?')) return;
   try {
     await updateDoc(doc(adminDb, 'orders', orderId), { paymentStatus: reason, status: reason });
     const order = _adminOrders.find(o => o.id === orderId);
     if (order) { order.paymentStatus = reason; order.status = reason; }
-    alert(reason === 'payment_failed' ? '❌ Marked as Payment Failed.' : '🚫 Order Rejected.');
+    const reasonLabel = reason === 'payment_failed' ? '❌ PAYMENT FAILED' : '🚫 ORDER REJECTED';
+    const header = reasonLabel + '\n\nUTR: ' + (order.utrId||'—') + '\nClient: ' + (order.clientName||order.userName||'—') + '\nWhatsApp: ' + (order.whatsapp||'—');
+    if (window.tgForwardOrder) await window.tgForwardOrder(order, '-5149184468', header);
+    alert(reason === 'payment_failed' ? '❌ Marked as Payment Failed. Files forwarded to Rejected group.' : '🚫 Order Rejected. Files forwarded to Rejected group.');
     window.loadAdminOrders();
   } catch(e) { alert('Error: ' + e.message); }
 }
