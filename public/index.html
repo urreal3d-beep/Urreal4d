@@ -3,7 +3,7 @@
 <head>
 <!-- Social share / WhatsApp preview -->
 <meta property="og:title" content="Urreal3D">
-<meta property="og:description" content="https://urreal4d.onrender.com/images/logo.png">
+<meta property="og:description" content="Premium 3D clothing animations and renders for fashion brands, e-commerce stores, and independent designers. Realistic fabric, fast delivery.">
 <meta property="og:image" content="images/logo.png">
 <meta property="og:url" content="https://urreal4d.onrender.com">
 <meta property="og:type" content="website">
@@ -270,7 +270,7 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
   nav{padding:15px 20px;}
   .hero{padding:96px 20px 64px;}
   .hero-stats{flex-wrap:wrap;gap:24px;}
-  .port-grid.featured-first .port-card:first-child .media-box{aspect-ratio:16/9;}
+  .port-grid.featured-first .port-card:first-child .media-box{aspect-ratio:9/16;}
   .sec,.svc-grid{padding-left:20px;padding-right:20px;}
   .port-hero,.test-hero,.appt-hero,.pricing-hero{padding:106px 20px 32px;}
   .filter-bar,.port-grid,.port-section-title,.photos-sec,.test-grid,.test-cta,.appt-grid,.pricing-grid,.pricing-note,.pricing-faq{padding-left:20px;padding-right:20px;}
@@ -2681,23 +2681,54 @@ async function submitReview() {
 <!-- ═══ LAZY LOADING ═══ -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  if (!('IntersectionObserver' in window)) return;
+
+  // Lazy load images
   const imgs = document.querySelectorAll('.port-card img');
-  if ('IntersectionObserver' in window) {
-    const obs = new IntersectionObserver(function(entries) {
-      entries.forEach(function(e) {
-        if (e.isIntersecting) {
-          const img = e.target;
-          if (img.dataset.src) { img.src = img.dataset.src; delete img.dataset.src; }
-          obs.unobserve(img);
-        }
-      });
-    }, { rootMargin: '200px' });
-    imgs.forEach(function(img) {
-      img.dataset.src = img.src;
-      img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"%3E%3C/svg%3E';
-      obs.observe(img);
+  const imgObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) {
+        const img = e.target;
+        if (img.dataset.src) { img.src = img.dataset.src; delete img.dataset.src; }
+        imgObs.unobserve(img);
+      }
     });
-  }
+  }, { rootMargin: '200px' });
+  imgs.forEach(function(img) {
+    img.dataset.src = img.src;
+    img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"%3E%3C/svg%3E';
+    imgObs.observe(img);
+  });
+
+  // Lazy load videos — pause when out of view, play when in view
+  const videos = document.querySelectorAll('.port-card video');
+  videos.forEach(function(v) {
+    // Store the source and remove it so video doesn't load upfront
+    const source = v.querySelector('source');
+    if (source) {
+      v.dataset.src = source.src;
+      source.removeAttribute('src');
+      v.load(); // reset
+    }
+  });
+  const videoObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      const v = e.target;
+      if (e.isIntersecting) {
+        // Load source if not yet loaded
+        if (v.dataset.src) {
+          const source = v.querySelector('source');
+          if (source) { source.src = v.dataset.src; }
+          v.load();
+          delete v.dataset.src;
+        }
+        v.play().catch(function(){});
+      } else {
+        v.pause();
+      }
+    });
+  }, { rootMargin: '100px', threshold: 0.25 });
+  videos.forEach(function(v) { videoObs.observe(v); });
 });
 </script>
 <!-- ═══ END LAZY LOADING ═══ -->
