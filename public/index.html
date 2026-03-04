@@ -1916,11 +1916,13 @@ async function submitPayment() {
   btn.textContent = 'Submitting...'; btn.disabled = true;
   const d = window._pendingOrderFiles;
   try {
-    await window.saveOrderToFirestore({
+    const orderId = await window.saveOrderToFirestore({
       templateName: d.title, templateType: d.templateType, price: d.price,
       clientName: d.clientName, brandName: d.clientBrand, whatsapp: d.clientWp,
       utrId: utr, paymentStatus: 'payment_pending'
     });
+    const orderData = { templateName: d.title, price: d.price, utrId: utr, clientName: d.clientName, brandName: d.clientBrand, whatsapp: d.clientWp };
+    await window.sendOrderToReviewing(orderId, orderData, d.files, d.refFile);
     document.getElementById('payment-overlay').classList.remove('open');
     document.getElementById('payment-modal').classList.remove('open');
     closeRenderPanel();
@@ -1937,15 +1939,88 @@ function closePaymentModal() {
   document.getElementById('payment-modal').classList.remove('open');
 }
 
-// Called by admin — sends files to Telegram after confirming payment
+// ── Telegram 3-Group System ──
+const BOT_TOKEN = '8684367752:AAETdjkf6LGb6sRXGfiKjjXsycNtcZhsdcY';
+const TG_REVIEWING = '-4815432496';
+const TG_CONFIRMED = '-5150343945';
+const TG_REJECTED  = '-5149184468';
+
+async function tgSend(chatId, text) {
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' })
+    });
+    const data = await res.json();
+    return data.result ? data.result.message_id : null;
+  } catch(e) { console.error('Telegram error:', e); return null; }
+}
+
+async function tgSendFile(chatId, file, caption) {
+  try {
+    const form = new FormData();
+    form.append('chat_id', chatId);
+    if (caption) form.append('caption', caption);
+    form.append('document', file, file.name);
+    const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
+      method: 'POST', body: form
+    });
+    const data = await res.json();
+    return data.result ? data.result.message_id : null;
+  } catch(e) { console.error('Telegram file error:', e); return null; }
+}
+
+async function tgForward(fromChatId, toChatId, messageId) {
+  try {
+    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/forwardMessage`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: toChatId, from_chat_id: fromChatId, message_id: messageId })
+    });
+  } catch(e) { console.error('Telegram forward error:', e); }
+}
+
+function orderMsg(order, prefix) {
+  return `${prefix}\n\n🎽 <b>Template:</b> ${order.templateName||'—'}\n💰 <b>Price:</b> ${order.price||'—'}\n🔖 <b>UTR:</b> ${order.utrId||'—'}\n\n👤 <b>Name:</b> ${order.clientName||order.userName||'—'}\n🏷 <b>Brand:</b> ${order.brandName||'—'}\n📱 <b>WhatsApp:</b> ${order.whatsapp||'—'}\n📧 <b>Email:</b> ${order.userEmail||'—'}`;
+}
+
+// Client submits → send text + all files to Reviewing, save message_ids to Firestore
+window.sendOrderToReviewing = async function(orderId, orderData, files, refFile) {
+  const msgIds = [];
+  const textMsgId = await tgSend(TG_REVIEWING, orderMsg(orderData, '🔍 <b>New Order — Reviewing Payment</b>'));
+  if (textMsgId) msgIds.push(textMsgId);
+  if (refFile) {
+    const refMsgId = await tgSendFile(TG_REVIEWING, refFile, '📎 Reference Image');
+    if (refMsgId) msgIds.push(refMsgId);
+  }
+  const labels = ['Front', 'Back', 'Sleeves', 'Logo'];
+  for (let i = 0; i < files.length; i++) {
+    if (files[i]) {
+      const fileMsgId = await tgSendFile(TG_REVIEWING, files[i], `📁 ${labels[i] || 'File ' + (i+1)}`);
+      if (fileMsgId) msgIds.push(fileMsgId);
+    }
+  }
+  if (orderId && msgIds.length > 0) {
+    try { await updateDoc(doc(db, 'orders', orderId), { tgMessageIds: msgIds }); }
+    catch(e) { console.error('Could not save tgMessageIds:', e); }
+  }
+}
+
+// Admin confirms → forward all messages from Reviewing to Confirmed
 window.sendOrderToTelegram = async function(orderId) {
-  const BOT_TOKEN = '8670625484:AAHcKZ2okImb8E7i0MiE0Bz1gsGW1Hyn0OA';
-  const CHAT_ID = '8502965753';
   const order = window._adminOrders ? window._adminOrders.find(o => o.id === orderId) : null;
   if (!order) { alert('Order data not found. Please refresh.'); return; }
-  const labels = ['Front', 'Back', 'Sleeves', 'Logo'];
-  const message = `✅ Payment Confirmed — Order Started!\n\n🎽 Template: ${order.templateName}\n💰 Price: ${order.price}\n🔖 UTR: ${order.utrId||'—'}\n\n👤 Name: ${order.clientName||order.userName}\n🏷 Brand: ${order.brandName||'—'}\n📱 WhatsApp: ${order.whatsapp||'—'}\n📧 Email: ${order.userEmail||'—'}`;
-  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({chat_id: CHAT_ID, text: message}) });
+  const msgIds = order.tgMessageIds || [];
+  if (msgIds.length === 0) { await tgSend(TG_CONFIRMED, orderMsg(order, '✅ <b>Payment Confirmed — Order Started!</b>')); return; }
+  for (const msgId of msgIds) { await tgForward(TG_REVIEWING, TG_CONFIRMED, msgId); }
+}
+
+// Admin rejects → forward all messages from Reviewing to Rejected
+window.sendOrderRejected = async function(orderId) {
+  const order = window._adminOrders ? window._adminOrders.find(o => o.id === orderId) : null;
+  if (!order) return;
+  const msgIds = order.tgMessageIds || [];
+  if (msgIds.length === 0) { await tgSend(TG_REJECTED, orderMsg(order, '🚫 <b>Order Rejected</b>')); return; }
+  for (const msgId of msgIds) { await tgForward(TG_REVIEWING, TG_REJECTED, msgId); }
 }
 
 function filterRender(btn, type) {
@@ -2126,7 +2201,7 @@ window.handleGoogleLogin = async function() {
 
 window.saveOrderToFirestore = async function(orderData) {
   try {
-    await addDoc(collection(db, 'orders'), {
+    const docRef = await addDoc(collection(db, 'orders'), {
       ...orderData,
       userId: auth.currentUser.uid,
       userEmail: auth.currentUser.email,
@@ -2137,6 +2212,7 @@ window.saveOrderToFirestore = async function(orderData) {
       utrId: orderData.utrId || null,
       renderedFile: null
     });
+    return docRef.id;
   } catch(e) {
     console.log('Order save failed:', e);
   }
@@ -2304,6 +2380,7 @@ window.adminRejectOrder = async function(orderId, reason) {
     await updateDoc(doc(adminDb, 'orders', orderId), { paymentStatus: reason, status: reason });
     const order = _adminOrders.find(o => o.id === orderId);
     if (order) { order.paymentStatus = reason; order.status = reason; }
+    if (window.sendOrderRejected) await window.sendOrderRejected(orderId);
     alert(reason === 'payment_failed' ? '❌ Marked as Payment Failed.' : '🚫 Order Rejected.');
     window.loadAdminOrders();
   } catch(e) { alert('Error: ' + e.message); }
