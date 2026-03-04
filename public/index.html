@@ -4199,33 +4199,58 @@ window.loadAdminOrders = async function() {
 
 function renderPaymentsList() {
   const list = document.getElementById('admin-payments-list');
-  // Now shows orders paid via Razorpay that are awaiting render delivery
   const inProgress = _adminOrders.filter(o => o.status === 'pending' && o.paymentStatus === 'confirmed');
-  document.getElementById('payments-count').textContent = inProgress.length + ' orders awaiting render';
+  document.getElementById('payments-count').textContent = inProgress.length + ' order' + (inProgress.length !== 1 ? 's' : '') + ' awaiting render';
   if (inProgress.length === 0) { list.innerHTML = '<div class="admin-empty">✅ No pending renders — all clear!</div>'; return; }
-  list.innerHTML = inProgress.map(order => {
-    const date = order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'}) : 'Unknown';
+
+  // Group by client
+  const clientMap = {};
+  inProgress.forEach(o => {
+    const key = o.userEmail || o.whatsapp || 'unknown';
+    if (!clientMap[key]) clientMap[key] = {
+      name: o.clientName || o.userName || 'Unknown',
+      contact: o.userEmail || o.whatsapp || '—',
+      orders: []
+    };
+    clientMap[key].orders.push(o);
+  });
+
+  list.innerHTML = Object.values(clientMap).map((c, ci) => {
+    const initials = c.name.charAt(0).toUpperCase();
+    const totalPaid = c.orders.reduce((s, o) => s + parseFloat((o.price||'0').replace(/[^0-9.]/g,'')), 0);
+    const sym = c.orders[0]?.price?.includes('₹') ? '₹' : '$';
+
+    const orderRows = c.orders.map(o => {
+      const date = o.createdAt ? new Date(o.createdAt.seconds*1000).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—';
+      const type = o.templateType === 'video' ? '🎬 Video' : '🖼 Image';
+      return `
+        <div style="display:flex;align-items:center;gap:0;padding:11px 18px;border-bottom:1px solid rgba(124,58,237,0.06);">
+          <span style="width:100px;font-size:11px;color:var(--gdim);flex-shrink:0;">${date}</span>
+          <span style="flex:1;font-size:12.5px;font-weight:600;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${o.templateName||'Custom'}</span>
+          <span style="width:80px;font-size:11px;color:var(--gdim);text-align:center;flex-shrink:0;">${type}</span>
+          <span style="width:72px;font-size:12.5px;font-weight:700;color:var(--pl);text-align:right;flex-shrink:0;">${o.price||'—'}</span>
+        </div>`;
+    }).join('');
+
     return `
-      <div class="order-item" style="border:1px solid rgba(124,58,237,0.3);margin-bottom:14px;border-radius:12px;padding:20px;">
-        <div class="order-item-top" style="margin-bottom:14px;">
-          <div class="order-item-title" style="font-size:16px;">🎨 ${order.templateName||'Custom'} — ${order.price||'—'}</div>
-          <span class="abadge abadge-pending">⏳ In Progress</span>
+      <div class="client-card" id="pmt-cc-${ci}" style="margin-bottom:10px;">
+        <div class="client-card-header" onclick="document.getElementById('pmt-cc-${ci}').classList.toggle('open')">
+          <div class="client-avatar">${initials}</div>
+          <div class="client-info">
+            <div class="client-name">${c.name}</div>
+            <div class="client-meta">${c.contact} · ${c.orders.length} order${c.orders.length>1?'s':''} · <span style="color:var(--pl);font-weight:700;">${sym}${totalPaid.toLocaleString('en-IN')} paid</span></div>
+          </div>
+          <span class="client-chevron">⌄</span>
         </div>
-        <div class="order-item-grid" style="margin-bottom:14px;">
-          <div class="orow">👤 Client<strong>${order.clientName||order.userName||'—'}</strong></div>
-          <div class="orow">🏷 Brand<strong>${order.brandName||'—'}</strong></div>
-          <div class="orow">📱 WhatsApp<strong>${order.whatsapp||'—'}</strong></div>
-          <div class="orow">📧 Email<strong>${order.userEmail||'—'}</strong></div>
-          <div class="orow">💰 Price<strong>${order.price||'—'}</strong></div>
-          <div class="orow">📋 Type<strong>${order.templateType==='video'?'🎬 Video':'🖼 Image'}</strong></div>
-          <div class="orow">🕐 Date<strong>${date}</strong></div>
+        <div class="client-orders">
+          <div style="display:flex;padding:7px 18px;background:rgba(124,58,237,0.05);border-bottom:1px solid rgba(124,58,237,0.1);">
+            <span style="width:100px;font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--gdim);flex-shrink:0;">Date</span>
+            <span style="flex:1;font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--gdim);">Order</span>
+            <span style="width:80px;font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--gdim);text-align:center;flex-shrink:0;">Type</span>
+            <span style="width:72px;font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--gdim);text-align:right;flex-shrink:0;">Amount</span>
+          </div>
+          ${orderRows}
         </div>
-        <div style="background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:12px 16px;margin-bottom:14px;">
-          <div style="font-size:11px;color:var(--gdim);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">Razorpay Payment ID</div>
-          <div style="font-size:14px;font-weight:800;color:#22c55e;letter-spacing:0.02em;">${order.razorpayPaymentId||'—'}</div>
-        </div>
-        <input class="order-link-input" id="alink2-${order.id}" placeholder="Paste Google Drive link here..." value="${order.renderedFile||''}">
-        <button class="order-done-btn" id="abtn2-${order.id}" onclick="adminMarkDone('${order.id}','alink2-${order.id}','abtn2-${order.id}')">🚀 Upload & Mark Done</button>
       </div>`;
   }).join('');
 }
@@ -4290,7 +4315,10 @@ function renderAdminClients() {
         <div class="order-item">
           <div class="order-item-top">
             <div class="order-item-title">Order ${oi+1} — ${order.templateName||'Custom'}</div>
-            <span class="abadge ${badgeClass}" style="${isFailed?'background:rgba(239,68,68,0.12);color:#f87171;border-color:rgba(239,68,68,0.3);':isRejected?'background:rgba(107,114,128,0.1);color:var(--gdim);':isAwaiting?'background:rgba(249,115,22,0.12);color:#f97316;border-color:rgba(249,115,22,0.3);':''}">${badgeText}</span>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="abadge ${badgeClass}" style="${isFailed?'background:rgba(239,68,68,0.12);color:#f87171;border-color:rgba(239,68,68,0.3);':isRejected?'background:rgba(107,114,128,0.1);color:var(--gdim);':isAwaiting?'background:rgba(249,115,22,0.12);color:#f97316;border-color:rgba(249,115,22,0.3);':''}">${badgeText}</span>
+              <button onclick="adminDeleteOrder('${order.id}')" title="Delete order" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:#f87171;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.18)'" onmouseout="this.style.background='rgba(239,68,68,0.08)'">🗑</button>
+            </div>
           </div>
           <div class="order-item-grid">
             <div class="orow">👤 Client<strong>${order.clientName||order.userName||'—'}</strong></div>
@@ -4351,6 +4379,16 @@ window.adminMarkDone = async function(orderId, linkId, btnId) {
     document.getElementById('ast-done').textContent = done;
     alert('✓ Done! Client can now see their render.');
   } catch(e) { if(btn){btn.textContent='🚀 Upload & Mark Done';btn.disabled=false;} alert('Error: '+e.message); }
+}
+
+window.adminDeleteOrder = async function(orderId) {
+  if (!confirm('Delete this order permanently? This cannot be undone.')) return;
+  try {
+    await deleteDoc(doc(adminDb, 'orders', orderId));
+    _adminOrders = _adminOrders.filter(o => o.id !== orderId);
+    window._adminOrders = _adminOrders;
+    window.loadAdminOrders();
+  } catch(e) { alert('Error: ' + e.message); }
 }
 
 window.checkAdminAccess = function() {
