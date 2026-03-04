@@ -1975,165 +1975,137 @@ function filterRender(btn, type) {
 
 <!-- ═══ FIREBASE AUTH ═══ -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+import { getApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, query } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCME4Fby4vXSbxf6vE40j4ANuOBqPk_YVw",
-  authDomain: "urreal3d-ba986.firebaseapp.com",
-  projectId: "urreal3d-ba986",
-  storageBucket: "urreal3d-ba986.firebasestorage.app",
-  messagingSenderId: "96423517661",
-  appId: "1:96423517661:web:7dddb240f2f76f075baa34"
-};
+const adminDb = getFirestore(getApp());
+let _adminOrders = [];
+let _adminFilter = 'all';
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-document.getElementById('auth-btn').style.display = 'none';
-document.getElementById('drawer-auth-btn').style.display = 'none';    document.getElementById('auth-btn').onclick = handleLogout;
-    document.getElementById('drawer-auth-btn').textContent = 'Logout';
-    document.getElementById('drawer-auth-btn').onclick = handleLogout;
-    document.getElementById('nav-profile-btn').style.cssText = 'width:36px;height:36px;border-radius:50%;background:rgba(124,58,237,0.2);border:1px solid var(--pb);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;';
-    if (user.email === 'urreal3d@gmail.com') {
-  document.querySelectorAll('.nav-links li').forEach(li => li.style.display = 'none');
-  document.getElementById('nav-admin-li').style.display = 'list-item';
-  document.getElementById('nl-home') && (document.getElementById('nl-home').parentElement.style.display = 'list-item');
-  document.querySelectorAll('.drawer a').forEach(a => a.style.display = 'none');
-  document.getElementById('nav-profile-btn').style.cssText = 'width:36px;height:36px;border-radius:50%;background:rgba(124,58,237,0.2);border:1px solid var(--pb);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;';
-  document.getElementById('drawer-admin-btn').style.display = 'block';
-  document.getElementById('nav-admin-logout').style.display = 'list-item';
-}
-    if (user.email === 'urreal3d@gmail.com') {
-  document.getElementById('nav-admin-li').style.display = 'list-item';
-  document.getElementById('drawer-admin-btn').style.display = 'block';
-} else {
-  document.getElementById('nav-admin-li').style.display = 'none';
-  document.getElementById('drawer-admin-btn').style.display = 'none';
-}
-    document.getElementById('drawer-profile-btn').style.display = 'block';
-  } else {
-    document.getElementById('auth-btn').textContent = 'Login';
-    document.getElementById('auth-btn').onclick = () => openAuthModal('login');
-    document.getElementById('drawer-auth-btn').textContent = 'Login';
-    document.getElementById('drawer-auth-btn').onclick = () => openAuthModal('login');
-    document.getElementById('nav-profile-btn').style.display = 'none';
-document.querySelectorAll('.nav-links li').forEach(li => li.style.display = '');
-document.querySelectorAll('.drawer a').forEach(a => a.style.display = '');
-document.getElementById('nav-admin-logout').style.display = 'none';
-document.getElementById('nav-admin-li').style.display = 'none';
-document.getElementById('drawer-admin-btn').style.display = 'none';
-document.getElementById('nav-profile-btn').style.display = 'none';
-document.getElementById('auth-btn').style.display = 'inline';
-document.getElementById('drawer-auth-btn').style.display = 'block';
-    document.getElementById('nav-admin-logout').style.display = 'none';
-document.getElementById('nav-admin-li').style.display = 'none';
-document.getElementById('drawer-admin-btn').style.display = 'none';
-    document.getElementById('nav-admin-li').style.display = 'none';
-document.getElementById('drawer-admin-btn').style.display = 'none';
-    document.getElementById('drawer-profile-btn').style.display = 'none';
-  }
-});
-
-window.handleSignup = async function() {
-  const name  = document.getElementById('auth-name').value.trim();
-  const email = document.getElementById('auth-email').value.trim();
-  const phone = document.getElementById('auth-phone').value.trim();
-  const pass  = document.getElementById('auth-pass').value;
-  const msg   = document.getElementById('auth-msg');
-  if (!name || !email || !phone || !pass) { msg.textContent = 'Please fill in all fields.'; msg.style.color = '#f87171'; return; }
-  if (pass.length < 6) { msg.textContent = 'Password must be at least 6 characters.'; msg.style.color = '#f87171'; return; }
+window.loadAdminOrders = async function() {
+  const user = window.getCurrentUser();
+  if (!user || user.email !== 'urreal3d@gmail.com') return;
+  const list = document.getElementById('admin-clients-list');
+  list.innerHTML = '<div class="admin-empty">Loading...</div>';
   try {
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    await updateProfile(cred.user, { displayName: name });
-    msg.textContent = 'Account created! Welcome ' + name;
-    msg.style.color = 'var(--green)';
-    setTimeout(() => closeAuthModal(), 1500);
+    const q = query(collection(adminDb,'orders'));
+    const snap = await getDocs(q);
+    _adminOrders = snap.docs.map(d=>({id:d.id,...d.data()}));
+    const pending = _adminOrders.filter(o=>(o.status||'pending')==='pending').length;
+    const done = _adminOrders.filter(o=>o.status==='done').length;
+    document.getElementById('ast-total').textContent = _adminOrders.length;
+    document.getElementById('ast-pending').textContent = pending;
+    document.getElementById('ast-done').textContent = done;
+    renderAdminClients();
   } catch(e) {
-    msg.textContent = e.message.replace('Firebase: ', '');
-    msg.style.color = '#f87171';
+    alert('Admin load error: ' + e.message);
+    list.innerHTML = '<div class="admin-empty">Error: ' + e.message + '</div>';
   }
 }
 
-window.handleLogin = async function() {
-  const email = document.getElementById('auth-email').value.trim();
-  const pass  = document.getElementById('auth-pass').value;
-  const msg   = document.getElementById('auth-msg');
-  if (!email || !pass) { msg.textContent = 'Please enter email and password.'; msg.style.color = '#f87171'; return; }
+function renderAdminClients() {
+  const list = document.getElementById('admin-clients-list');
+  let orders = _adminOrders;
+  if (_adminFilter === 'pending') orders = orders.filter(o=>(o.status||'pending')==='pending');
+  if (_adminFilter === 'done') orders = orders.filter(o=>o.status==='done');
+  const clientMap = {};
+  orders.forEach(order => {
+    const key = order.userEmail || 'unknown';
+    if (!clientMap[key]) clientMap[key] = { name: order.userName || order.clientName || 'Unknown', email: order.userEmail || '—', orders: [] };
+    clientMap[key].orders.push(order);
+  });
+  const clients = Object.values(clientMap);
+  document.getElementById('admin-count').textContent = clients.length + ' clients';
+  if (clients.length === 0) { list.innerHTML = '<div class="admin-empty">No orders found.</div>'; return; }
+  list.innerHTML = clients.map((client, ci) => {
+    const initials = client.name.charAt(0).toUpperCase();
+    const pendingCount = client.orders.filter(o=>(o.status||'pending')==='pending').length;
+    const ordersHtml = client.orders.map((order, oi) => {
+      const date = order.createdAt ? new Date(order.createdAt.seconds*1000).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'Unknown';
+      const isDone = order.status === 'done';
+      return `
+        <div class="order-item">
+          <div class="order-item-top">
+            <div class="order-item-title">Order ${oi+1} — ${order.templateName||'Custom'}</div>
+            <span class="abadge ${isDone?'abadge-done':'abadge-pending'}">${isDone?'✓ Done':'⏳ Pending'}</span>
+          </div>
+          <div class="order-item-grid">
+            <div class="orow">👤 Client<strong>${order.clientName||order.userName||'—'}</strong></div>
+            <div class="orow">🏷 Brand<strong>${order.brandName||'—'}</strong></div>
+            <div class="orow">📱 WhatsApp<strong>${order.whatsapp||'—'}</strong></div>
+            <div class="orow">📧 Email<strong>${order.userEmail||'—'}</strong></div>
+            <div class="orow">💰 Price<strong>${order.price||'—'}</strong></div>
+            <div class="orow">📋 Type<strong>${order.templateType==='video'?'🎬 Video':'🖼 Image'}</strong></div>
+            <div class="orow">🕐 Date<strong>${date}</strong></div>
+          </div>
+          ${isDone && order.renderedFile ? `<a href="${order.renderedFile}" target="_blank" style="display:block;text-align:center;margin-bottom:10px;background:rgba(124,58,237,0.1);border:1px solid var(--pb);color:var(--pl);padding:9px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;">👁 View Uploaded Render</a>` : ''}
+          <input class="order-link-input" id="alink-${order.id}" placeholder="Paste Google Drive link here..." value="${order.renderedFile||''}">
+          <button class="order-done-btn ${isDone?'done':''}" id="abtn-${order.id}" onclick="adminMarkDone('${order.id}')">
+            ${isDone ? '✓ Completed' : '🚀 Upload & Mark Done'}
+          </button>
+        </div>`;
+    }).join('');
+    return `
+      <div class="client-card" id="cc-${ci}">
+        <div class="client-card-header" onclick="toggleClient(${ci})">
+          <div class="client-avatar">${initials}</div>
+          <div class="client-info">
+            <div class="client-name">${client.name}</div>
+            <div class="client-meta">${client.email} · ${client.orders.length} order${client.orders.length>1?'s':''} ${pendingCount>0?'· <span style="color:var(--yellow);">'+pendingCount+' pending</span>':''}</div>
+          </div>
+          <span class="client-chevron">⌄</span>
+        </div>
+        <div class="client-orders">${ordersHtml}</div>
+      </div>`;
+  }).join('');
+}
+
+window.toggleClient = function(ci) { document.getElementById('cc-'+ci).classList.toggle('open'); }
+
+window.adminTabFilter = function(btn, filter) {
+  document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  _adminFilter = filter;
+  renderAdminClients();
+}
+
+window.adminMarkDone = async function(orderId) {
+  const btn = document.getElementById('abtn-'+orderId);
+  if (btn.classList.contains('done')) return;
+  const link = document.getElementById('alink-'+orderId).value.trim();
+  if (!link) { alert('Please paste the Google Drive link first.'); return; }
+  btn.textContent = 'Saving...'; btn.disabled = true;
   try {
-    await signInWithEmailAndPassword(auth, email, pass);
-    msg.textContent = 'Logged in!';
-    msg.style.color = 'var(--green)';
-    setTimeout(() => closeAuthModal(), 1500);
-  } catch(e) {
-    msg.textContent = 'Wrong email or password.';
-    msg.style.color = '#f87171';
+    await updateDoc(doc(adminDb,'orders',orderId), { status:'done', renderedFile:link });
+    const order = _adminOrders.find(o=>o.id===orderId);
+    if (order) { order.status='done'; order.renderedFile=link; }
+    btn.textContent = '✓ Completed'; btn.classList.add('done'); btn.disabled = false;
+    const pending = _adminOrders.filter(o=>(o.status||'pending')==='pending').length;
+    const done = _adminOrders.filter(o=>o.status==='done').length;
+    document.getElementById('ast-pending').textContent = pending;
+    document.getElementById('ast-done').textContent = done;
+    alert('✓ Done! Client can now see their render.');
+  } catch(e) { btn.textContent = '🚀 Upload & Mark Done'; btn.disabled = false; alert('Error: ' + e.message); }
+}
+
+window.checkAdminAccess = function() {
+  const show = () => {
+    document.getElementById('admin-denied').style.display = 'none';
+    document.getElementById('admin-main').style.display = 'block';
+    window.loadAdminOrders();
   }
-}
-
-window.handleLogout = async function() {
-  await signOut(auth);
-}
-
-window.getCurrentUser = function() {
-  return auth.currentUser;
-}
-
-window.isAdminUser = function() {
-  const user = auth.currentUser;
-  return user && user.email === 'urreal3d@gmail.com';
-}
-
-window.handleGoogleLogin = async function() {
-  try {
-    const { GoogleAuthProvider, signInWithPopup } = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js");
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
-    const result = await signInWithPopup(auth, provider);
-    if (result.user) {
-      closeAuthModal();
-    }
-  } catch(e) {
-    console.log(e);
-    document.getElementById('auth-msg').textContent = 'Google login failed: ' + e.message;
-    document.getElementById('auth-msg').style.color = '#f87171';
+  const deny = () => {
+    document.getElementById('admin-denied').style.display = 'block';
+    document.getElementById('admin-main').style.display = 'none';
   }
-}
-// ── Save Order to Firestore ──
-window.saveOrderToFirestore = async function(orderData) {
-  try {
-    await addDoc(collection(db, 'orders'), {
-      ...orderData,
-      userId: auth.currentUser.uid,
-      userEmail: auth.currentUser.email,
-      userName: auth.currentUser.displayName,
-      createdAt: serverTimestamp(),
-      status: 'pending',
-      renderedFile: null
-    });
-  } catch(e) {
-    console.log('Order save failed:', e);
-  }
-}
-
-// ── Load Orders from Firestore ──
-window.loadUserOrders = async function() {
-  try {
-    const q = query(
-      collection(db, 'orders'),
-      where('userId', '==', auth.currentUser.uid),
-      orderBy('createdAt', 'desc')
-    );
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  } catch(e) {
-    console.log('Load orders failed:', e);
-    return [];
-  }
+  let attempts = 0;
+  const check = setInterval(() => {
+    attempts++;
+    const u = window.getCurrentUser();
+    if (u && u.email === 'urreal3d@gmail.com') { clearInterval(check); show(); }
+    else if (u) { clearInterval(check); deny(); }
+    else if (attempts > 20) { clearInterval(check); deny(); }
+  }, 200);
 }
 </script>
 <!-- ═══ AUTH MODAL ═══ -->
