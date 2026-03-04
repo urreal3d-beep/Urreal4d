@@ -24,6 +24,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com">
+<!-- Razorpay -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <!-- Fonts: load async so they never block first paint -->
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300&family=Syne:wght@700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
@@ -2690,24 +2692,18 @@ async function loadOrders() {
       ? new Date(order.createdAt.seconds * 1000).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
       : 'Just now';
 
-    const isVideo = order.templateType === 'video';
-    const waitTime = isVideo ? '6 hours' : '2 hours';
-    const isDone = order.status === 'done' && order.renderedFile;
-    const isFailed = order.status === 'payment_failed';
+    const isVideo    = order.templateType === 'video';
+    const waitTime   = isVideo ? '6 hours' : '2 hours';
+    const isDone     = order.status === 'done' && order.renderedFile;
     const isRejected = order.status === 'rejected';
-    const isAwaiting = order.paymentStatus === 'payment_pending';
 
     let statusHtml = `<span class="order-status-pending">⏳ In Progress</span>`;
-    if (isDone) statusHtml = `<span class="order-status-done">✓ Completed</span>`;
-    else if (isFailed) statusHtml = `<span style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.22);color:#f87171;border-radius:3px;padding:3px 9px;font-size:9.5px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;">❌ Failed</span>`;
+    if (isDone)     statusHtml = `<span class="order-status-done">✓ Completed</span>`;
     else if (isRejected) statusHtml = `<span style="background:rgba(107,114,128,0.1);border:1px solid rgba(107,114,128,0.2);color:var(--gdim);border-radius:3px;padding:3px 9px;font-size:9.5px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;">🚫 Rejected</span>`;
-    else if (isAwaiting) statusHtml = `<span style="background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.22);color:#f97316;border-radius:3px;padding:3px 9px;font-size:9.5px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;">💳 Awaiting</span>`;
 
-    let renderHtml = `<div class="order-result waiting">⏱ Ready within <strong>${waitTime}</strong> of payment confirmation.</div>`;
-    if (isDone) renderHtml = `<a href="${order.renderedFile}" target="_blank" class="order-view-btn">View Render →</a>`;
-    else if (isFailed) renderHtml = `<div class="order-result failed">❌ Payment could not be verified. Contact us on WhatsApp.</div>`;
-    else if (isRejected) renderHtml = `<div class="order-result rejected">🚫 Order not accepted. Contact us for more info.</div>`;
-    else if (isAwaiting) renderHtml = `<div class="order-result awaiting">💳 Payment under review — within a few hours. UTR: <strong>${order.utrId||'—'}</strong></div>`;
+    let renderHtml = `<div class="order-result waiting">⏱ Your render will be ready within <strong>${waitTime}</strong>.</div>`;
+    if (isDone)     renderHtml = `<a href="${order.renderedFile}" target="_blank" class="order-view-btn">View Render →</a>`;
+    else if (isRejected) renderHtml = `<div class="order-result rejected">🚫 Order not accepted. Contact us on WhatsApp.</div>`;
 
     return `
       <div class="order-card">
@@ -3433,70 +3429,111 @@ function checkClientForm() {
 
 
 <script>
-async function handleRender(){
+// ════════════════════════════════════════
+// RAZORPAY PAYMENT FLOW
+// Replace YOUR_RAZORPAY_KEY_ID with your actual key from Razorpay dashboard
+// ════════════════════════════════════════
+const RAZORPAY_KEY = 'YOUR_RAZORPAY_KEY_ID';
+
+async function handleRender() {
   if (!window.getCurrentUser || !window.getCurrentUser()) { openAuthModal('login'); return; }
-  const title = document.getElementById('rp-title').textContent;
-  const price = document.getElementById('rp-price').textContent;
-  const clientName = document.getElementById('client-name').value.trim();
-  const clientBrand = document.getElementById('client-brand').value.trim();
-  const clientWp = document.getElementById('client-wp').value.trim();
+
+  const title        = document.getElementById('rp-title').textContent;
+  const price        = document.getElementById('rp-price').textContent;
+  const clientName   = document.getElementById('client-name').value.trim();
+  const clientBrand  = document.getElementById('client-brand').value.trim();
+  const clientWp     = document.getElementById('client-wp').value.trim();
   const templateType = document.getElementById('rp-type-tag').textContent.includes('VIDEO') ? 'video' : 'image';
-  const refFile = document.getElementById('ref-file-input');
+  const refFile      = document.getElementById('ref-file-input');
+
   if (!refFile.files[0]) { alert('Please upload a reference image — it is mandatory.'); return; }
   const files = document.querySelectorAll('.rp-file-btn input[type="file"]');
   let filesSent = 0;
-  for(let i = 0; i < files.length; i++){ if(files[i].files[0]) filesSent++; }
-  if(filesSent === 0){ alert('Please upload at least one design file before ordering.'); return; }
-  // Store files in memory — sent to Telegram only after admin confirms payment
+  for (let i = 0; i < files.length; i++) { if (files[i].files[0]) filesSent++; }
+  if (filesSent === 0) { alert('Please upload at least one design file before ordering.'); return; }
+
+  // Hold files in memory — only sent to Telegram after payment is confirmed
   window._pendingOrderFiles = {
     files: Array.from(files).map(f => f.files[0] || null),
     refFile: refFile.files[0],
     title, price, clientName, clientBrand, clientWp, templateType
   };
-  // Show payment modal
-  document.getElementById('pay-amount').textContent = price;
-  document.getElementById('pay-utr').value = '';
-  document.getElementById('pay-msg').textContent = '';
-  document.getElementById('payment-overlay').classList.add('open');
-  document.getElementById('payment-modal').classList.add('open');
+
+  // Parse amount (₹999 → 99900 paise, $50 → 5000 cents)
+  const isINR   = price.includes('₹');
+  const amount  = parseFloat(price.replace(/[^0-9.]/g, '').replace(',', ''));
+  const user    = window.getCurrentUser();
+
+  const options = {
+    key: RAZORPAY_KEY,
+    amount: Math.round(amount * 100),   // Razorpay needs smallest unit
+    currency: isINR ? 'INR' : 'USD',
+    name: 'Urreal3D',
+    description: title,
+    image: 'images/applogo.png',
+    prefill: {
+      name: clientName,
+      email: user ? user.email : '',
+      contact: clientWp
+    },
+    theme: { color: '#7c3aed' },
+    handler: async function(response) {
+      // ✅ Payment SUCCESS — now save order + send files to Telegram
+      await onRazorpaySuccess(response);
+    },
+    modal: {
+      ondismiss: function() {
+        // ❌ User closed/cancelled — files stay in memory, nothing is sent
+        console.log('Razorpay dismissed — no order placed.');
+      }
+    }
+  };
+
+  const rzp = new Razorpay(options);
+  rzp.open();
 }
 
-async function submitPayment() {
-  const utr = document.getElementById('pay-utr').value.trim();
-  const msg = document.getElementById('pay-msg');
-  if (!utr || utr.length < 6) { msg.textContent = 'Please enter a valid UTR / Transaction ID.'; msg.style.color = '#f87171'; return; }
-  const btn = document.getElementById('pay-submit-btn');
-  btn.textContent = 'Submitting...'; btn.disabled = true;
-  const d = window._pendingOrderFiles;
+async function onRazorpaySuccess(razorpayResponse) {
+  const d   = window._pendingOrderFiles;
+  const btn = document.querySelector('#rp-panel .rp-order-btn');
   try {
+    if (btn) { btn.textContent = 'Processing…'; btn.disabled = true; }
+
+    // Save confirmed order to Firestore
     const orderId = await window.saveOrderToFirestore({
-      templateName: d.title, templateType: d.templateType, price: d.price,
-      clientName: d.clientName, brandName: d.clientBrand, whatsapp: d.clientWp,
-      utrId: utr, paymentStatus: 'payment_pending'
+      templateName:      d.title,
+      templateType:      d.templateType,
+      price:             d.price,
+      clientName:        d.clientName,
+      brandName:         d.clientBrand,
+      whatsapp:          d.clientWp,
+      paymentStatus:     'confirmed',
+      status:            'pending',
+      razorpayPaymentId: razorpayResponse.razorpay_payment_id
     });
-    const orderData = { templateName: d.title, price: d.price, utrId: utr, clientName: d.clientName, brandName: d.clientBrand, whatsapp: d.clientWp };
-    await window.sendOrderToReviewing(orderId, orderData, d.files, d.refFile);
-    document.getElementById('payment-overlay').classList.remove('open');
-    document.getElementById('payment-modal').classList.remove('open');
+
+    // Send files to Telegram — only reaches here after real payment
+    await window.sendOrderToTelegram(orderId, {
+      templateName:      d.title,
+      price:             d.price,
+      razorpayPaymentId: razorpayResponse.razorpay_payment_id,
+      clientName:        d.clientName,
+      brandName:         d.clientBrand,
+      whatsapp:          d.clientWp
+    }, d.files, d.refFile);
+
     closeRenderPanel();
-    alert('✅ Order submitted! We will verify your payment and begin your render shortly.');
+    alert('✅ Payment confirmed! Your order is placed. We will deliver your render shortly.');
   } catch(e) {
-    msg.textContent = 'Error submitting. Please try again.';
-    msg.style.color = '#f87171';
+    alert('⚠️ Payment received but order save failed. Please contact us on WhatsApp with Payment ID: ' + razorpayResponse.razorpay_payment_id);
+    console.error(e);
   }
-  btn.textContent = 'Confirm Payment →'; btn.disabled = false;
+  if (btn) { btn.textContent = 'Render My T‑Shirt →'; btn.disabled = false; }
 }
 
-function closePaymentModal() {
-  document.getElementById('payment-overlay').classList.remove('open');
-  document.getElementById('payment-modal').classList.remove('open');
-}
-
-// ── Telegram 3-Group System ──
+// ── Telegram — Single group (files only sent after confirmed payment) ──
 const BOT_TOKEN = '8684367752:AAETdjkf6LGb6sRXGfiKjjXsycNtcZhsdcY';
-const TG_REVIEWING = '-4815432496';
-const TG_CONFIRMED = '-5150343945';
-const TG_REJECTED  = '-5149184468';
+const TG_ORDERS = '-4815432496';   // your main orders group
 
 async function tgSend(chatId, text) {
   try {
@@ -3533,47 +3570,17 @@ async function tgForward(fromChatId, toChatId, messageId) {
 }
 
 function orderMsg(order, prefix) {
-  return `${prefix}\n\n🎽 <b>Template:</b> ${order.templateName||'—'}\n💰 <b>Price:</b> ${order.price||'—'}\n🔖 <b>UTR:</b> ${order.utrId||'—'}\n\n👤 <b>Name:</b> ${order.clientName||order.userName||'—'}\n🏷 <b>Brand:</b> ${order.brandName||'—'}\n📱 <b>WhatsApp:</b> ${order.whatsapp||'—'}\n📧 <b>Email:</b> ${order.userEmail||'—'}`;
+  return `${prefix}\n\n🎽 <b>Template:</b> ${order.templateName||'—'}\n💰 <b>Price:</b> ${order.price||'—'}\n💳 <b>Razorpay ID:</b> ${order.razorpayPaymentId||'—'}\n\n👤 <b>Name:</b> ${order.clientName||order.userName||'—'}\n🏷 <b>Brand:</b> ${order.brandName||'—'}\n📱 <b>WhatsApp:</b> ${order.whatsapp||'—'}\n📧 <b>Email:</b> ${order.userEmail||'—'}`;
 }
 
-// Client submits → send text + all files to Reviewing, save message_ids to Firestore
-window.sendOrderToReviewing = async function(orderId, orderData, files, refFile) {
-  const msgIds = [];
-  const textMsgId = await tgSend(TG_REVIEWING, orderMsg(orderData, '🔍 <b>New Order — Reviewing Payment</b>'));
-  if (textMsgId) msgIds.push(textMsgId);
-  if (refFile) {
-    const refMsgId = await tgSendFile(TG_REVIEWING, refFile, '📎 Reference Image');
-    if (refMsgId) msgIds.push(refMsgId);
-  }
+// Send order + files to Telegram immediately after confirmed Razorpay payment
+window.sendOrderToTelegram = async function(orderId, orderData, files, refFile) {
+  await tgSend(TG_ORDERS, orderMsg(orderData, '✅ <b>New Order — Payment Confirmed via Razorpay</b>'));
+  if (refFile) await tgSendFile(TG_ORDERS, refFile, '📎 Reference Image');
   const labels = ['Front', 'Back', 'Sleeves', 'Logo'];
   for (let i = 0; i < files.length; i++) {
-    if (files[i]) {
-      const fileMsgId = await tgSendFile(TG_REVIEWING, files[i], `📁 ${labels[i] || 'File ' + (i+1)}`);
-      if (fileMsgId) msgIds.push(fileMsgId);
-    }
+    if (files[i]) await tgSendFile(TG_ORDERS, files[i], `📁 ${labels[i] || 'File ' + (i + 1)}`);
   }
-  if (orderId && msgIds.length > 0) {
-    try { await updateDoc(doc(db, 'orders', orderId), { tgMessageIds: msgIds }); }
-    catch(e) { console.error('Could not save tgMessageIds:', e); }
-  }
-}
-
-// Admin confirms → forward all messages from Reviewing to Confirmed
-window.sendOrderToTelegram = async function(orderId) {
-  const order = window._adminOrders ? window._adminOrders.find(o => o.id === orderId) : null;
-  if (!order) { alert('Order data not found. Please refresh.'); return; }
-  const msgIds = order.tgMessageIds || [];
-  if (msgIds.length === 0) { await tgSend(TG_CONFIRMED, orderMsg(order, '✅ <b>Payment Confirmed — Order Started!</b>')); return; }
-  for (const msgId of msgIds) { await tgForward(TG_REVIEWING, TG_CONFIRMED, msgId); }
-}
-
-// Admin rejects → forward all messages from Reviewing to Rejected
-window.sendOrderRejected = async function(orderId) {
-  const order = window._adminOrders ? window._adminOrders.find(o => o.id === orderId) : null;
-  if (!order) return;
-  const msgIds = order.tgMessageIds || [];
-  if (msgIds.length === 0) { await tgSend(TG_REJECTED, orderMsg(order, '🚫 <b>Order Rejected</b>')); return; }
-  for (const msgId of msgIds) { await tgForward(TG_REVIEWING, TG_REJECTED, msgId); }
 }
 
 function filterRender(btn, type) {
@@ -3585,97 +3592,6 @@ function filterRender(btn, type) {
   });
 }
 </script>
-
-<!-- ═══ PAYMENT MODAL ═══ -->
-<style>
-.pay-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:590;opacity:0;pointer-events:none;transition:opacity 0.28s;backdrop-filter:blur(8px);}
-.pay-overlay.open{opacity:1;pointer-events:all;}
-.pay-modal{
-  position:fixed;top:50%;left:50%;
-  transform:translate(-50%,-56%);z-index:610;
-  background:#0c0919;
-  border:1px solid rgba(124,58,237,0.18);
-  border-radius:12px;padding:28px 26px;
-  width:min(400px,92vw);
-  transition:transform 0.32s cubic-bezier(0.22,1,0.36,1),opacity 0.32s;
-  opacity:0;pointer-events:none;max-height:90vh;overflow-y:auto;
-}
-.pay-modal.open{transform:translate(-50%,-50%);opacity:1;pointer-events:all;}
-/* modal internals */
-.pay-modal-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;}
-.pay-modal-title{font-family:'Fraunces',serif;font-size:21px;font-weight:700;line-height:1.1;letter-spacing:-0.01em;}
-.pay-modal-x{background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.18);border-radius:5px;width:28px;height:28px;color:var(--gray);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0;}
-.pay-modal-x:hover{background:rgba(124,58,237,0.25);color:var(--white);}
-.pay-modal-sub{color:var(--gdim);font-size:11.5px;margin-bottom:18px;line-height:1.65;}
-/* amount area */
-.pay-amount-wrap{
-  background:rgba(124,58,237,0.05);
-  border:1px solid rgba(124,58,237,0.13);
-  border-radius:8px;padding:18px;text-align:center;margin-bottom:16px;
-}
-.pay-amount-lbl{font-size:9px;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;color:var(--gdim);margin-bottom:8px;}
-.pay-amount-val{font-family:'Fraunces',serif;font-size:40px;font-weight:700;color:var(--pl);line-height:1;margin-bottom:16px;}
-.pay-qr{width:148px;height:148px;border-radius:7px;object-fit:cover;border:1.5px solid rgba(124,58,237,0.22);display:block;margin:0 auto 10px;}
-.pay-upi-chip{font-size:13px;font-weight:800;color:var(--pl);background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);border-radius:4px;padding:7px 16px;letter-spacing:0.03em;display:inline-block;}
-/* divider */
-.pay-div{height:1px;background:rgba(124,58,237,0.1);margin:14px 0;}
-/* UTR */
-.pay-utr-lbl{font-size:9px;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;color:var(--gdim);margin-bottom:7px;display:block;}
-.pay-utr-in{
-  width:100%;background:rgba(124,58,237,0.04);
-  border:1px solid rgba(124,58,237,0.16);
-  border-radius:5px;padding:11px 13px;color:var(--white);
-  font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;outline:none;
-  transition:border-color 0.2s;
-}
-.pay-utr-in:focus{border-color:var(--pl);background:rgba(124,58,237,0.07);}
-.pay-utr-in::placeholder{color:var(--gdim);}
-.pay-utr-hint{font-size:10.5px;color:var(--gdim);margin:7px 0 14px;line-height:1.65;}
-.pay-msg-area{font-size:12px;min-height:16px;text-align:center;margin-bottom:10px;}
-/* buttons */
-.pay-submit-btn{
-  width:100%;background:var(--purple);color:var(--white);
-  padding:13px;border-radius:6px;border:none;
-  font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;font-weight:800;
-  letter-spacing:0.07em;text-transform:uppercase;
-  cursor:pointer;margin-bottom:8px;transition:all 0.22s;
-  box-shadow:0 4px 18px rgba(124,58,237,0.28);
-}
-.pay-submit-btn:hover{background:var(--pm);box-shadow:0 6px 28px rgba(124,58,237,0.48);}
-.pay-cancel-btn{
-  width:100%;background:transparent;color:var(--gdim);padding:10px;
-  border-radius:6px;border:1px solid rgba(124,58,237,0.1);
-  font-family:'Plus Jakarta Sans',sans-serif;font-size:11.5px;font-weight:600;
-  cursor:pointer;transition:all 0.2s;
-}
-.pay-cancel-btn:hover{border-color:rgba(124,58,237,0.28);color:var(--white);}
-</style>
-
-<div class="pay-overlay" id="payment-overlay" onclick="closePaymentModal()"></div>
-<div class="pay-modal" id="payment-modal">
-  <div class="pay-modal-hd">
-    <div class="pay-modal-title">Complete Payment</div>
-    <button class="pay-modal-x" onclick="closePaymentModal()">✕</button>
-  </div>
-  <div class="pay-modal-sub">Pay via UPI to confirm your order. Files are only processed after we verify your payment.</div>
-
-  <div class="pay-amount-wrap">
-    <div class="pay-amount-lbl">Amount to Pay</div>
-    <div id="pay-amount" class="pay-amount-val">₹999</div>
-    <img src="images/qr.png" class="pay-qr" alt="UPI QR Code">
-    <div class="pay-upi-chip">9664871972@fam</div>
-  </div>
-
-  <div class="pay-div"></div>
-
-  <label class="pay-utr-lbl">UTR / Transaction ID *</label>
-  <input id="pay-utr" class="pay-utr-in" type="text" placeholder="Enter UTR or Transaction ID after paying">
-  <div class="pay-utr-hint">📌 After paying → open your UPI app → Transaction History → copy the 12-digit UTR or Transaction ID and paste above.</div>
-  <div class="pay-msg-area" id="pay-msg"></div>
-  <button id="pay-submit-btn" class="pay-submit-btn" onclick="submitPayment()">Confirm Payment →</button>
-  <button class="pay-cancel-btn" onclick="closePaymentModal()">Cancel</button>
-</div>
-<!-- ═══ END PAYMENT MODAL ═══ -->
 
 <!-- ═══ FIREBASE AUTH ═══ -->
 <script type="module">
@@ -3826,9 +3742,9 @@ window.saveOrderToFirestore = async function(orderData) {
       userEmail: auth.currentUser.email,
       userName: auth.currentUser.displayName,
       createdAt: serverTimestamp(),
-      status: 'payment_pending',
-      paymentStatus: orderData.paymentStatus || 'payment_pending',
-      utrId: orderData.utrId || null,
+      status: orderData.status || 'pending',
+      paymentStatus: orderData.paymentStatus || 'confirmed',
+      razorpayPaymentId: orderData.razorpayPaymentId || null,
       renderedFile: null
     });
     return docRef.id;
@@ -3930,9 +3846,9 @@ window.loadAdminOrders = async function() {
     const snap = await getDocs(query(collection(adminDb, 'orders'), orderBy('createdAt', 'desc')));
     _adminOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     window._adminOrders = _adminOrders;
-    const awaiting = _adminOrders.filter(o => o.paymentStatus === 'payment_pending').length;
+    const awaiting   = _adminOrders.filter(o => o.status === 'pending' && o.paymentStatus === 'confirmed').length;
     const inprogress = _adminOrders.filter(o => o.status === 'pending' && o.paymentStatus === 'confirmed').length;
-    const done = _adminOrders.filter(o => o.status === 'done').length;
+    const done       = _adminOrders.filter(o => o.status === 'done').length;
     document.getElementById('ast-total').textContent = _adminOrders.length;
     document.getElementById('ast-awaiting').textContent = awaiting;
     document.getElementById('ast-pending').textContent = inprogress;
@@ -3946,16 +3862,17 @@ window.loadAdminOrders = async function() {
 
 function renderPaymentsList() {
   const list = document.getElementById('admin-payments-list');
-  const pending = _adminOrders.filter(o => o.paymentStatus === 'payment_pending');
-  document.getElementById('payments-count').textContent = pending.length + ' awaiting confirmation';
-  if (pending.length === 0) { list.innerHTML = '<div class="admin-empty">✅ No pending payments — all clear!</div>'; return; }
-  list.innerHTML = pending.map(order => {
+  // Now shows orders paid via Razorpay that are awaiting render delivery
+  const inProgress = _adminOrders.filter(o => o.status === 'pending' && o.paymentStatus === 'confirmed');
+  document.getElementById('payments-count').textContent = inProgress.length + ' orders awaiting render';
+  if (inProgress.length === 0) { list.innerHTML = '<div class="admin-empty">✅ No pending renders — all clear!</div>'; return; }
+  list.innerHTML = inProgress.map(order => {
     const date = order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'}) : 'Unknown';
     return `
-      <div class="order-item" style="border:1px solid rgba(249,115,22,0.3);margin-bottom:14px;border-radius:12px;padding:20px;">
+      <div class="order-item" style="border:1px solid rgba(124,58,237,0.3);margin-bottom:14px;border-radius:12px;padding:20px;">
         <div class="order-item-top" style="margin-bottom:14px;">
-          <div class="order-item-title" style="font-size:16px;">💳 ${order.templateName||'Custom'} — ${order.price||'—'}</div>
-          <span class="abadge abadge-pending" style="background:rgba(249,115,22,0.15);color:#f97316;border-color:rgba(249,115,22,0.3);">⏳ Awaiting</span>
+          <div class="order-item-title" style="font-size:16px;">🎨 ${order.templateName||'Custom'} — ${order.price||'—'}</div>
+          <span class="abadge abadge-pending">⏳ In Progress</span>
         </div>
         <div class="order-item-grid" style="margin-bottom:14px;">
           <div class="orow">👤 Client<strong>${order.clientName||order.userName||'—'}</strong></div>
@@ -3966,15 +3883,12 @@ function renderPaymentsList() {
           <div class="orow">📋 Type<strong>${order.templateType==='video'?'🎬 Video':'🖼 Image'}</strong></div>
           <div class="orow">🕐 Date<strong>${date}</strong></div>
         </div>
-        <div style="background:rgba(124,58,237,0.08);border:1px solid var(--pb);border-radius:8px;padding:12px 16px;margin-bottom:14px;">
-          <div style="font-size:11px;color:var(--gdim);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">UTR / Transaction ID</div>
-          <div style="font-size:16px;font-weight:800;color:var(--pl);letter-spacing:0.04em;">${order.utrId||'Not provided'}</div>
+        <div style="background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:12px 16px;margin-bottom:14px;">
+          <div style="font-size:11px;color:var(--gdim);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">Razorpay Payment ID</div>
+          <div style="font-size:14px;font-weight:800;color:#22c55e;letter-spacing:0.02em;">${order.razorpayPaymentId||'—'}</div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-          <button onclick="adminConfirmPayment('${order.id}')" style="background:var(--green);color:#fff;padding:12px;border-radius:8px;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">✅ Confirm Payment</button>
-          <button onclick="adminRejectOrder('${order.id}','payment_failed')" style="background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);padding:12px;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">❌ Payment Failed</button>
-        </div>
-        <button onclick="adminRejectOrder('${order.id}','rejected')" style="width:100%;background:rgba(107,114,128,0.1);color:var(--gdim);border:1px solid var(--pb);padding:10px;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">🚫 Reject Order</button>
+        <input class="order-link-input" id="alink2-${order.id}" placeholder="Paste Google Drive link here..." value="${order.renderedFile||''}">
+        <button class="order-done-btn" id="abtn2-${order.id}" onclick="adminMarkDone('${order.id}','alink2-${order.id}','abtn2-${order.id}')">🚀 Upload & Mark Done</button>
       </div>`;
   }).join('');
 }
@@ -4048,7 +3962,7 @@ function renderAdminClients() {
             <div class="orow">📧 Email<strong>${order.userEmail||'—'}</strong></div>
             <div class="orow">💰 Price<strong>${order.price||'—'}</strong></div>
             <div class="orow">📋 Type<strong>${order.templateType==='video'?'🎬 Video':'🖼 Image'}</strong></div>
-            <div class="orow">🔖 UTR<strong>${order.utrId||'—'}</strong></div>
+            <div class="orow">🔖 Razorpay<strong>${order.razorpayPaymentId||'—'}</strong></div>
             <div class="orow">🕐 Date<strong>${date}</strong></div>
           </div>
           ${isDone && order.renderedFile ? `<a href="${order.renderedFile}" target="_blank" style="display:block;text-align:center;margin-bottom:10px;background:rgba(124,58,237,0.1);border:1px solid var(--pb);color:var(--pl);padding:9px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;">👁 View Uploaded Render</a>` : ''}
@@ -4083,21 +3997,23 @@ window.adminTabFilter = function(btn, filter) {
   renderAdminClients();
 }
 
-window.adminMarkDone = async function(orderId) {
-  const btn = document.getElementById('abtn-'+orderId);
-  if (btn.classList.contains('done')) return;
-  const link = document.getElementById('alink-'+orderId).value.trim();
-  if (!link) { alert('Please paste the Google Drive link first.'); return; }
-  btn.textContent = 'Saving...'; btn.disabled = true;
+window.adminMarkDone = async function(orderId, linkId, btnId) {
+  linkId = linkId || ('alink-' + orderId);
+  btnId  = btnId  || ('abtn-'  + orderId);
+  const btn = document.getElementById(btnId);
+  if (btn && btn.classList.contains('done')) return;
+  const link = document.getElementById(linkId);
+  if (!link || !link.value.trim()) { alert('Please paste the Google Drive link first.'); return; }
+  if (btn) { btn.textContent = 'Saving...'; btn.disabled = true; }
   try {
-    await updateDoc(doc(adminDb,'orders',orderId), { status:'done', renderedFile:link });
+    await updateDoc(doc(adminDb,'orders',orderId), { status:'done', renderedFile: link.value.trim() });
     const order = _adminOrders.find(o=>o.id===orderId);
-    if (order) { order.status='done'; order.renderedFile=link; }
-    btn.textContent = '✓ Completed'; btn.classList.add('done'); btn.disabled = false;
+    if (order) { order.status='done'; order.renderedFile=link.value.trim(); }
+    if (btn) { btn.textContent = '✓ Completed'; btn.classList.add('done'); btn.disabled = false; }
     const done = _adminOrders.filter(o=>o.status==='done').length;
     document.getElementById('ast-done').textContent = done;
     alert('✓ Done! Client can now see their render.');
-  } catch(e) { btn.textContent = '🚀 Upload & Mark Done'; btn.disabled = false; alert('Error: ' + e.message); }
+  } catch(e) { if(btn){btn.textContent='🚀 Upload & Mark Done';btn.disabled=false;} alert('Error: '+e.message); }
 }
 
 window.checkAdminAccess = function() {
