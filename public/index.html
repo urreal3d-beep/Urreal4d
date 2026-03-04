@@ -3,7 +3,7 @@
 <head>
 <!-- Social share / WhatsApp preview -->
 <meta property="og:title" content="Urreal3D">
-<meta property="og:description" content="Premium 3D clothing animations and renders for fashion brands, e-commerce stores, and independent designers. Realistic fabric, fast delivery.">
+<meta property="og:description" content="https://urreal4d.onrender.com/images/logo.png">
 <meta property="og:image" content="images/logo.png">
 <meta property="og:url" content="https://urreal4d.onrender.com">
 <meta property="og:type" content="website">
@@ -53,14 +53,19 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;justify-content
 .page.active{display:block;animation:fadeUp 0.3s ease both;}
 
 /* ── HERO ── */
-.hero{min-height:100vh;display:flex;align-items:center;padding:110px 28px 80px;position:relative;overflow:hidden;}
+.hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:start;gap:32px;padding:110px 48px 80px;position:relative;overflow:hidden;}
+.hero-content{position:relative;z-index:1;width:100%;min-width:0;}
+.hero-video-wrap{position:relative;z-index:1;width:100%;min-width:0;margin-top:40px;animation:fadeUp 0.6s 0.3s ease both;opacity:0;animation-fill-mode:both;}
+.hero-video-glow{position:absolute;inset:-24px;border-radius:20px;background:radial-gradient(circle,rgba(124,58,237,0.4),transparent 70%);filter:blur(28px);z-index:0;animation:pulse-glow 3s ease-in-out infinite;}
+.hero-video{width:100%;aspect-ratio:16/9;border-radius:16px;border:1.5px solid rgba(124,58,237,0.4);object-fit:cover;display:block;position:relative;z-index:1;box-shadow:0 8px 48px rgba(124,58,237,0.3);}
+@keyframes pulse-glow{0%,100%{opacity:0.7;transform:scale(1);}50%{opacity:1;transform:scale(1.04);}}
 .orb1{position:absolute;top:0;right:-5%;width:min(700px,140vw);height:min(700px,140vw);border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,0.15),transparent 60%);pointer-events:none;}
 .orb2{position:absolute;bottom:-10%;left:-10%;width:min(450px,100vw);height:min(450px,100vw);border-radius:50%;background:radial-gradient(circle,rgba(139,70,240,0.09),transparent 60%);pointer-events:none;}
 .gridlines{position:absolute;inset:0;opacity:0.025;background-image:linear-gradient(var(--pl) 1px,transparent 1px),linear-gradient(90deg,var(--pl) 1px,transparent 1px);background-size:48px 48px;}
-.hero-content{position:relative;z-index:1;max-width:680px;width:100%;}
+.hero-content{position:relative;z-index:1;width:100%;}
 .tag{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--pb);border-radius:100px;padding:5px 16px;margin-bottom:24px;font-size:11px;font-weight:600;letter-spacing:0.1em;color:var(--pl);animation:fadeUp 0.5s ease both;}
 .tdot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 2s infinite;flex-shrink:0;}
-.hero h1{font-family:'Fraunces',serif;font-size:clamp(46px,11vw,100px);font-weight:700;line-height:0.95;margin-bottom:26px;animation:fadeUp 0.5s 0.08s ease both;opacity:0;animation-fill-mode:both;}
+.hero h1{font-family:'Fraunces',serif;font-size:clamp(36px,6vw,80px);font-weight:700;line-height:0.95;margin-bottom:26px;animation:fadeUp 0.5s 0.08s ease both;opacity:0;animation-fill-mode:both;}
 .hero h1 .it{font-style:italic;font-weight:300;color:var(--pl);display:block;}
 .hero-sub{font-size:16px;color:var(--gray);font-weight:400;line-height:1.7;max-width:480px;margin-bottom:36px;animation:fadeUp 0.5s 0.16s ease both;opacity:0;animation-fill-mode:both;}
 .hero-btns{display:flex;flex-wrap:wrap;gap:12px;animation:fadeUp 0.5s 0.24s ease both;opacity:0;animation-fill-mode:both;}
@@ -94,7 +99,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;justify-content
 .svc-card p{color:var(--gray);font-size:13px;line-height:1.72;font-weight:400;}
 
 /* ABOUT */
-.about-wrap{display:grid;grid-template-columns:1fr 1fr;gap:56px;padding:110px clamp(20px,5vw,60px) 72px;align-items:start;}
+.about-wrap{display:grid;grid-template-columns:1fr 2fr;gap:56px;padding:110px clamp(20px,5vw,60px) 72px;align-items:start;}
 .about-text h1{font-family:'Fraunces',serif;font-size:clamp(34px,5.5vw,52px);font-weight:700;line-height:1.06;margin-bottom:22px;}
 .about-text h1 em{font-style:italic;color:var(--pl);}
 .about-text p{color:var(--gray);line-height:1.8;font-size:15px;margin-bottom:16px;}
@@ -253,6 +258,16 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
 .footer-links a:hover{color:var(--white);}
 .footer-copy{font-size:12px;color:var(--gdim);}
 
+/* PAGE TRANSITION */
+#page-transition{position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden;}
+#page-transition .pt-wipe{position:absolute;inset:0;background:linear-gradient(135deg,var(--purple) 0%,#4c1d95 50%,var(--deep) 100%);transform:translateX(-100%);transition:transform 0.38s cubic-bezier(0.7,0,0.3,1);}
+#page-transition .pt-logo{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Fraunces',serif;font-size:32px;font-weight:700;color:#f0ebff;opacity:0;transition:opacity 0.18s;white-space:nowrap;}
+#page-transition .pt-logo em{color:var(--pl);font-style:normal;}
+#page-transition.in .pt-wipe{transform:translateX(0);}
+#page-transition.in .pt-logo{opacity:1;}
+#page-transition.out .pt-wipe{transform:translateX(100%);}
+#page-transition.out .pt-logo{opacity:0;}
+
 /* KEYFRAMES */
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
 @keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
@@ -267,8 +282,11 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
 @media(max-width:640px){
   .hbg{display:flex;}
   .nav-links{display:none;}
+  .hero{grid-template-columns:1fr;}
+  .hero-video-wrap{display:none;}
   nav{padding:15px 20px;}
   .hero{padding:96px 20px 64px;}
+  .hero-video-wrap{display:none;}
   .hero-stats{flex-wrap:wrap;gap:24px;}
   .port-grid.featured-first .port-card:first-child .media-box{aspect-ratio:9/16;}
   .sec,.svc-grid{padding-left:20px;padding-right:20px;}
@@ -286,6 +304,11 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
 </style>
 </head>
 <body>
+<!-- PAGE TRANSITION OVERLAY -->
+<div id="page-transition">
+  <div class="pt-wipe"></div>
+  <div class="pt-logo">Urreal<em>3D</em></div>
+</div>
 
 <!-- NAV -->
 <nav>
@@ -342,10 +365,16 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
         <button class="btn-g" onclick="go('pricing')">Render Now</button>
       </div>
       <div class="hero-stats">
-        <div><div class="snum">3+</div><div class="slbl">Years Experience</div></div>
-        <div><div class="snum">50+</div><div class="slbl">Projects Done</div></div>
-        <div><div class="snum">100%</div><div class="slbl">Satisfaction Rate</div></div>
+        <div><div class="snum" data-count="5" data-suffix="+">0+</div><div class="slbl">Years Experience</div></div>
+        <div><div class="snum" data-count="500" data-suffix="+">0+</div><div class="slbl">Clients</div></div>
+        <div><div class="snum" data-count="100" data-suffix="%">0%</div><div class="slbl">Success Rate</div></div>
       </div>
+    </div>
+    <div class="hero-video-wrap">
+      <div class="hero-video-glow"></div>
+      <video autoplay muted loop playsinline class="hero-video">
+        <source src="videos/first.mp4" type="video/mp4">
+      </video>
     </div>
   </div>
   <div class="mstrip">
@@ -908,7 +937,7 @@ history.replaceState({page: 'home'}, '', '');
 // ── Page Navigation ──
 const pages = ['home','about','render','portfolio','pricing','testimonials','appointment','policy','admin'];
 function go(name){
-document.querySelector('nav').style.display='flex';
+  document.querySelector('nav').style.display='flex';
   pages.forEach(p=>{
     document.getElementById('p-'+p).classList.remove('active');
     const nl=document.getElementById('nl-'+p);
@@ -2678,57 +2707,67 @@ async function submitReview() {
 </script>
 <!-- ═══ END REVIEW SYSTEM ═══ -->
 
+<!-- ═══ STATS COUNT-UP ═══ -->
+<script>
+(function(){
+  var animated = false;
+  function runCountUp(){
+    if(animated) return;
+    var nums = document.querySelectorAll('.snum[data-count]');
+    if(!nums.length) return;
+    animated = true;
+    nums.forEach(function(el){
+      var target = parseInt(el.dataset.count);
+      var suffix = el.dataset.suffix || '';
+      var duration = 1600;
+      var start = null;
+      function easeOut(t){ return 1 - Math.pow(1 - t, 3); }
+      function step(ts){
+        if(!start) start = ts;
+        var progress = Math.min((ts - start) / duration, 1);
+        var val = Math.floor(easeOut(progress) * target);
+        el.textContent = val + suffix;
+        if(progress < 1) requestAnimationFrame(step);
+        else el.textContent = target + suffix;
+      }
+      requestAnimationFrame(step);
+    });
+  }
+  // Trigger when stats come into view
+  var statsEl = document.querySelector('.hero-stats');
+  if(statsEl && 'IntersectionObserver' in window){
+    var obs = new IntersectionObserver(function(entries){
+      if(entries[0].isIntersecting){ runCountUp(); obs.disconnect(); }
+    }, { threshold: 0.5 });
+    obs.observe(statsEl);
+  } else {
+    // Fallback: run after short delay
+    setTimeout(runCountUp, 800);
+  }
+})();
+</script>
+<!-- ═══ END STATS COUNT-UP ═══ -->
+
 <!-- ═══ LAZY LOADING ═══ -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  if (!('IntersectionObserver' in window)) return;
-
-  // Lazy load images
   const imgs = document.querySelectorAll('.port-card img');
-  const imgObs = new IntersectionObserver(function(entries) {
-    entries.forEach(function(e) {
-      if (e.isIntersecting) {
-        const img = e.target;
-        if (img.dataset.src) { img.src = img.dataset.src; delete img.dataset.src; }
-        imgObs.unobserve(img);
-      }
-    });
-  }, { rootMargin: '200px' });
-  imgs.forEach(function(img) {
-    img.dataset.src = img.src;
-    img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"%3E%3C/svg%3E';
-    imgObs.observe(img);
-  });
-
-  // Lazy load videos — pause when out of view, play when in view
-  const videos = document.querySelectorAll('.port-card video');
-  videos.forEach(function(v) {
-    // Store the source and remove it so video doesn't load upfront
-    const source = v.querySelector('source');
-    if (source) {
-      v.dataset.src = source.src;
-      source.removeAttribute('src');
-      v.load(); // reset
-    }
-  });
-  const videoObs = new IntersectionObserver(function(entries) {
-    entries.forEach(function(e) {
-      const v = e.target;
-      if (e.isIntersecting) {
-        // Load source if not yet loaded
-        if (v.dataset.src) {
-          const source = v.querySelector('source');
-          if (source) { source.src = v.dataset.src; }
-          v.load();
-          delete v.dataset.src;
+  if ('IntersectionObserver' in window) {
+    const obs = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        if (e.isIntersecting) {
+          const img = e.target;
+          if (img.dataset.src) { img.src = img.dataset.src; delete img.dataset.src; }
+          obs.unobserve(img);
         }
-        v.play().catch(function(){});
-      } else {
-        v.pause();
-      }
+      });
+    }, { rootMargin: '200px' });
+    imgs.forEach(function(img) {
+      img.dataset.src = img.src;
+      img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"%3E%3C/svg%3E';
+      obs.observe(img);
     });
-  }, { rootMargin: '100px', threshold: 0.25 });
-  videos.forEach(function(v) { videoObs.observe(v); });
+  }
 });
 </script>
 <!-- ═══ END LAZY LOADING ═══ -->
