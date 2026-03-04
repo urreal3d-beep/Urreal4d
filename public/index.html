@@ -1805,7 +1805,8 @@ const q = query(collection(adminDb,'orders'));
     document.getElementById('ast-pending').textContent = pending;
     document.getElementById('ast-done').textContent = done;
     renderAdminClients();
-  } catch(e) {
+} catch(e) {
+    alert('Admin load error: ' + e.message);
     list.innerHTML = '<div class="admin-empty">Error: ' + e.message + '</div>';
   }
 }
