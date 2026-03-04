@@ -1934,6 +1934,7 @@ window.checkAdminAccess = function() {
 }
 </script>
 
+<script>
 async function handleRender(){
   if (!window.getCurrentUser || !window.getCurrentUser()) {
     openAuthModal('login');
