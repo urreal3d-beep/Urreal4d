@@ -5526,6 +5526,11 @@ function closeAuthModal() {
   document.getElementById('auth-overlay').classList.remove('open');
   document.getElementById('auth-modal').classList.remove('open');
   _confirmationResult = null;
+  // Clear reCAPTCHA so it's recreated fresh next time the modal opens
+  if (window._recaptchaVerifier) {
+    try { window._recaptchaVerifier.clear(); } catch(e) {}
+    window._recaptchaVerifier = null;
+  }
 }
 
 // Switch between Phone / Google / Email tabs
@@ -5586,6 +5591,12 @@ document.addEventListener('keydown', function(e) {
 function backToPhone() {
   showOtpStep('phone');
   document.querySelectorAll('.otp-box').forEach(b => { b.value = ''; b.classList.remove('filled'); });
+  // Clear used reCAPTCHA verifier so a fresh one is created on next send attempt
+  if (window._recaptchaVerifier) {
+    try { window._recaptchaVerifier.clear(); } catch(e) {}
+    window._recaptchaVerifier = null;
+  }
+  _confirmationResult = null;
 }
 
 // ── Phone OTP send ──
