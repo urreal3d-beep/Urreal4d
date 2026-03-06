@@ -1022,7 +1022,7 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
   .port-grid{grid-template-columns:repeat(2,1fr);gap:14px;}
   .port-featured{padding:0 clamp(20px,4vw,40px);}
   .pricing-hero{grid-template-columns:1fr;padding-top:106px;gap:20px;}
-  .pricing-grid{grid-template-columns:repeat(2,1fr);}
+  .pricing-grid{grid-template-columns:1fr 1fr;}
 }
 @media(max-width:640px){
   .hbg{display:flex;}
@@ -1063,6 +1063,80 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
   .nav-render-btn{display:none;}
   .nav-login-btn{display:none;}
 }
+
+/* ── Mobile pricing — single column, horizontal card layout ── */
+@media(max-width:540px){
+  .pricing-grid{
+    grid-template-columns:1fr !important;
+    gap:12px !important;
+    padding-left:16px !important;
+    padding-right:16px !important;
+    margin-top:28px !important;
+  }
+  .price-card{
+    display:grid;
+    grid-template-columns:1fr;
+    padding:20px 18px 18px !important;
+    border-radius:10px !important;
+  }
+  .price-card.popular{
+    border-radius:10px !important;
+  }
+  .price-icon{ font-size:20px !important; margin-bottom:10px !important; }
+  .price-card h3{ font-size:17px !important; margin-bottom:6px !important; }
+  .price-card .price-desc{
+    font-size:12.5px !important;
+    line-height:1.6 !important;
+    margin-bottom:12px !important;
+    color:rgba(160,160,180,0.85) !important;
+  }
+  .price-num{
+    font-size:26px !important;
+    line-height:1 !important;
+  }
+  .price-num em{ font-size:12px !important; }
+  .price-from{ font-size:9px !important; margin-bottom:3px !important; }
+  .price-amount{ margin-bottom:12px !important; }
+  .price-divider{ margin:12px 0 !important; }
+  .price-features{ gap:8px !important; margin-bottom:16px !important; }
+  .pf{ font-size:12.5px !important; line-height:1.45 !important; gap:9px !important; }
+  .pf-check{ font-size:11px !important; margin-top:1px !important; }
+  .price-cta{
+    padding:13px !important;
+    font-size:11px !important;
+    border-radius:6px !important;
+    letter-spacing:0.08em !important;
+  }
+  .popular-badge{
+    font-size:8.5px !important;
+    padding:3px 9px !important;
+    margin-bottom:12px !important;
+  }
+  .price-range{ font-size:10.5px !important; margin-top:3px !important; }
+
+  /* Hero on mobile */
+  .pricing-hero h1{ font-size:36px !important; line-height:1 !important; }
+  .pricing-hero p{ font-size:13px !important; max-width:100% !important; }
+  .pricing-trust{ gap:14px !important; }
+  .ptrust-item{ font-size:10.5px !important; }
+
+  /* Note */
+  .pricing-note{
+    font-size:11.5px !important;
+    padding:16px 16px 8px !important;
+    line-height:1.7 !important;
+  }
+
+  /* FAQ */
+  .pricing-faq{ padding-bottom:56px !important; }
+  .pricing-faq-title{ font-size:24px !important; margin-bottom:20px !important; }
+  .faq-q{ font-size:13px !important; padding:14px 0 !important; }
+  .faq-a-inner{ font-size:12px !important; line-height:1.7 !important; }
+
+  /* Section bg wrap padding */
+  .pricing-grid ~ div, [class*="pricing"] + div{ padding:28px 0 36px !important; }
+}
+
 @media(max-width:380px){.hero h1{font-size:40px;}}
 </style>
 </head>
@@ -6476,7 +6550,7 @@ async function submitReview() {
         }
         imgObs.unobserve(img);
       });
-    }, { rootMargin: '500px' }); // start loading 500px before visible
+    }, { rootMargin: '300px' }); // start loading 300px before visible
   }
 
   window.observeLazyImg = function(img) {
@@ -6502,7 +6576,6 @@ async function submitReview() {
             if (source) {
               source.src = source.dataset.src;
               delete source.dataset.src;
-              video.preload = 'auto';
               video.load();
             }
             video.dataset.loaded = '1';
@@ -6513,7 +6586,7 @@ async function submitReview() {
           video.pause();
         }
       });
-    }, { rootMargin: '400px', threshold: 0.1 });
+    }, { rootMargin: '150px', threshold: 0.1 });
   }
 
   window.observeLazyVideo = function(video) {
@@ -6525,19 +6598,6 @@ async function submitReview() {
       source.dataset.src = source.src;
       source.removeAttribute('src');
       video.load(); // flushes any buffered data
-    }
-    // If already in viewport, load immediately without waiting for observer callback
-    var rect = video.getBoundingClientRect();
-    var inView = rect.top < window.innerHeight + 400 && rect.bottom > -400;
-    if (inView && !video.dataset.loaded) {
-      var src = video.querySelector('source[data-src]');
-      if (src) { src.src = src.dataset.src; delete src.dataset.src; }
-      video.preload = 'auto';
-      video.load();
-      video.play().catch(function(){});
-      video.dataset.loaded = '1';
-      var parent = video.closest('.media-box, .photo-box, .rt-media');
-      if (parent) parent.classList.add('loaded');
     }
     videoObs.observe(video);
   };
