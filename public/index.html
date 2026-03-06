@@ -5213,9 +5213,8 @@ let _editCtx = null;
 
 function openEditModal(ctx) {
   _editCtx = ctx;
-  const m = document.getElementById('inline-edit-modal');
   const overlay = document.getElementById('inline-edit-overlay');
-  if (!m) return;
+  if (!overlay) { console.error('Edit modal overlay not found'); return; }
   document.getElementById('iem-title').value     = ctx.title || '';
   document.getElementById('iem-short').value     = ctx.shortDesc || '';
   document.getElementById('iem-full').value      = ctx.fullDesc || '';
@@ -5248,9 +5247,14 @@ window.saveInlineEdit = async function() {
   if (_editCtx.type === 'render') { update.fullDesc = fullDesc; update.price = price; }
   if (_editCtx.type === 'portfolio') { update.tags = tagsRaw.split(',').map(t=>t.trim()).filter(Boolean); }
 
-  const savedType = _editCtx.type; // capture before closeInlineEdit() nulls _editCtx
+  const savedType   = _editCtx.type;
+  const savedColName = _editCtx.colName;
+  const savedDocId   = _editCtx.docId;
+
+  msgEl.textContent = 'Saving…'; msgEl.style.color = 'var(--gray)';
+
   try {
-    await updateDoc(doc(db, _editCtx.colName, _editCtx.docId), update);
+    await updateDoc(doc(db, savedColName, savedDocId), update);
     msgEl.textContent = '✅ Saved!'; msgEl.style.color = '#22c55e';
     setTimeout(() => {
       closeInlineEdit();
@@ -5307,7 +5311,6 @@ setTimeout(() => {
 .admin-mode:hover .admin-card-bar { opacity: 1; pointer-events: all; }
 .admin-card-bar.admin-render-bar  { opacity: 1; pointer-events: all; }
 
-/* Base for all three admin buttons */
 .admin-replace-btn,
 .admin-edit-btn,
 .admin-del-btn {
@@ -5318,45 +5321,20 @@ setTimeout(() => {
   transition: all 0.18s; display: inline-flex; align-items: center; gap: 5px;
   line-height: 1;
 }
-
-/* Replace — purple outline */
 .admin-replace-btn {
-  background: rgba(124,58,237,0.12);
-  border-color: rgba(124,58,237,0.35);
-  color: #c4b5fd;
+  background: rgba(124,58,237,0.12); border-color: rgba(124,58,237,0.35); color: #c4b5fd;
 }
-.admin-replace-btn:hover {
-  background: rgba(124,58,237,0.28);
-  border-color: #a78bfa;
-  color: #fff;
-}
-
-/* Edit — white outline */
+.admin-replace-btn:hover { background: rgba(124,58,237,0.28); border-color: #a78bfa; color: #fff; }
 .admin-edit-btn {
-  background: rgba(255,255,255,0.06);
-  border-color: rgba(255,255,255,0.14);
-  color: rgba(255,255,255,0.75);
+  background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.14); color: rgba(255,255,255,0.75);
 }
-.admin-edit-btn:hover {
-  background: rgba(255,255,255,0.12);
-  border-color: rgba(255,255,255,0.3);
-  color: #fff;
-}
-
-/* Delete — red, pushed right */
+.admin-edit-btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); color: #fff; }
 .admin-del-btn {
   margin-left: auto;
-  background: rgba(239,68,68,0.08);
-  border-color: rgba(239,68,68,0.22);
-  color: rgba(248,113,113,0.8);
+  background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.22); color: rgba(248,113,113,0.8);
 }
-.admin-del-btn:hover {
-  background: rgba(239,68,68,0.18);
-  border-color: rgba(248,113,113,0.5);
-  color: #f87171;
-}
+.admin-del-btn:hover { background: rgba(239,68,68,0.18); border-color: rgba(248,113,113,0.5); color: #f87171; }
 
-/* portfolio admin mode — allow bar to overflow card */
 .port-card.admin-mode { position: relative; overflow: visible; }
 
 /* ── Add-new card ── */
@@ -5379,207 +5357,135 @@ setTimeout(() => {
 }
 .admin-add-icon-wrap {
   width: 44px; height: 44px;
-  border: 1px solid rgba(124,58,237,0.28);
-  border-radius: 10px;
+  border: 1px solid rgba(124,58,237,0.28); border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
-  background: rgba(124,58,237,0.08);
-  transition: all 0.22s;
+  background: rgba(124,58,237,0.08); transition: all 0.22s;
 }
 .admin-add-card:hover .admin-add-icon-wrap {
-  border-color: rgba(124,58,237,0.55);
-  background: rgba(124,58,237,0.16);
+  border-color: rgba(124,58,237,0.55); background: rgba(124,58,237,0.16);
 }
 .admin-add-icon-wrap svg { display: block; }
-.admin-add-label {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 12px; font-weight: 700; letter-spacing: 0.04em;
-  color: rgba(167,139,250,0.85);
-}
-.admin-add-hint {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 10.5px; color: rgba(106,88,128,0.7);
-  letter-spacing: 0.02em;
-}
+.admin-add-label { font-family:'Plus Jakarta Sans',sans-serif; font-size:12px; font-weight:700; letter-spacing:0.04em; color:rgba(167,139,250,0.85); }
+.admin-add-hint  { font-family:'Plus Jakarta Sans',sans-serif; font-size:10.5px; color:rgba(106,88,128,0.7); }
 
 /* ── Edit modal overlay ── */
 .iem-overlay {
   position: fixed; inset: 0;
-  background: rgba(0,0,0,0.84);
+  background: rgba(0,0,0,0.85);
   z-index: 900;
   display: none; align-items: center; justify-content: center;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
 }
 .iem-overlay.open { display: flex; }
 
-/* ── Edit modal shell ── */
 .iem-modal {
   position: relative;
   background: #0d0a1f;
   border: 1px solid rgba(124,58,237,0.22);
   border-radius: 16px;
   width: min(520px, 94vw);
-  max-height: 90vh;
-  overflow-y: auto;
+  max-height: 90vh; overflow-y: auto;
   box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(124,58,237,0.06);
   animation: iem-in 0.26s cubic-bezier(0.22,1,0.36,1) both;
 }
 @keyframes iem-in {
-  from { opacity: 0; transform: translateY(14px) scale(0.98); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity:0; transform:translateY(14px) scale(0.98); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
 }
-
-/* ── Modal header ── */
 .iem-header {
   padding: 24px 28px 20px;
   border-bottom: 1px solid rgba(124,58,237,0.1);
   display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
 }
-.iem-header-left {}
-.iem-eyebrow {
-  font-size: 9.5px; font-weight: 800; letter-spacing: 0.2em;
-  text-transform: uppercase; color: rgba(124,58,237,0.7);
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  margin-bottom: 5px;
-}
-.iem-title {
-  font-family: 'Fraunces', serif;
-  font-size: 22px; font-weight: 700; color: #fff;
-  letter-spacing: -0.02em; line-height: 1.1;
-}
-.iem-title em { font-style: italic; color: var(--pl); font-weight: 300; }
+.iem-eyebrow { font-size:9.5px; font-weight:800; letter-spacing:0.2em; text-transform:uppercase; color:rgba(124,58,237,0.7); font-family:'Plus Jakarta Sans',sans-serif; margin-bottom:5px; }
+.iem-title { font-family:'Fraunces',serif; font-size:22px; font-weight:700; color:#fff; letter-spacing:-0.02em; line-height:1.1; }
+.iem-title em { font-style:italic; color:var(--pl); font-weight:300; }
 .iem-close-btn {
-  flex-shrink: 0;
-  width: 32px; height: 32px; border-radius: 8px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.35); font-size: 16px; line-height: 1;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  transition: all 0.18s; margin-top: 2px;
+  flex-shrink:0; width:32px; height:32px; border-radius:8px;
+  background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+  color:rgba(255,255,255,0.35); font-size:16px; line-height:1;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:all 0.18s; margin-top:2px;
 }
-.iem-close-btn:hover {
-  background: rgba(248,113,113,0.1);
-  border-color: rgba(248,113,113,0.25);
-  color: #f87171;
-}
-
-/* ── Modal body ── */
-.iem-body { padding: 24px 28px 28px; display: flex; flex-direction: column; gap: 16px; }
-
-/* Field group */
-.iem-field { display: flex; flex-direction: column; gap: 7px; }
-.iem-label {
-  font-size: 9.5px; font-weight: 800; letter-spacing: 0.14em;
-  text-transform: uppercase; color: rgba(106,88,128,0.9);
-  font-family: 'Plus Jakarta Sans', sans-serif;
-}
-.iem-sublabel {
-  font-size: 10.5px; color: rgba(106,88,128,0.6);
-  font-family: 'Plus Jakarta Sans', sans-serif; margin-top: -4px;
-}
+.iem-close-btn:hover { background:rgba(248,113,113,0.1); border-color:rgba(248,113,113,0.25); color:#f87171; }
+.iem-body { padding:24px 28px; display:flex; flex-direction:column; gap:16px; }
+.iem-field { display:flex; flex-direction:column; gap:7px; }
+.iem-label { font-size:9.5px; font-weight:800; letter-spacing:0.14em; text-transform:uppercase; color:rgba(106,88,128,0.9); font-family:'Plus Jakarta Sans',sans-serif; }
+.iem-sublabel { font-size:10.5px; color:rgba(106,88,128,0.6); font-family:'Plus Jakarta Sans',sans-serif; margin-top:-4px; }
 .iem-input, .iem-textarea {
-  width: 100%;
-  background: rgba(255,255,255,0.025);
-  border: 1px solid rgba(124,58,237,0.16);
-  border-radius: 8px;
-  padding: 11px 14px;
-  color: #f0ebff;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 13.5px;
-  transition: border-color 0.2s, background 0.2s;
-  outline: none;
+  width:100%; background:rgba(255,255,255,0.025);
+  border:1px solid rgba(124,58,237,0.16); border-radius:8px;
+  padding:11px 14px; color:#f0ebff;
+  font-family:'Plus Jakarta Sans',sans-serif; font-size:13.5px;
+  transition:border-color 0.2s, background 0.2s; outline:none;
 }
-.iem-input::placeholder, .iem-textarea::placeholder { color: rgba(106,88,128,0.55); }
-.iem-input:focus, .iem-textarea:focus {
-  border-color: rgba(124,58,237,0.5);
-  background: rgba(124,58,237,0.05);
-  box-shadow: 0 0 0 3px rgba(124,58,237,0.07);
+.iem-input::placeholder,.iem-textarea::placeholder { color:rgba(106,88,128,0.55); }
+.iem-input:focus,.iem-textarea:focus {
+  border-color:rgba(124,58,237,0.5); background:rgba(124,58,237,0.05);
+  box-shadow:0 0 0 3px rgba(124,58,237,0.07);
 }
-.iem-textarea { resize: vertical; min-height: 80px; line-height: 1.65; }
-
-/* ── Footer bar ── */
+.iem-textarea { resize:vertical; min-height:80px; line-height:1.65; }
 .iem-footer {
-  padding: 18px 28px;
-  border-top: 1px solid rgba(124,58,237,0.08);
-  display: flex; align-items: center; gap: 10px;
+  padding:18px 28px; border-top:1px solid rgba(124,58,237,0.08);
+  display:flex; align-items:center; gap:10px;
 }
 .iem-save {
-  flex: 1;
-  background: var(--purple); color: #fff;
-  padding: 12px 20px; border-radius: 8px; border: none;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 12px; font-weight: 700; letter-spacing: 0.06em;
-  cursor: pointer; transition: all 0.2s;
-  box-shadow: 0 4px 18px rgba(124,58,237,0.3);
+  flex:1; background:var(--purple); color:#fff;
+  padding:12px 20px; border-radius:8px; border:none;
+  font-family:'Plus Jakarta Sans',sans-serif; font-size:12px; font-weight:700; letter-spacing:0.06em;
+  cursor:pointer; transition:all 0.2s; box-shadow:0 4px 18px rgba(124,58,237,0.3);
 }
-.iem-save:hover { background: var(--pm); box-shadow: 0 6px 24px rgba(124,58,237,0.45); transform: translateY(-1px); }
-.iem-save:active { transform: translateY(0); }
+.iem-save:hover { background:var(--pm); transform:translateY(-1px); }
 .iem-cancel {
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.35);
-  padding: 12px 18px; border-radius: 8px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 12px; font-weight: 600;
-  cursor: pointer; transition: all 0.18s;
+  background:transparent; border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.35);
+  padding:12px 18px; border-radius:8px;
+  font-family:'Plus Jakarta Sans',sans-serif; font-size:12px; font-weight:600;
+  cursor:pointer; transition:all 0.18s;
 }
-.iem-cancel:hover { border-color: rgba(255,255,255,0.18); color: rgba(255,255,255,0.7); }
-.iem-msg {
-  font-size: 11.5px; font-family: 'Plus Jakarta Sans', sans-serif;
-  min-height: 16px; margin-left: auto; text-align: right;
-}
+.iem-cancel:hover { border-color:rgba(255,255,255,0.18); color:rgba(255,255,255,0.7); }
+.iem-msg { font-size:11.5px; font-family:'Plus Jakarta Sans',sans-serif; min-height:16px; margin-left:auto; text-align:right; }
 </style>
 
 <!-- ── Edit Modal HTML ── -->
 <div class="iem-overlay" id="inline-edit-overlay" onclick="if(event.target===this)closeInlineEdit()">
   <div class="iem-modal">
-
     <div class="iem-header">
-      <div class="iem-header-left">
+      <div>
         <div class="iem-eyebrow">Admin · Urreal3D</div>
         <div class="iem-title">Edit <em>Card</em></div>
       </div>
       <button class="iem-close-btn" onclick="closeInlineEdit()">✕</button>
     </div>
-
     <div class="iem-body">
-
       <div class="iem-field">
         <label class="iem-label">Title</label>
         <input class="iem-input" id="iem-title" placeholder="e.g. Streetwear Float">
       </div>
-
       <div class="iem-field">
         <label class="iem-label">Short Description</label>
         <div class="iem-sublabel">Shown on the card thumbnail</div>
         <input class="iem-input" id="iem-short" placeholder="e.g. Floating tee, rim lighting, dark BG.">
       </div>
-
       <div class="iem-field" id="iem-full-row">
         <label class="iem-label">Full Description</label>
         <div class="iem-sublabel">Shown when client opens the detail panel</div>
-        <textarea class="iem-textarea" id="iem-full" placeholder="Describe the scene, fabric type, lighting setup, and ideal use case…" rows="3"></textarea>
+        <textarea class="iem-textarea" id="iem-full" placeholder="Describe the scene, fabric type, lighting setup…" rows="3"></textarea>
       </div>
-
       <div class="iem-field" id="iem-price-row">
         <label class="iem-label">Price</label>
         <input class="iem-input" id="iem-price" placeholder="e.g. ₹1,999">
       </div>
-
       <div class="iem-field" id="iem-tags-row">
         <label class="iem-label">Tags</label>
         <div class="iem-sublabel">Comma separated — e.g. Streetwear, 3D, Luxury</div>
         <input class="iem-input" id="iem-tags" placeholder="Streetwear, 3D, Luxury">
       </div>
-
     </div>
-
     <div class="iem-footer">
       <button class="iem-cancel" onclick="closeInlineEdit()">Cancel</button>
       <div class="iem-msg" id="iem-msg"></div>
       <button class="iem-save" onclick="saveInlineEdit()">Save Changes →</button>
     </div>
-
   </div>
 </div>
 <!-- ═══ AUTH MODAL ═══ -->
