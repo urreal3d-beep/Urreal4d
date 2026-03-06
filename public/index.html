@@ -1187,7 +1187,7 @@ setTimeout(function(){
   </div>
   <nav class="drawer-nav">
     <a href="#" onclick="go('home');return false;" id="dl-home" class="active"><span class="drawer-icon">⌂</span>Home</a>
-    <a onclick="go('render');closeDrawer();" id="dl-render"><span class="drawer-icon">✦</span>Render My Design</a>
+    <a onclick="go('render');closeDrawer();" id="dl-render"><span class="drawer-icon">✦</span>Render</a>
     <a href="#" onclick="go('portfolio');return false;" id="dl-portfolio"><span class="drawer-icon">◈</span>Portfolio</a>
     <a href="#" onclick="go('pricing');return false;" id="dl-pricing"><span class="drawer-icon">◎</span>Pricing</a>
     <a href="#" onclick="go('testimonials');return false;" id="dl-testimonials"><span class="drawer-icon">★</span>Reviews</a>
@@ -3583,27 +3583,14 @@ function updateCartBadge() {
   badge.classList.toggle('show', count > 0);
 }
 
-// ── Quick-add from render page (no panel needed) ──
+// ── Quick-add from render page (no login required) ──
 function quickAddToCart(type, title, desc, src, price, btn) {
-  if (!window.getCurrentUser || !window.getCurrentUser()) {
-    openAuthModal('login');
-    return;
-  }
-
-  // Check if already in cart
-  const already = (window._cart || []).find(i => i.title === title);
-  if (already) {
-    // If already added, open cart instead
-    openCart();
-    return;
-  }
+  // NO auth check here — anyone can add to cart
+  // Login is only required at checkout (Pay & Place Order)
 
   const item = {
     id:           Date.now(),
-    title,
-    desc,
-    src,
-    price,
+    title, desc, src, price,
     templateType:  type,
     priceNum:      parseFloat(price.replace(/[^0-9.]/g,'').replace(',','')),
     isINR:         price.includes('₹'),
@@ -3617,15 +3604,52 @@ function quickAddToCart(type, title, desc, src, price, btn) {
   window._cart.push(item);
   updateCartBadge();
 
-  // Update button state → "✓ Added"
+  // Show qty counter on button
+  const qty = window._cart.filter(i => i.title === title).length;
   if (btn) {
     btn.classList.add('added');
-    btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Added`;
-    btn.onclick = function(e) { e.stopPropagation(); openCart(); };
-    btn.title = 'Click to open cart';
+    btn.style.cssText = 'display:inline-flex;align-items:center;gap:0;padding:0;overflow:hidden;border-radius:6px;min-width:90px;justify-content:center;';
+    btn.innerHTML = `
+      <span onclick="event.stopPropagation();cartQtyChange('${title}',${type==='video'?`'${src}'`:JSON.stringify(src)},'${price}','${type}',this.closest('button'),-1)"
+        style="padding:6px 10px;font-size:15px;font-weight:700;cursor:pointer;user-select:none;border-right:1px solid rgba(255,255,255,0.15);">−</span>
+      <span class="cart-qty-display" data-title="${title}" style="padding:6px 8px;font-size:12px;font-weight:700;min-width:26px;text-align:center;">${qty}</span>
+      <span onclick="event.stopPropagation();cartQtyChange('${title}',${type==='video'?`'${src}'`:JSON.stringify(src)},'${price}','${type}',this.closest('button'),1)"
+        style="padding:6px 10px;font-size:15px;font-weight:700;cursor:pointer;user-select:none;border-left:1px solid rgba(255,255,255,0.15);">+</span>`;
+    btn.onclick = function(e) { e.stopPropagation(); };
   }
 
   showCartToast(title);
+}
+
+function cartQtyChange(title, src, price, type, btn, delta) {
+  window._cart = window._cart || [];
+  if (delta === 1) {
+    window._cart.push({
+      id: Date.now(), title, desc:'', src, price, templateType: type,
+      priceNum: parseFloat(price.replace(/[^0-9.]/g,'').replace(',','')),
+      isINR: price.includes('₹'), refFiles:[], designFiles:[null,null,null,null],
+      labels:['Front','Back','Sleeves','Logo'], addedAt: new Date().toLocaleTimeString()
+    });
+    showCartToast(title);
+  } else {
+    const entries = window._cart.map((item,n) => [item,n]).filter(([item]) => item.title === title);
+    if (entries.length) window._cart.splice(entries[entries.length-1][1], 1);
+  }
+  updateCartBadge();
+  const qty = window._cart.filter(i => i.title === title).length;
+  document.querySelectorAll('.cart-qty-display').forEach(el => {
+    if (el.dataset.title === title) {
+      el.textContent = qty;
+      if (qty === 0 && btn) {
+        btn.classList.remove('added');
+        btn.style.cssText = '';
+        btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add to Cart`;
+        const t=title,s=src,p=price,ty=type;
+        btn.onclick = function(e){e.stopPropagation();quickAddToCart(ty,t,'',s,p,btn);};
+      }
+    }
+  });
+  if (qty > 0) renderCart();
 }
 
 </script>
@@ -3968,6 +3992,31 @@ onAuthStateChanged(auth, async (user) => {
 
   if (user) {
     await loadUserProfile(user.uid);
+
+    // Restore any cart items saved before login prompt
+    try {
+      const saved = sessionStorage.getItem('_pendingCart');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.length) {
+          window._cart = window._cart || [];
+          // Only restore items not already in cart (avoid duplicates if user was already logged in)
+          if (window._cart.length === 0) {
+            parsed.forEach(i => {
+              window._cart.push({
+                ...i,
+                refFiles: [],
+                designFiles: [null, null, null, null],
+                labels: ['Front','Back','Sleeves','Logo']
+              });
+            });
+            updateCartBadge();
+            if (typeof renderCart === 'function') renderCart();
+          }
+        }
+        sessionStorage.removeItem('_pendingCart');
+      }
+    } catch(e) {}
 
     if (authBtn)    authBtn.style.display    = 'none';
     if (drawerAuth) drawerAuth.style.display = 'none';
@@ -4876,6 +4925,15 @@ window.checkAdminAccess = function() {
 let _confirmationResult = null;
 
 function openAuthModal(mode) {
+  // Save cart items (non-file data) before login so they survive the auth flow
+  try {
+    const cartData = (window._cart || []).map(i => ({
+      id: i.id, title: i.title, desc: i.desc, src: i.src,
+      price: i.price, templateType: i.templateType,
+      priceNum: i.priceNum, isINR: i.isINR, addedAt: i.addedAt
+    }));
+    if (cartData.length) sessionStorage.setItem('_pendingCart', JSON.stringify(cartData));
+  } catch(e) {}
   document.getElementById('auth-overlay').classList.add('open');
   document.getElementById('auth-modal').classList.add('open');
   switchAuthMethod('phone');
@@ -5108,7 +5166,7 @@ async function detectAndSetPricing() {
     // Update rtype-badges
     document.querySelectorAll('.rtype-badge').forEach(el => {
       if (el.textContent.includes('999') || el.textContent.includes('100')) {
-        el.textContent = pricing.templateImage + ' / image';
+        el.textContent = pricing.templateImage + ' / 5 image';
       } else if (el.textContent.includes('1,999') || el.textContent.includes('50')) {
         el.textContent = pricing.templateVideo + ' / video';
       }
@@ -5117,12 +5175,12 @@ async function detectAndSetPricing() {
     // Update pricing page — directly by ID, no guessing
     const set = (id, html) => { const el = document.getElementById(id); if(el) el.innerHTML = html; };
     if (isIndia) {
-      set('pn-template-image', '₹999<em>/image</em>');
+      set('pn-template-image', '₹999<em>/5 image</em>');
       set('pn-custom-image',   '₹1,999<em>–₹4,999</em>');
       set('pn-template-video', '₹1,999<em>/video</em>');
       set('pn-custom-video',   '₹4,999<em>–₹14,999</em>');
     } else {
-      set('pn-template-image', '$50<em>/image</em>');
+      set('pn-template-image', '$50<em>/5 image</em>');
       set('pn-custom-image',   '$100<em>–$200</em>');
       set('pn-template-video', '$100<em>/video</em>');
       set('pn-custom-video',   '$200<em>–$600</em>');
@@ -5821,8 +5879,26 @@ function toggleCartItem(id) {
 }
 
 function removeCartItem(id) {
+  const removing = (window._cart || []).find(i => i.id === id);
   window._cart = (window._cart || []).filter(i => i.id !== id);
   updateCartBadge();
+  if (removing) {
+    const qty = window._cart.filter(i => i.title === removing.title).length;
+    document.querySelectorAll('.cart-qty-display').forEach(el => {
+      if (el.dataset.title === removing.title) {
+        el.textContent = qty;
+        if (qty === 0) {
+          const btn = el.closest('button');
+          if (btn) {
+            btn.classList.remove('added'); btn.style.cssText = '';
+            btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add to Cart`;
+            const t=removing.title,s=removing.src,p=removing.price,ty=removing.templateType;
+            btn.onclick = function(e){e.stopPropagation();quickAddToCart(ty,t,'',s,p,btn);};
+          }
+        }
+      }
+    });
+  }
   renderCart();
 }
 
