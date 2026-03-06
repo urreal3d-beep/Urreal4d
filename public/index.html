@@ -3352,13 +3352,28 @@ async function pfSendPhoneOTP(isResend) {
   try {
     const { RecaptchaVerifier, signInWithPhoneNumber } = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js");
 
-    // Always recreate verifier to avoid stale state
+    // Destroy old verifier completely
     if (window._pfRecaptcha) {
       try { window._pfRecaptcha.clear(); } catch(e) {}
       window._pfRecaptcha = null;
     }
-    window._pfRecaptcha = new RecaptchaVerifier(window._firebaseAuth, 'pfa-recaptcha-container', { size: 'invisible' });
-    await window._pfRecaptcha.render();
+
+    // Use a body-level div so it's never hidden/obscured
+    let rcDiv = document.getElementById('pf-global-recaptcha');
+    if (!rcDiv) {
+      rcDiv = document.createElement('div');
+      rcDiv.id = 'pf-global-recaptcha';
+      rcDiv.style.cssText = 'position:fixed;bottom:0;left:0;z-index:9999;';
+      document.body.appendChild(rcDiv);
+    } else {
+      // Clear inner HTML so reCAPTCHA can re-render fresh
+      rcDiv.innerHTML = '';
+    }
+
+    window._pfRecaptcha = new RecaptchaVerifier(window._firebaseAuth, 'pf-global-recaptcha', {
+      size: 'invisible',
+      callback: () => {}
+    });
 
     _pfConfirmResult = await signInWithPhoneNumber(window._firebaseAuth, fullPhone, window._pfRecaptcha);
     window._pfVerificationPhone = fullPhone;
@@ -3367,16 +3382,22 @@ async function pfSendPhoneOTP(isResend) {
     document.getElementById('pfa-phone-step2').style.display = 'block';
     document.getElementById('pfa-otp-sent-txt').textContent  = 'OTP sent to ' + fullPhone;
     setTimeout(() => document.querySelector('.pfa-otp-box')?.focus(), 100);
+
   } catch(e) {
     console.error('OTP send error:', e.code, e.message);
     let msg = 'Failed to send OTP. Please try again.';
-    if (e.code === 'auth/invalid-phone-number')    msg = 'Invalid phone number. Include your country code.';
+    if (e.code === 'auth/invalid-phone-number')    msg = 'Invalid phone number. Use format: +91XXXXXXXXXX';
     if (e.code === 'auth/too-many-requests')        msg = 'Too many attempts. Please wait a few minutes.';
-    if (e.code === 'auth/operation-not-allowed')    msg = 'Phone auth not enabled — contact support.';
-    if (e.code === 'auth/captcha-check-failed')     msg = 'Domain not authorized in Firebase. Contact support.';
-    if (e.code === 'auth/quota-exceeded')           msg = 'SMS quota exceeded. Try again later.';
+    if (e.code === 'auth/operation-not-allowed')    msg = 'Phone auth not enabled in Firebase.';
+    if (e.code === 'auth/captcha-check-failed')     msg = 'Domain not in Firebase Authorized Domains list.';
+    if (e.code === 'auth/quota-exceeded')           msg = 'Daily SMS limit reached. Try again tomorrow.';
+    if (e.code === 'auth/billing-not-enabled')      msg = 'Firebase billing not active. Contact support.';
     pfSetMsg('pfa-phone-msg', msg, 'error');
+    // Clean up failed verifier
+    try { window._pfRecaptcha?.clear(); } catch(e2) {}
     window._pfRecaptcha = null;
+    const rc = document.getElementById('pf-global-recaptcha');
+    if (rc) rc.innerHTML = '';
   }
   if (btn) { btn.disabled = false; btn.textContent = 'Send OTP →'; }
 }
