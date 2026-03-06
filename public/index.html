@@ -2352,14 +2352,7 @@ function filterTab(btn) {
     </div>
   </div>
 
-  <!-- Image Templates -->
-  <div class="render-section" data-type="image">
-    <div class="render-section-head">
-      <h3>Still Render Templates</h3>
-      <span class="rcount">5</span>
-      <span class="rtype-badge">₹999 / 5 image</span>
-    </div>
-    <div class="render-grid">
+  <!-- old-image-trash-start -->
 
       <div class="rt-card" onclick="openRenderPanel('image','Lookbook — Silk Wrap','High-res render for a luxury brand lookbook. Clean background with dramatic side light.',['images/one.jpg','images/one-2.jpg','images/one-3.jpg','images/one-4.jpg','images/one-5.jpg'],'₹999')">
   <div class="rt-media">
@@ -4999,7 +4992,9 @@ const sto = getStorage(getApp());
 // ── Firebase Storage base URL builder ──
 const BUCKET = 'urreal3d-ba986.firebasestorage.app';
 function fbUrl(path) {
-  return `https://firebasestorage.googleapis.com/v0/b/${BUCKET}/o/${encodeURIComponent(path)}?alt=media`;
+  // Encode the full path but keep slashes as %2F (Firebase requires this)
+  const encoded = path.split('/').map(encodeURIComponent).join('%2F');
+  return `https://firebasestorage.googleapis.com/v0/b/${BUCKET}/o/${encoded}?alt=media`;
 }
 
 // ── Default seed data (runs once if Firestore collection is empty) ──
