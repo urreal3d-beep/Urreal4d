@@ -6476,7 +6476,7 @@ async function submitReview() {
         }
         imgObs.unobserve(img);
       });
-    }, { rootMargin: '300px' }); // start loading 300px before visible
+    }, { rootMargin: '500px' }); // start loading 500px before visible
   }
 
   window.observeLazyImg = function(img) {
@@ -6502,6 +6502,7 @@ async function submitReview() {
             if (source) {
               source.src = source.dataset.src;
               delete source.dataset.src;
+              video.preload = 'auto';
               video.load();
             }
             video.dataset.loaded = '1';
@@ -6512,7 +6513,7 @@ async function submitReview() {
           video.pause();
         }
       });
-    }, { rootMargin: '150px', threshold: 0.1 });
+    }, { rootMargin: '400px', threshold: 0.1 });
   }
 
   window.observeLazyVideo = function(video) {
@@ -6524,6 +6525,19 @@ async function submitReview() {
       source.dataset.src = source.src;
       source.removeAttribute('src');
       video.load(); // flushes any buffered data
+    }
+    // If already in viewport, load immediately without waiting for observer callback
+    var rect = video.getBoundingClientRect();
+    var inView = rect.top < window.innerHeight + 400 && rect.bottom > -400;
+    if (inView && !video.dataset.loaded) {
+      var src = video.querySelector('source[data-src]');
+      if (src) { src.src = src.dataset.src; delete src.dataset.src; }
+      video.preload = 'auto';
+      video.load();
+      video.play().catch(function(){});
+      video.dataset.loaded = '1';
+      var parent = video.closest('.media-box, .photo-box, .rt-media');
+      if (parent) parent.classList.add('loaded');
     }
     videoObs.observe(video);
   };
