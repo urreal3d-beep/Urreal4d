@@ -3520,7 +3520,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 // ── Add to Cart from render panel ──
 function handleAddToCart() {
-  if (!window.getCurrentUser || !window.getCurrentUser()) { openAuthModal('login'); return; }
+  // No login required — login only asked at checkout
 
   const title        = document.getElementById('rp-title').textContent;
   const price        = document.getElementById('rp-price').textContent;
@@ -3585,14 +3585,13 @@ function updateCartBadge() {
 
 // ── Quick-add from render page (no panel needed) ──
 function quickAddToCart(type, title, desc, src, price, btn) {
-  // No login required to add to cart — login is only asked at checkout
-
+  // No login required — login only asked at checkout
   window._cart = window._cart || [];
   window._cart.push({
     id: Date.now(), title, desc, src, price,
     templateType:  type,
     priceNum:      parseFloat(price.replace(/[^0-9.]/g,'').replace(',','')),
-    isINR:         price.includes('\u20b9'),
+    isINR:         price.includes('₹'),
     refFiles:      [],
     designFiles:   [null, null, null, null],
     labels:        ['Front','Back','Sleeves','Logo'],
@@ -3603,49 +3602,86 @@ function quickAddToCart(type, title, desc, src, price, btn) {
   const qty = window._cart.filter(i => i.title === title).length;
 
   if (btn) {
-    btn.classList.add('added');
-    btn.style.cssText = 'display:inline-flex;align-items:center;gap:0;padding:0;overflow:hidden;border-radius:6px;min-width:90px;justify-content:center;';
-    const srcJson = type === 'video' ? JSON.stringify(src) : JSON.stringify(src);
-    btn.innerHTML =
-      '<span onclick="event.stopPropagation();cartQtyChange(' + JSON.stringify(title) + ',' + srcJson + ',' + JSON.stringify(price) + ',' + JSON.stringify(type) + ',this.closest(\'button\'),-1)" style="padding:6px 10px;font-size:15px;font-weight:700;cursor:pointer;user-select:none;border-right:1px solid rgba(255,255,255,0.15);">−</span>' +
-      '<span class="cart-qty-display" data-title="' + title.replace(/"/g,'&quot;') + '" style="padding:6px 8px;font-size:12px;font-weight:700;min-width:26px;text-align:center;">' + qty + '</span>' +
-      '<span onclick="event.stopPropagation();cartQtyChange(' + JSON.stringify(title) + ',' + srcJson + ',' + JSON.stringify(price) + ',' + JSON.stringify(type) + ',this.closest(\'button\'),1)" style="padding:6px 10px;font-size:15px;font-weight:700;cursor:pointer;user-select:none;border-left:1px solid rgba(255,255,255,0.15);">+</span>';
-    btn.onclick = function(e) { e.stopPropagation(); };
+    _turnBtnToCounter(btn, title, src, price, type, qty);
   }
-
   showCartToast(title);
 }
 
-function cartQtyChange(title, src, price, type, btn, delta) {
+// Safely turn an Add-to-Cart button into a − qty + counter using DOM (no innerHTML onclick hacks)
+function _turnBtnToCounter(btn, title, src, price, type, qty) {
+  btn.classList.add('added');
+  btn.style.cssText = 'display:inline-flex;align-items:center;gap:0;padding:0;overflow:hidden;border-radius:6px;min-width:90px;justify-content:center;';
+  btn.innerHTML = '';
+
+  var minus = document.createElement('span');
+  minus.textContent = '−';
+  minus.style.cssText = 'padding:6px 10px;font-size:15px;font-weight:700;cursor:pointer;user-select:none;border-right:1px solid rgba(255,255,255,0.15);';
+  minus.addEventListener('click', function(e) {
+    e.stopPropagation();
+    _cartQtyStep(title, src, price, type, btn, -1);
+  });
+
+  var display = document.createElement('span');
+  display.className = 'cart-qty-display';
+  display.dataset.title = title;
+  display.textContent = qty;
+  display.style.cssText = 'padding:6px 8px;font-size:12px;font-weight:700;min-width:26px;text-align:center;';
+
+  var plus = document.createElement('span');
+  plus.textContent = '+';
+  plus.style.cssText = 'padding:6px 10px;font-size:15px;font-weight:700;cursor:pointer;user-select:none;border-left:1px solid rgba(255,255,255,0.15);';
+  plus.addEventListener('click', function(e) {
+    e.stopPropagation();
+    _cartQtyStep(title, src, price, type, btn, 1);
+  });
+
+  btn.appendChild(minus);
+  btn.appendChild(display);
+  btn.appendChild(plus);
+  btn.onclick = function(e) { e.stopPropagation(); };
+}
+
+function _cartQtyStep(title, src, price, type, btn, delta) {
   window._cart = window._cart || [];
   if (delta === 1) {
     window._cart.push({
       id: Date.now(), title, desc:'', src, price, templateType: type,
       priceNum: parseFloat(price.replace(/[^0-9.]/g,'').replace(',','')),
-      isINR: price.includes('\u20b9'),
+      isINR: price.includes('₹'),
       refFiles:[], designFiles:[null,null,null,null],
       labels:['Front','Back','Sleeves','Logo'],
       addedAt: new Date().toLocaleTimeString()
     });
     showCartToast(title);
   } else {
-    const entries = window._cart.map((item,n) => [item,n]).filter(([item]) => item.title === title);
-    if (entries.length) window._cart.splice(entries[entries.length - 1][1], 1);
+    var entries = window._cart.map(function(item,n){ return [item,n]; }).filter(function(x){ return x[0].title === title; });
+    if (entries.length) window._cart.splice(entries[entries.length-1][1], 1);
   }
   updateCartBadge();
-  const qty = window._cart.filter(i => i.title === title).length;
+  var qty = window._cart.filter(function(i){ return i.title === title; }).length;
+
+  // Update all qty displays for this title
   document.querySelectorAll('.cart-qty-display').forEach(function(el) {
-    if (el.dataset.title === title) {
-      el.textContent = qty;
-      if (qty === 0 && btn) {
-        btn.classList.remove('added');
-        btn.style.cssText = '';
-        btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add to Cart';
-        (function(t,s,p,ty){ btn.onclick = function(e){e.stopPropagation();quickAddToCart(ty,t,'',s,p,btn);}; })(title,src,price,type);
-      }
-    }
+    if (el.dataset.title === title) el.textContent = qty;
   });
+
+  if (qty === 0 && btn) {
+    // Reset button back to Add to Cart
+    btn.classList.remove('added');
+    btn.style.cssText = '';
+    btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add to Cart';
+    // Re-attach click — capture vars in closure
+    (function(t,s,p,ty){
+      btn.onclick = function(e){ e.stopPropagation(); quickAddToCart(ty,t,'',s,p,btn); };
+    })(title, src, price, type);
+  }
+
   if (qty > 0 && typeof renderCart === 'function') renderCart();
+}
+
+// Keep cartQtyChange as alias in case called elsewhere
+function cartQtyChange(title, src, price, type, btn, delta) {
+  _cartQtyStep(title, src, price, type, btn, delta);
 }
 
 </script>
@@ -5876,9 +5912,12 @@ function removeCartItem(id) {
         if (qty === 0) {
           const btn = el.closest('button');
           if (btn) {
-            btn.classList.remove('added'); btn.style.cssText = '';
+            btn.classList.remove('added');
+            btn.style.cssText = '';
             btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add to Cart';
-            (function(t,s,p,ty){ btn.onclick = function(e){e.stopPropagation();quickAddToCart(ty,t,'',s,p,btn);}; })(removing.title,removing.src,removing.price,removing.templateType);
+            (function(t,s,p,ty){
+              btn.onclick = function(e){ e.stopPropagation(); quickAddToCart(ty,t,'',s,p,btn); };
+            })(removing.title, removing.src, removing.price, removing.templateType);
           }
         }
       }
