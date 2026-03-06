@@ -2816,6 +2816,130 @@ function filterTab(btn) {
   border: 1px dashed rgba(255,255,255,0.07); border-radius: 10px;
   color: rgba(255,255,255,0.25); font-size: 13px; font-family: 'Plus Jakarta Sans', sans-serif;
 }
+
+/* ── Account edit elements ── */
+.pfa-edit-btn {
+  background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.2);
+  color: var(--pl); width: 26px; height: 26px; border-radius: 6px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; flex-shrink: 0;
+}
+.pfa-edit-btn:hover { background: rgba(124,58,237,0.22); border-color: var(--pl); }
+
+.pfa-verified-badge {
+  font-size: 9.5px; font-weight: 800; letter-spacing: 0.06em;
+  color: #22c55e; background: rgba(34,197,94,0.1);
+  border: 1px solid rgba(34,197,94,0.25); border-radius: 4px; padding: 2px 8px;
+  flex-shrink: 0;
+}
+
+.pfa-edit-card {
+  background: rgba(124,58,237,0.04);
+  border: 1px solid rgba(124,58,237,0.16);
+  border-radius: 12px; padding: 18px 20px; margin-bottom: 14px;
+}
+.pfa-edit-card-label {
+  font-size: 11px; font-weight: 800; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--pl); margin-bottom: 6px;
+}
+.pfa-edit-card-sub {
+  font-size: 12px; color: var(--gdim); line-height: 1.6; margin-bottom: 14px;
+}
+.pfa-input {
+  width: 100%; background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(124,58,237,0.2); border-radius: 8px;
+  padding: 11px 14px; color: var(--white);
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px;
+  outline: none; transition: border-color 0.2s;
+}
+.pfa-input:focus { border-color: rgba(124,58,237,0.5); background: rgba(124,58,237,0.05); }
+.pfa-input::placeholder { color: rgba(106,88,128,0.6); }
+.pfa-save-btn {
+  background: var(--purple); color: #fff; border: none;
+  padding: 10px 20px; border-radius: 8px;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+}
+.pfa-save-btn:hover { background: var(--pm); }
+.pfa-save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.pfa-cancel-btn {
+  background: transparent; color: var(--gdim);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 10px 16px; border-radius: 8px;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+}
+.pfa-cancel-btn:hover { border-color: rgba(255,255,255,0.15); color: var(--white); }
+.pfa-msg {
+  font-size: 12px; min-height: 16px; margin-top: 8px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* phone row */
+.pfa-phone-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.pfa-dial-wrap {
+  position: relative; display: flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(124,58,237,0.2);
+  border-radius: 8px; padding: 11px 12px; cursor: pointer;
+  font-size: 13px; font-weight: 600; color: var(--white);
+  white-space: nowrap; flex-shrink: 0; transition: border-color 0.2s;
+  user-select: none;
+}
+.pfa-dial-wrap:hover { border-color: rgba(124,58,237,0.4); }
+.pfa-phone-input { flex: 1; }
+.pfa-dial-dropdown {
+  display: none; position: absolute; top: calc(100% + 6px); left: 0;
+  background: #0f0b1e; border: 1px solid rgba(124,58,237,0.2);
+  border-radius: 10px; z-index: 600; width: 220px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+  overflow: hidden;
+}
+.pfa-dial-wrap.open .pfa-dial-dropdown { display: block; }
+.pfa-dial-search {
+  width: 100%; background: rgba(255,255,255,0.04);
+  border: none; border-bottom: 1px solid rgba(124,58,237,0.12);
+  padding: 10px 14px; color: var(--white);
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; outline: none;
+}
+.pfa-dial-list { max-height: 180px; overflow-y: auto; }
+.pfa-dial-opt {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 14px; cursor: pointer; font-size: 12.5px;
+  transition: background 0.15s;
+}
+.pfa-dial-opt:hover { background: rgba(124,58,237,0.1); }
+.pfa-dial-opt-name { flex: 1; color: var(--white); }
+.pfa-dial-opt-code { color: var(--gdim); font-size: 11px; }
+
+/* OTP boxes */
+.pfa-otp-boxes { display: flex; gap: 8px; justify-content: center; margin: 12px 0; }
+.pfa-otp-box {
+  width: 40px; height: 46px; text-align: center;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(124,58,237,0.2);
+  border-radius: 8px; color: var(--white);
+  font-size: 20px; font-weight: 700; outline: none;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  transition: border-color 0.2s;
+}
+.pfa-otp-box:focus { border-color: var(--pl); background: rgba(124,58,237,0.07); }
+.pfa-otp-box.filled { border-color: rgba(124,58,237,0.45); }
+.pfa-otp-sent-txt {
+  font-size: 12px; color: var(--gdim); text-align: center; margin-bottom: 4px;
+}
+.pfa-resend-link {
+  font-size: 12px; color: var(--pl); cursor: pointer; text-decoration: underline;
+  font-weight: 600;
+}
+
+/* Add phone CTA */
+.pfa-add-phone-btn {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 9px;
+  background: rgba(124,58,237,0.07); border: 1px dashed rgba(124,58,237,0.3);
+  border-radius: 10px; padding: 14px; color: var(--pl);
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; margin-bottom: 14px;
+}
+.pfa-add-phone-btn:hover { background: rgba(124,58,237,0.14); border-color: var(--pl); }
 </style>
 
 <div class="page" id="p-profile">
@@ -2891,13 +3015,96 @@ function filterTab(btn) {
         <div class="pf-section-head">
           <div class="pf-section-title">Account</div>
         </div>
-        <div class="pf-info-block">
+
+        <!-- ── Personal Info (static display) ── -->
+        <div class="pf-info-block" id="pfa-static-block">
           <div class="pf-info-block-label">Personal Info</div>
-          <div class="pf-info-row"><span class="pf-info-key">Full Name</span><span class="pf-info-val" id="pfa-name">—</span></div>
+          <div class="pf-info-row">
+            <span class="pf-info-key">Full Name</span>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="pf-info-val" id="pfa-name">—</span>
+              <button class="pfa-edit-btn" onclick="pfShowEditName()" id="pfa-name-edit-btn" title="Edit name">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+            </div>
+          </div>
           <div class="pf-info-row"><span class="pf-info-key">Email</span><span class="pf-info-val" id="pfa-email">—</span></div>
-          <div class="pf-info-row"><span class="pf-info-key">Phone</span><span class="pf-info-val" id="pfa-phone">—</span></div>
+          <div class="pf-info-row" id="pfa-phone-row">
+            <span class="pf-info-key">Phone</span>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="pf-info-val" id="pfa-phone">—</span>
+              <span class="pfa-verified-badge" id="pfa-phone-verified" style="display:none">✓ Verified</span>
+            </div>
+          </div>
         </div>
-        <div class="pf-info-block">
+
+        <!-- ── Edit Name inline form ── -->
+        <div class="pfa-edit-card" id="pfa-edit-name-card" style="display:none">
+          <div class="pfa-edit-card-label">Update Display Name</div>
+          <input class="pfa-input" id="pfa-name-input" type="text" placeholder="Your full name" maxlength="60">
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <button class="pfa-save-btn" onclick="pfSaveName()">Save Name</button>
+            <button class="pfa-cancel-btn" onclick="pfHideEditName()">Cancel</button>
+          </div>
+          <div class="pfa-msg" id="pfa-name-msg"></div>
+        </div>
+
+        <!-- ── Phone Verification card (shown for Google users without phone) ── -->
+        <div class="pfa-edit-card" id="pfa-phone-verify-card" style="display:none">
+          <div class="pfa-edit-card-label">Add &amp; Verify Phone Number</div>
+          <div class="pfa-edit-card-sub">Your verified number replaces email for order updates &amp; login.</div>
+
+          <!-- Step 1: Enter number -->
+          <div id="pfa-phone-step1">
+            <div class="pfa-phone-row">
+              <div class="pfa-dial-wrap" id="pfa-dial-wrap" onclick="pfToggleDialDropdown()">
+                <span id="pfa-flag">🇮🇳</span>
+                <span id="pfa-dial">+91</span>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+                <div class="pfa-dial-dropdown" id="pfa-dial-dropdown">
+                  <input class="pfa-dial-search" id="pfa-dial-search" type="text" placeholder="Search country…" onclick="event.stopPropagation()" oninput="pfFilterDial(this.value)">
+                  <div class="pfa-dial-list" id="pfa-dial-list"></div>
+                </div>
+              </div>
+              <input class="pfa-input pfa-phone-input" id="pfa-phone-number-input" type="tel" placeholder="Phone number" maxlength="15">
+            </div>
+            <div id="pfa-recaptcha-container"></div>
+            <button class="pfa-save-btn" id="pfa-send-otp-btn" onclick="pfSendPhoneOTP()" style="margin-top:10px;width:100%">
+              Send OTP →
+            </button>
+          </div>
+
+          <!-- Step 2: Enter OTP -->
+          <div id="pfa-phone-step2" style="display:none">
+            <div class="pfa-otp-sent-txt" id="pfa-otp-sent-txt">OTP sent</div>
+            <div class="pfa-otp-boxes" id="pfa-otp-boxes">
+              <input class="pfa-otp-box" type="tel" maxlength="1" oninput="pfOtpNext(this,0)">
+              <input class="pfa-otp-box" type="tel" maxlength="1" oninput="pfOtpNext(this,1)">
+              <input class="pfa-otp-box" type="tel" maxlength="1" oninput="pfOtpNext(this,2)">
+              <input class="pfa-otp-box" type="tel" maxlength="1" oninput="pfOtpNext(this,3)">
+              <input class="pfa-otp-box" type="tel" maxlength="1" oninput="pfOtpNext(this,4)">
+              <input class="pfa-otp-box" type="tel" maxlength="1" oninput="pfOtpNext(this,5)">
+            </div>
+            <button class="pfa-save-btn" id="pfa-verify-otp-btn" onclick="pfVerifyPhoneOTP()" style="width:100%">Verify OTP →</button>
+            <div style="text-align:center;margin-top:8px;">
+              <span class="pfa-resend-link" onclick="pfSendPhoneOTP(true)">Resend OTP</span>
+            </div>
+          </div>
+
+          <div class="pfa-msg" id="pfa-phone-msg"></div>
+          <button class="pfa-cancel-btn" onclick="pfHidePhoneVerify()" style="margin-top:8px;">Cancel</button>
+        </div>
+
+        <!-- ── Add Phone CTA (shown for Google users with no verified phone) ── -->
+        <div id="pfa-add-phone-cta" style="display:none">
+          <button class="pfa-add-phone-btn" onclick="pfShowPhoneVerify()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 11.88 19.79 19.79 0 0 1 1.61 3.28 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.72 16z"/></svg>
+            Add &amp; Verify Phone Number
+          </button>
+        </div>
+
+        <!-- ── Membership ── -->
+        <div class="pf-info-block" style="margin-top:16px;">
           <div class="pf-info-block-label">Membership</div>
           <div class="pf-info-row"><span class="pf-info-key">Member Since</span><span class="pf-info-val" id="pfa-since">—</span></div>
           <div class="pf-info-row"><span class="pf-info-key">Total Projects</span><span class="pf-info-val accent" id="pfa-total">0</span></div>
@@ -2929,19 +3136,39 @@ async function loadProfileData() {
   const user = window.getCurrentUser();
   if (!user) return;
 
-  const initial = (user.displayName || user.email || 'U')[0].toUpperCase();
-  document.getElementById('pf-avatar').textContent   = initial;
-  document.getElementById('pf-name').textContent     = user.displayName || 'Client';
-  document.getElementById('pf-email').textContent    = user.email || '—';
-  document.getElementById('pfa-name').textContent    = user.displayName || '—';
-  document.getElementById('pfa-email').textContent   = user.email || '—';
-  document.getElementById('pfa-phone').textContent   = user.phoneNumber || localStorage.getItem('ph_' + user.uid) || '—';
+  const profile = window._userProfile || {};
+  const verifiedPhone = user.phoneNumber || profile.phone || localStorage.getItem('ph_' + user.uid) || '';
+  const isGoogleUser = user.providerData?.some(p => p.providerId === 'google.com');
 
-  const since = user.metadata && user.metadata.creationTime
+  const initial = (user.displayName || user.email || 'U')[0].toUpperCase();
+  document.getElementById('pf-avatar').textContent = initial;
+  document.getElementById('pf-name').textContent   = user.displayName || 'Client';
+
+  // Sidebar: show phone if verified, else email
+  const sidebarId = document.getElementById('pf-email');
+  if (sidebarId) sidebarId.textContent = verifiedPhone || user.email || '—';
+
+  // Account tab fields
+  document.getElementById('pfa-name').textContent  = user.displayName || '—';
+  document.getElementById('pfa-email').textContent = user.email || '—';
+
+  if (verifiedPhone) {
+    document.getElementById('pfa-phone').textContent              = verifiedPhone;
+    document.getElementById('pfa-phone-verified').style.display  = 'inline-flex';
+    document.getElementById('pfa-add-phone-cta').style.display   = 'none';
+    document.getElementById('pfa-phone-verify-card').style.display = 'none';
+  } else {
+    document.getElementById('pfa-phone').textContent              = 'Not added';
+    document.getElementById('pfa-phone-verified').style.display  = 'none';
+    // Show the CTA only for Google users
+    document.getElementById('pfa-add-phone-cta').style.display   = isGoogleUser ? 'block' : 'none';
+  }
+
+  const since = user.metadata?.creationTime
     ? new Date(user.metadata.creationTime).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'})
     : '—';
-  document.getElementById('pf-since').textContent    = 'Since ' + since;
-  document.getElementById('pfa-since').textContent   = since;
+  document.getElementById('pf-since').textContent  = 'Since ' + since;
+  document.getElementById('pfa-since').textContent = since;
 
   document.getElementById('pf-orders-list').innerHTML   = '<div class="pf-empty">Loading…</div>';
   document.getElementById('pf-payments-list').innerHTML = '<div class="pf-empty">Loading…</div>';
@@ -3016,6 +3243,196 @@ async function loadProfileData() {
       + '<th>Order</th><th>Template</th><th>Date</th><th>Payment ID</th><th>Amount</th>'
       + '</tr></thead><tbody>' + rows + '</tbody></table></div>';
   }
+}
+
+// ════════════════════════════════════
+// ACCOUNT SECTION — EDIT NAME
+// ════════════════════════════════════
+function pfShowEditName() {
+  const user = window.getCurrentUser();
+  const nameInput = document.getElementById('pfa-name-input');
+  if (nameInput) nameInput.value = user?.displayName || '';
+  document.getElementById('pfa-edit-name-card').style.display = 'block';
+  document.getElementById('pfa-name-edit-btn').style.display = 'none';
+  if (nameInput) nameInput.focus();
+}
+function pfHideEditName() {
+  document.getElementById('pfa-edit-name-card').style.display = 'none';
+  document.getElementById('pfa-name-edit-btn').style.display = 'flex';
+  document.getElementById('pfa-name-msg').textContent = '';
+}
+async function pfSaveName() {
+  const name = document.getElementById('pfa-name-input').value.trim();
+  if (!name || name.length < 2) { pfSetMsg('pfa-name-msg', 'Please enter a valid name.', 'error'); return; }
+  const user = window.getCurrentUser();
+  if (!user) return;
+  const btn = document.querySelector('#pfa-edit-name-card .pfa-save-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    const { updateProfile } = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js");
+    await updateProfile(user, { displayName: name });
+    await window._saveUserProfile(user, name);
+    document.getElementById('pfa-name').textContent = name;
+    document.getElementById('pf-name').textContent  = name;
+    document.getElementById('pf-avatar').textContent = name[0].toUpperCase();
+    pfSetMsg('pfa-name-msg', '✓ Name updated!', 'success');
+    setTimeout(pfHideEditName, 1000);
+  } catch(e) {
+    pfSetMsg('pfa-name-msg', 'Could not update name. Please try again.', 'error');
+  }
+  btn.disabled = false; btn.textContent = 'Save Name';
+}
+
+// ════════════════════════════════════
+// ACCOUNT SECTION — PHONE OTP VERIFY
+// ════════════════════════════════════
+let _pfConfirmResult = null;
+let _pfSelectedDial  = { flag:'🇮🇳', name:'India', dial:'+91' };
+let _pfDialFiltered  = [];
+
+function pfShowPhoneVerify() {
+  document.getElementById('pfa-add-phone-cta').style.display     = 'none';
+  document.getElementById('pfa-phone-verify-card').style.display = 'block';
+  document.getElementById('pfa-phone-step1').style.display = 'block';
+  document.getElementById('pfa-phone-step2').style.display = 'none';
+  pfSetMsg('pfa-phone-msg', '', '');
+  pfRenderDialList(COUNTRIES);
+  _pfDialFiltered = [...COUNTRIES];
+}
+function pfHidePhoneVerify() {
+  document.getElementById('pfa-phone-verify-card').style.display = 'none';
+  const user = window.getCurrentUser();
+  const verifiedPhone = user?.phoneNumber || window._userProfile?.phone || localStorage.getItem('ph_' + user?.uid) || '';
+  document.getElementById('pfa-add-phone-cta').style.display = (!verifiedPhone) ? 'block' : 'none';
+  pfSetMsg('pfa-phone-msg', '', '');
+  _pfConfirmResult = null;
+}
+
+function pfToggleDialDropdown() {
+  document.getElementById('pfa-dial-wrap').classList.toggle('open');
+  if (document.getElementById('pfa-dial-wrap').classList.contains('open')) {
+    setTimeout(() => document.getElementById('pfa-dial-search')?.focus(), 50);
+  }
+}
+function pfFilterDial(q) {
+  const lower = q.toLowerCase();
+  _pfDialFiltered = COUNTRIES.filter(c => c.name.toLowerCase().includes(lower) || c.dial.includes(lower));
+  pfRenderDialList(_pfDialFiltered);
+}
+function pfRenderDialList(list) {
+  const el = document.getElementById('pfa-dial-list');
+  if (!el) return;
+  el.innerHTML = list.map((c, i) => `
+    <div class="pfa-dial-opt" onclick="pfSelectDial(${COUNTRIES.indexOf(c)});event.stopPropagation()">
+      <span>${c.flag}</span>
+      <span class="pfa-dial-opt-name">${c.name}</span>
+      <span class="pfa-dial-opt-code">${c.dial}</span>
+    </div>`).join('');
+}
+function pfSelectDial(idx) {
+  _pfSelectedDial = COUNTRIES[idx];
+  document.getElementById('pfa-flag').textContent = _pfSelectedDial.flag;
+  document.getElementById('pfa-dial').textContent = _pfSelectedDial.dial;
+  document.getElementById('pfa-dial-wrap').classList.remove('open');
+  document.getElementById('pfa-phone-number-input')?.focus();
+}
+document.addEventListener('click', function(e) {
+  const wrap = document.getElementById('pfa-dial-wrap');
+  if (wrap && !wrap.contains(e.target)) wrap.classList.remove('open');
+});
+
+async function pfSendPhoneOTP(isResend) {
+  const num = document.getElementById('pfa-phone-number-input')?.value.trim().replace(/\D/g,'');
+  if (!num || num.length < 7) { pfSetMsg('pfa-phone-msg', 'Please enter a valid phone number.', 'error'); return; }
+  const fullPhone = _pfSelectedDial.dial + num;
+  const btn = document.getElementById('pfa-send-otp-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+
+  try {
+    const { RecaptchaVerifier, signInWithPhoneNumber } = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js");
+    if (!window._pfRecaptcha || isResend) {
+      window._pfRecaptcha = new RecaptchaVerifier(window._firebaseAuth, 'pfa-recaptcha-container', { size: 'invisible' });
+    }
+    _pfConfirmResult = await signInWithPhoneNumber(window._firebaseAuth, fullPhone, window._pfRecaptcha);
+    document.getElementById('pfa-phone-step1').style.display = 'none';
+    document.getElementById('pfa-phone-step2').style.display = 'block';
+    document.getElementById('pfa-otp-sent-txt').textContent  = 'OTP sent to ' + fullPhone;
+    pfSetMsg('pfa-phone-msg', '', '');
+    setTimeout(() => document.querySelector('.pfa-otp-box')?.focus(), 100);
+  } catch(e) {
+    pfSetMsg('pfa-phone-msg', 'Failed to send OTP. Please try again.', 'error');
+    window._pfRecaptcha = null;
+  }
+  if (btn) { btn.disabled = false; btn.textContent = 'Send OTP →'; }
+}
+
+function pfOtpNext(input, idx) {
+  if (input.value) {
+    input.classList.add('filled');
+    const boxes = document.querySelectorAll('.pfa-otp-box');
+    if (idx < 5) boxes[idx + 1].focus();
+    else pfVerifyPhoneOTP();
+  }
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Backspace' && e.target.classList.contains('pfa-otp-box')) {
+    const boxes = Array.from(document.querySelectorAll('.pfa-otp-box'));
+    const idx = boxes.indexOf(e.target);
+    e.target.value = ''; e.target.classList.remove('filled');
+    if (idx > 0) boxes[idx - 1].focus();
+  }
+});
+
+async function pfVerifyPhoneOTP() {
+  const boxes = document.querySelectorAll('.pfa-otp-box');
+  const code = Array.from(boxes).map(b => b.value).join('');
+  if (code.length !== 6) { pfSetMsg('pfa-phone-msg', 'Please enter all 6 digits.', 'error'); return; }
+  if (!_pfConfirmResult) { pfSetMsg('pfa-phone-msg', 'Session expired. Please resend OTP.', 'error'); return; }
+
+  const btn = document.getElementById('pfa-verify-otp-btn');
+  btn.disabled = true; btn.textContent = 'Verifying…';
+
+  try {
+    const result = await _pfConfirmResult.confirm(code);
+    const verifiedPhone = result.user.phoneNumber;
+
+    // Save phone to Firestore + localStorage under the *original* user
+    const origUser = window.getCurrentUser();
+    if (origUser && window._saveUserProfile) {
+      // Merge phone into their Firestore doc
+      const { getFirestore, doc, setDoc, getApp } = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js");
+      const db2 = getFirestore(getApp());
+      await setDoc(doc(db2, 'users', origUser.uid), { phone: verifiedPhone }, { merge: true });
+      localStorage.setItem('ph_' + origUser.uid, verifiedPhone);
+      if (window._userProfile) window._userProfile.phone = verifiedPhone;
+    }
+
+    // Update UI
+    document.getElementById('pfa-phone').textContent             = verifiedPhone;
+    document.getElementById('pfa-phone-verified').style.display  = 'inline-flex';
+    document.getElementById('pf-email').textContent              = verifiedPhone;
+    pfHidePhoneVerify();
+    pfSetMsg('pfa-phone-msg', '', '');
+    // Brief success flash
+    const phoneRow = document.getElementById('pfa-phone-row');
+    if (phoneRow) { phoneRow.style.background = 'rgba(34,197,94,0.07)'; setTimeout(() => phoneRow.style.background = '', 1500); }
+
+  } catch(e) {
+    const msg = e.code === 'auth/invalid-verification-code'
+      ? 'Incorrect OTP. Please check and try again.'
+      : 'Verification failed. Please try again.';
+    pfSetMsg('pfa-phone-msg', msg, 'error');
+    boxes.forEach(b => { b.value = ''; b.classList.remove('filled'); });
+    document.querySelector('.pfa-otp-box')?.focus();
+  }
+  btn.disabled = false; btn.textContent = 'Verify OTP →';
+}
+
+function pfSetMsg(id, text, type) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text;
+  el.style.color = type === 'error' ? '#f87171' : type === 'success' ? '#22c55e' : 'var(--gdim)';
 }
 </script>
 
