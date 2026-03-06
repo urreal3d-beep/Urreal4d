@@ -1185,11 +1185,7 @@ window.addEventListener('load', function() {
   var s = document.getElementById('boot-screen');
   if(s){ s.classList.add('done'); setTimeout(function(){ s.remove(); }, 450); }
 });
-// Fallback: remove after 3s no matter what
-setTimeout(function(){
-  var s = document.getElementById('boot-screen');
-  if(s){ s.classList.add('done'); setTimeout(function(){ s.remove(); }, 450); }
-}, 3000);
+
 </script>
 
 <!-- NAV -->
@@ -2098,51 +2094,7 @@ async function submitForm(){
   btn.disabled=false;btn.textContent='Send Inquiry →';
 }
 </script>
-<script>
-function filterTab(btn) {
 
-  document.querySelectorAll(".ftab").forEach(tab => {
-    tab.classList.remove("active");
-  });
-
-  btn.classList.add("active");
-
-  let filterValue = btn.innerText;
-  let cards = document.querySelectorAll(".port-card");
-
-  cards.forEach(card => {
-
-    if (filterValue === "All") {
-      card.style.display = "block";
-    } else if (card.getAttribute("data-category") === filterValue) {
-      card.style.display = "block";
-    } else {
-      card.style.display = "none";
-    }
-
-  });
-}
-</script>
-<!--
-  ================================================================
-  URREAL3D — RENDER PAGE SNIPPET
-  ================================================================
-  HOW TO ADD THIS TO YOUR index.html:
-
-  1. PAGES ARRAY — find this line in your <script>:
-       const pages = ['home','about','portfolio','pricing','testimonials','appointment','policy'];
-     Change to:
-       const pages = ['home','about','portfolio','pricing','testimonials','appointment','policy','render'];
-
-  2. NAV LINK — inside <ul class="nav-links">, add:
-       <li><a onclick="go('render')" id="nl-render">Render</a></li>
-
-  3. DRAWER LINK — inside <div class="drawer">, add:
-       <a onclick="go('render')" id="dl-render">Render</a>
-
-  4. PASTE EVERYTHING BELOW just before the closing </body> tag
-  ================================================================
--->
 
 <!-- ═══ RENDER PAGE ═══ -->
 <div class="page" id="p-render">
@@ -4052,7 +4004,7 @@ function pfSetMsg(id, text, type) {
 .rp-upload-section.unlocked .rp-upload-lock-bar{display:none;}
 
 /* File upload grid */
-.rp-file-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px;}
+.rp-file-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px;}
 .rp-file-slot{
   background:rgba(255,255,255,0.03);
   border:1px dashed rgba(124,58,237,0.22);
@@ -4147,7 +4099,7 @@ function pfSetMsg(id, text, type) {
       <div class="rp-price-bar">
         <div class="rp-price-bar-left">
           <div class="rp-price-label">Render Price</div>
-          <div class="rp-price-sublabel">T-shirt · Front, Back, Sleeves, Logo + Reference</div>
+          <div class="rp-price-sublabel">T-shirt · Front, Back, Sleeves, Logo, Other + Reference</div>
         </div>
         <div class="rp-price-val" id="rp-price">₹1,999</div>
       </div>
@@ -4200,6 +4152,13 @@ function pfSetMsg(id, text, type) {
             <div class="rp-file-slot-label">Logo</div>
             <div class="rp-file-slot-name rp-file-name">Choose file…</div>
             <input type="file" accept="image/*,.svg,.ai,.pdf" onchange="setFileName(this);this.closest('.rp-file-slot').classList.add('has-file');">
+          </div>
+          <div class="rp-file-slot" onclick="this.querySelector('input').click()">
+            <span class="rp-file-slot-icon">📎</span>
+            <div class="rp-file-slot-label">Other</div>
+            <div class="rp-file-slot-name rp-file-name">Choose file…</div>
+            <div class="rp-file-slot-hint">Any extra file</div>
+            <input type="file" accept="image/*,.ai,.psd,.pdf,.zip,.svg" onchange="setFileName(this);this.closest('.rp-file-slot').classList.add('has-file');">
           </div>
         </div>
       </div>
@@ -4349,7 +4308,7 @@ function handleAddToCart() {
   if (!refInput.files[0]) { alert('Please upload a Reference Image — it is required.'); return; }
   let hasFile = false;
   fileInputs.forEach(f => { if (f.files[0]) hasFile = true; });
-  if (!hasFile) { alert('Please upload at least one design file (Front, Back, Sleeves, or Logo).'); return; }
+  if (!hasFile) { alert('Please upload at least one design file (Front, Back, Sleeves, Logo, or Other).'); return; }
 
   // Store files as FileList references (held in memory)
   const item = {
@@ -4361,7 +4320,7 @@ function handleAddToCart() {
     isINR:        price.includes('₹'),
     refFiles:     Array.from(refInput.files),
     designFiles:  Array.from(fileInputs).map(f => f.files[0] || null),
-    labels:       ['Front','Back','Sleeves','Logo'],
+    labels:       ['Front','Back','Sleeves','Logo','Other'],
     addedAt:      new Date().toLocaleTimeString()
   };
 
@@ -4409,7 +4368,7 @@ function quickAddToCart(type, title, desc, src, price, btn) {
     id: Date.now(), title, desc, src, price, templateType: type,
     priceNum: parseFloat(price.replace(/[^0-9.]/g,'').replace(',','')),
     isINR: price.includes('₹'), refFiles: [],
-    designFiles: [null,null,null,null], labels: ['Front','Back','Sleeves','Logo'],
+    designFiles: [null,null,null,null,null], labels: ['Front','Back','Sleeves','Logo','Other'],
     addedAt: new Date().toLocaleTimeString()
   });
   updateCartBadge();
@@ -4444,8 +4403,8 @@ function _cartQtyStep(title, src, price, type, btn, delta) {
   if (delta === 1) {
     window._cart.push({ id:Date.now(), title, desc:'', src, price, templateType:type,
       priceNum:parseFloat(price.replace(/[^0-9.]/g,'').replace(',','')),
-      isINR:price.includes('₹'), refFiles:[], designFiles:[null,null,null,null],
-      labels:['Front','Back','Sleeves','Logo'], addedAt:new Date().toLocaleTimeString() });
+      isINR:price.includes('₹'), refFiles:[], designFiles:[null,null,null,null,null],
+      labels:['Front','Back','Sleeves','Logo','Other'], addedAt:new Date().toLocaleTimeString() });
     showCartToast(title);
   } else {
     var entries = window._cart.map(function(item,n){ return [item,n]; }).filter(function(x){ return x[0].title===title; });
@@ -4510,7 +4469,7 @@ async function checkoutCart() {
       return;
     }
     if (!item.designFiles || !item.designFiles.some(Boolean)) {
-      alert(`Please upload at least one design file (Front, Back, Sleeves or Logo) for "${item.title}" (Order ${i+1}) before checking out.`);
+      alert(`Please upload at least one design file (Front, Back, Sleeves, Logo, or Other) for "${item.title}" (Order ${i+1}) before checking out.`);
       openCart();
       const orderEl = document.getElementById('cg-order-' + item.id);
       if (orderEl) { orderEl.classList.add('oi-open'); orderEl.closest('.cart-group-card')?.classList.add('cg-open'); }
@@ -4549,7 +4508,7 @@ async function checkoutCart() {
     },
     theme:  { color: '#7c3aed' },
     handler: async function(response) { await onCartPaymentSuccess(response, brand); },
-    modal:  { ondismiss: function() { console.log('Razorpay dismissed.'); } }
+    modal:  { ondismiss: function() {} }
   };
 
   const rzp = new Razorpay(options);
@@ -4616,11 +4575,11 @@ async function onCartPaymentSuccess(rzpResponse, brand) {
         try {
           const url = await uploadOne(f, `client-uploads/${oid}/ref_${j}_${f.name}`);
           refUrls.push({ name: f.name, url, label: 'Reference ' + (j+1) });
-        } catch(e) { console.warn('Ref upload failed:', e); }
+        } catch(e) { /* ref upload skipped */ }
       }
 
       // Upload design files (Front, Back, Sleeves, Logo)
-      const designLabels = ['Front','Back','Sleeves','Logo'];
+      const designLabels = ['Front','Back','Sleeves','Logo','Other'];
       const designUrls = [];
       for (let j = 0; j < item.designFiles.length; j++) {
         const f = item.designFiles[j];
@@ -4628,7 +4587,7 @@ async function onCartPaymentSuccess(rzpResponse, brand) {
         try {
           const url = await uploadOne(f, `client-uploads/${oid}/design_${designLabels[j] || j}_${f.name}`);
           designUrls.push({ name: f.name, url, label: designLabels[j] || ('File ' + (j+1)) });
-        } catch(e) { console.warn('Design upload failed:', e); }
+        } catch(e) { /* design upload skipped */ }
       }
 
       // Save URLs back into the order document
@@ -4638,7 +4597,7 @@ async function onCartPaymentSuccess(rzpResponse, brand) {
             clientRefFiles:    refUrls,
             clientDesignFiles: designUrls,
           });
-        } catch(e) { console.warn('Attaching files to order failed:', e); }
+        } catch(e) { /* attach skipped */ }
       }
     }
 
@@ -4652,7 +4611,6 @@ async function onCartPaymentSuccess(rzpResponse, brand) {
   } catch(e) {
     showProcessingOverlay(false);
     alert('⚠️ Payment received but order save failed. Please contact us with Payment ID: ' + payId);
-    console.error(e);
   }
 }
 
@@ -4700,37 +4658,7 @@ function showOrderSuccessModal(count) {
   el.style.display = 'flex';
 }
 
-// ── Telegram helpers ──
-const BOT_TOKEN = '8670625484:AAHcKZ2okImb8E7i0MiE0Bz1gsGW1Hyn0OA';
-const TG_ORDERS = '8502965753';
-
-async function tgSend(chatId, text) {
-  try {
-    const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ chat_id:chatId, text, parse_mode:'HTML' })
-    });
-    const data = await res.json();
-    return data.result?.message_id || null;
-  } catch(e) { console.error('Telegram error:',e); return null; }
-}
-
-async function tgSendFile(chatId, file, caption) {
-  try {
-    const form = new FormData();
-    form.append('chat_id', chatId);
-    if (caption) form.append('caption', caption);
-    form.append('document', file, file.name);
-    const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
-      method:'POST', body: form
-    });
-    const data = await res.json();
-    return data.result?.message_id || null;
-  } catch(e) { console.error('Telegram file error:',e); return null; }
-}
-
-// Keep for backwards compatibility
-window.sendOrderToTelegram = async function() {};
+// Telegram helpers removed — files upload directly to Firebase Storage
 
 function filterRender(btn, type) {
   document.querySelectorAll('.render-pill-btn').forEach(b => b.classList.remove('active'));
@@ -4823,7 +4751,7 @@ onAuthStateChanged(auth, async (user) => {
         var parsed = JSON.parse(saved);
         if (parsed.length && (!window._cart || window._cart.length === 0)) {
           window._cart = parsed.map(function(i){
-            return Object.assign({},i,{refFiles:[],designFiles:[null,null,null,null],labels:['Front','Back','Sleeves','Logo']});
+            return Object.assign({},i,{refFiles:[],designFiles:[null,null,null,null,null],labels:['Front','Back','Sleeves','Logo','Other']});
           });
           if (typeof updateCartBadge==='function') updateCartBadge();
           if (typeof renderCart==='function') renderCart();
@@ -5945,7 +5873,7 @@ let _editCtx = null;
 function openEditModal(ctx) {
   _editCtx = ctx;
   const overlay = document.getElementById('inline-edit-overlay');
-  if (!overlay) { console.error('Edit modal overlay not found'); return; }
+  if (!overlay) { return; }
   document.getElementById('iem-title').value     = ctx.title || '';
   document.getElementById('iem-short').value     = ctx.shortDesc || '';
   document.getElementById('iem-full').value      = ctx.fullDesc || '';
@@ -6984,7 +6912,7 @@ async function detectAndSetPricing() {
     window.currentPricing = pricing;
 
   } catch(e) {
-    console.log('Pricing detection failed, using default INR');
+
   }
 }
 detectAndSetPricing();
@@ -7818,7 +7746,7 @@ function renderCart() {
           </div>
           <div class="cf-section-label">Design Files</div>
           <div class="cf-file-grid">
-            ${['👕 Front','🔄 Back','💪 Sleeves','🏷 Logo'].map((lbl, fi) => {
+            ${['👕 Front','🔄 Back','💪 Sleeves','🏷 Logo','📎 Other'].map((lbl, fi) => {
               const [ico, name] = lbl.split(' ');
               const hasF = item.designFiles?.[fi];
               return `<div class="cf-file-slot${hasF ? ' has-file' : ''}" id="cf-slot-${item.id}-${fi}"
