@@ -1905,7 +1905,7 @@ setTimeout(function(){
 
 <script>
 // ── Page Navigation with full History API support ──
-const pages = ['home','about','render','portfolio','pricing','testimonials','appointment','policy','admin'];
+const pages = ['home','about','render','portfolio','pricing','testimonials','appointment','policy','admin','profile'];
 
 function go(name, pushToHistory = true){
   document.getElementById('main-nav').style.display = 'flex';
@@ -1923,6 +1923,12 @@ function go(name, pushToHistory = true){
   if(dl) dl.classList.add('active');
   window.scrollTo(0, 0);
   closeDrawer();
+
+  if(name === 'profile'){
+    document.getElementById('main-nav').style.display = 'none';
+    pfSwitch('orders');
+    loadProfileData();
+  }
 
   if(name === 'admin'){
     document.getElementById('admin-loading').style.display = 'block';
@@ -1972,9 +1978,9 @@ window.addEventListener('popstate', function(e) {
   }
 
   // Priority 2: profile panel open → close it
-  const profilePanel = document.getElementById('profile-panel');
-  if(profilePanel && profilePanel.style.transform === 'translateX(0px)'){
-    closeProfile();
+  const profilePanel = document.getElementById('p-profile');
+  if(profilePanel && profilePanel.classList.contains('active')){
+    go('home');
     return;
   }
 
@@ -2578,285 +2584,441 @@ function filterTab(btn) {
 </div>
 <!-- ═══ END RENDER PAGE ═══ -->
 
-<!-- ═══ PROFILE PANEL ═══ -->
+<!-- ═══ PROFILE PAGE ═══ -->
 <style>
-/* ── PROFILE PANEL ── */
-#profile-panel{
-  position:fixed;top:0;right:0;bottom:0;
-  width:min(420px,100vw);
-  background:linear-gradient(180deg,#100d22 0%,#0b0817 100%);
-  border-left:1px solid rgba(124,58,237,0.18);
-  z-index:600;
-  transform:translateX(100%);
-  transition:transform 0.34s cubic-bezier(0.22,1,0.36,1);
-  overflow-y:auto;display:flex;flex-direction:column;
+#p-profile { background: #0b0817; min-height: 100vh; }
+
+.pf-topbar {
+  position: sticky; top: 0; z-index: 10;
+  background: rgba(11,8,23,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(124,58,237,0.1);
+  padding: 0 clamp(16px,5vw,48px);
+  height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
 }
-/* header */
-.pp-header{
-  padding:20px 22px 18px;
-  border-bottom:1px solid rgba(124,58,237,0.1);
-  display:flex;align-items:center;gap:14px;
-  background:rgba(124,58,237,0.04);
-  flex-shrink:0;
+.pf-topbar-left { display: flex; align-items: center; gap: 14px; }
+.pf-back {
+  background: transparent; border: 1px solid rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.4); padding: 6px 12px; border-radius: 5px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+  cursor: pointer; transition: all 0.18s; display: flex; align-items: center; gap: 6px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
-.pp-avatar{
-  width:44px;height:44px;border-radius:50%;flex-shrink:0;
-  background:linear-gradient(135deg,rgba(124,58,237,0.35),rgba(167,139,250,0.15));
-  border:1.5px solid rgba(124,58,237,0.35);
-  display:flex;align-items:center;justify-content:center;
+.pf-back:hover { border-color: rgba(124,58,237,0.4); color: #fff; }
+.pf-topbar-title {
+  font-size: 12px; font-weight: 800; letter-spacing: 0.12em;
+  text-transform: uppercase; color: rgba(255,255,255,0.25);
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
-.pp-user{flex:1;min-width:0;}
-.pp-badge{font-size:8.5px;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;color:var(--pl);margin-bottom:3px;}
-.pp-name{font-family:'Fraunces',serif;font-size:18px;font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.pp-email{font-size:10.5px;color:var(--gdim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.pp-close{
-  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);
-  border-radius:6px;width:30px;height:30px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;color:var(--gray);font-size:13px;transition:all 0.2s;
+.pf-signout-top {
+  background: transparent; border: 1px solid rgba(248,113,113,0.2);
+  color: rgba(248,113,113,0.6); padding: 6px 14px; border-radius: 5px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+  cursor: pointer; transition: all 0.18s;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
-.pp-close:hover{background:rgba(248,113,113,0.12);border-color:rgba(248,113,113,0.25);color:#f87171;}
-/* tabs */
-.pp-tabs{
-  display:flex;border-bottom:1px solid rgba(124,58,237,0.1);
-  flex-shrink:0;
+.pf-signout-top:hover { border-color: rgba(248,113,113,0.5); color: #f87171; }
+
+.pf-body {
+  max-width: 1080px; margin: 0 auto;
+  padding: 36px clamp(16px,5vw,48px) 80px;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 28px; align-items: start;
 }
-.profile-tab{
-  flex:1;padding:13px 0;border:none;background:transparent;
-  color:var(--gdim);font-family:'Plus Jakarta Sans',sans-serif;
-  font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
-  cursor:pointer;border-bottom:2px solid transparent;
-  margin-bottom:-1px;transition:all 0.2s;
+@media(max-width:780px){ .pf-body { grid-template-columns: 1fr; gap: 20px; } }
+
+/* ── ID CARD ── */
+.pf-id-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(124,58,237,0.14);
+  border-radius: 12px; overflow: hidden; margin-bottom: 10px;
 }
-.profile-tab:hover{color:var(--white);}
-.profile-tab.active{color:var(--white);border-bottom-color:var(--pl);}
-/* tab bodies */
-.pp-tab-body{padding:18px 20px;flex:1;}
-/* order cards */
-.order-card{
-  background:rgba(255,255,255,0.02);
-  border:1px solid rgba(124,58,237,0.1);
-  border-radius:8px;padding:16px 18px;
-  margin-bottom:10px;transition:border-color 0.22s;
+.pf-id-hero {
+  background: linear-gradient(135deg,rgba(124,58,237,0.18),rgba(91,33,182,0.06));
+  padding: 28px 20px 22px; text-align: center;
+  border-bottom: 1px solid rgba(124,58,237,0.1);
 }
-.order-card:hover{border-color:rgba(124,58,237,0.28);}
-.order-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.order-card-title{font-family:'Fraunces',serif;font-size:15px;font-weight:600;letter-spacing:-0.01em;}
-.order-card-meta{display:flex;flex-direction:column;gap:3px;margin-bottom:10px;}
-.order-meta-row{font-size:11px;color:var(--gdim);display:flex;align-items:center;gap:6px;}
-.order-meta-icon{opacity:0.7;font-size:11px;}
-/* status badges */
-.order-status-pending{background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.22);color:#eab308;border-radius:3px;padding:3px 9px;font-size:9.5px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap;}
-.order-status-done{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.22);color:#22c55e;border-radius:3px;padding:3px 9px;font-size:9.5px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap;}
-/* render result block */
-.order-result{
-  margin-top:10px;border-radius:6px;padding:10px 13px;font-size:11.5px;line-height:1.6;
+.pf-avatar {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: linear-gradient(135deg,#7c3aed,#4f46e5);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fraunces', serif; font-size: 26px; font-weight: 700; color: #fff;
+  margin: 0 auto 12px;
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.2), 0 4px 24px rgba(124,58,237,0.25);
 }
-.order-result.waiting{background:rgba(234,179,8,0.07);border:1px solid rgba(234,179,8,0.18);color:#eab308;}
-.order-result.failed{background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.18);color:#f87171;}
-.order-result.rejected{background:rgba(107,114,128,0.07);border:1px solid rgba(107,114,128,0.18);color:var(--gdim);}
-.order-result.awaiting{background:rgba(249,115,22,0.07);border:1px solid rgba(249,115,22,0.18);color:#f97316;}
-.order-view-btn{
-  display:inline-flex;align-items:center;gap:6px;margin-top:10px;
-  background:var(--purple);color:var(--white);
-  padding:8px 16px;border-radius:5px;
-  font-size:11.5px;font-weight:700;text-decoration:none;
-  letter-spacing:0.04em;transition:all 0.2s;
+.pf-id-name {
+  font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700;
+  color: #fff; margin-bottom: 4px;
 }
-.order-view-btn:hover{background:var(--pm);transform:translateY(-1px);}
-/* account tab */
-.pp-account-card{
-  background:rgba(255,255,255,0.02);
-  border:1px solid rgba(124,58,237,0.1);
-  border-radius:8px;overflow:hidden;margin-bottom:12px;
+.pf-id-email { font-size: 11px; color: rgba(255,255,255,0.35); word-break: break-all; margin-bottom: 10px; }
+.pf-id-badge {
+  display: inline-block; font-size: 9.5px; font-weight: 800;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(124,58,237,0.9); background: rgba(124,58,237,0.1);
+  border: 1px solid rgba(124,58,237,0.22); padding: 3px 10px; border-radius: 20px;
 }
-.pp-account-hero{
-  padding:18px 18px 16px;
-  border-bottom:1px solid rgba(124,58,237,0.08);
-  display:flex;align-items:center;gap:14px;
-  background:rgba(124,58,237,0.04);
+.pf-id-stats {
+  display: grid; grid-template-columns: 1fr 1fr;
 }
-.pp-account-avatar{
-  width:46px;height:46px;border-radius:50%;flex-shrink:0;
-  background:linear-gradient(135deg,rgba(124,58,237,0.35),rgba(167,139,250,0.15));
-  border:1.5px solid rgba(124,58,237,0.3);
-  display:flex;align-items:center;justify-content:center;
+.pf-id-stat {
+  padding: 14px 12px; text-align: center;
 }
-.pp-account-name{font-family:'Fraunces',serif;font-size:16px;font-weight:700;}
-.pp-account-email-sub{font-size:11px;color:var(--gdim);margin-top:2px;}
-.pp-info-row{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:10px 18px;border-bottom:1px solid rgba(124,58,237,0.06);
+.pf-id-stat:first-child { border-right: 1px solid rgba(124,58,237,0.08); }
+.pf-id-stat-val {
+  font-family: 'Fraunces', serif; font-size: 24px; font-weight: 700;
+  color: #a78bfa; line-height: 1; margin-bottom: 3px;
 }
-.pp-info-row:last-child{border-bottom:none;}
-.pp-info-key{font-size:10.5px;color:var(--gdim);font-weight:600;letter-spacing:0.05em;}
-.pp-info-val{font-size:12px;font-weight:600;color:var(--white);max-width:180px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.pp-info-val.highlight{color:var(--pl);font-weight:800;}
-.pp-signout{
-  width:100%;background:transparent;
-  border:1px solid rgba(248,113,113,0.2);color:rgba(248,113,113,0.7);
-  padding:12px;border-radius:6px;
-  font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;
-  font-weight:800;letter-spacing:0.1em;text-transform:uppercase;
-  cursor:pointer;transition:all 0.2s;
+.pf-id-stat-lbl {
+  font-size: 9px; font-weight: 800; letter-spacing: 0.12em;
+  text-transform: uppercase; color: rgba(255,255,255,0.28);
 }
-.pp-signout:hover{border-color:rgba(248,113,113,0.5);color:#f87171;background:rgba(248,113,113,0.06);}
+
+/* ── SIDEBAR NAV ── */
+.pf-nav {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(124,58,237,0.1);
+  border-radius: 10px; overflow: hidden; margin-bottom: 10px;
+}
+.pf-nav-btn {
+  width: 100%; background: transparent; border: none; border-left: 2px solid transparent;
+  padding: 13px 18px; display: flex; align-items: center; gap: 10px;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 600;
+  color: rgba(255,255,255,0.4); cursor: pointer; transition: all 0.18s; text-align: left;
+}
+.pf-nav-btn + .pf-nav-btn { border-top: 1px solid rgba(255,255,255,0.04); }
+.pf-nav-btn:hover { color: #fff; background: rgba(124,58,237,0.05); }
+.pf-nav-btn.active { color: #fff; border-left-color: #a78bfa; background: rgba(124,58,237,0.08); }
+.pf-nav-icon { font-size: 13px; opacity: 0.6; width: 18px; text-align: center; flex-shrink: 0; }
+.pf-nav-btn.active .pf-nav-icon { opacity: 1; }
+
+/* ── MAIN CONTENT ── */
+.pf-section { display: none; }
+.pf-section.pf-active { display: block; }
+
+.pf-section-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  padding-bottom: 16px; margin-bottom: 20px;
+  border-bottom: 1px solid rgba(124,58,237,0.1);
+}
+.pf-section-title {
+  font-family: 'Fraunces', serif; font-size: 24px; font-weight: 700;
+  color: #fff; letter-spacing: -0.02em;
+}
+.pf-section-count { font-size: 11px; color: rgba(255,255,255,0.28); font-family: 'Plus Jakarta Sans', sans-serif; }
+
+/* ── ORDER CARDS ── */
+.pf-order {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px; margin-bottom: 10px; overflow: hidden;
+  transition: border-color 0.2s;
+}
+.pf-order:hover { border-color: rgba(124,58,237,0.22); }
+.pf-order-head {
+  display: grid; grid-template-columns: auto 1fr auto auto;
+  gap: 14px; align-items: center; padding: 16px 20px;
+}
+@media(max-width:560px){
+  .pf-order-head { grid-template-columns: auto 1fr auto; }
+  .pf-order-status { display: none; }
+}
+.pf-order-id {
+  font-family: monospace; font-size: 10px; font-weight: 700;
+  color: rgba(255,255,255,0.22); background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06); padding: 4px 9px; border-radius: 4px;
+  letter-spacing: 0.06em; white-space: nowrap;
+}
+.pf-order-name {
+  font-family: 'Fraunces', serif; font-size: 14px; font-weight: 600;
+  color: #fff; margin-bottom: 3px;
+}
+.pf-order-meta {
+  font-size: 10.5px; color: rgba(255,255,255,0.3);
+  display: flex; gap: 10px; flex-wrap: wrap;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.pf-order-price {
+  font-family: 'Fraunces', serif; font-size: 15px; font-weight: 700; color: #fff; white-space: nowrap;
+}
+.pf-order-status {
+  font-size: 9px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 4px; white-space: nowrap;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.pf-st-pending { background: rgba(234,179,8,0.08); border: 1px solid rgba(234,179,8,0.2); color: #eab308; }
+.pf-st-done    { background: rgba(34,197,94,0.08);  border: 1px solid rgba(34,197,94,0.2);  color: #22c55e; }
+.pf-st-reject  { background: rgba(107,114,128,0.08);border: 1px solid rgba(107,114,128,0.2);color: rgba(255,255,255,0.3); }
+.pf-order-foot {
+  padding: 11px 20px; border-top: 1px solid rgba(255,255,255,0.04);
+  background: rgba(0,0,0,0.12); display: flex; align-items: center; gap: 10px;
+}
+.pf-render-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #7c3aed; color: #fff; padding: 8px 16px; border-radius: 5px;
+  font-size: 11.5px; font-weight: 700; text-decoration: none; letter-spacing: 0.04em;
+  transition: all 0.2s; font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.pf-render-link:hover { background: #5b21b6; transform: translateY(-1px); }
+.pf-eta { font-size: 11px; color: rgba(234,179,8,0.75); font-family: 'Plus Jakarta Sans', sans-serif; }
+.pf-rejected-note { font-size: 11px; color: rgba(255,255,255,0.28); font-family: 'Plus Jakarta Sans', sans-serif; }
+
+/* ── PAYMENT TABLE ── */
+.pf-pay-wrap { overflow-x: auto; }
+.pf-pay-table { width: 100%; border-collapse: collapse; font-family: 'Plus Jakarta Sans', sans-serif; }
+.pf-pay-table thead tr { border-bottom: 1px solid rgba(124,58,237,0.12); }
+.pf-pay-table th {
+  font-size: 9.5px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.25); padding: 0 14px 12px; text-align: left;
+}
+.pf-pay-table th:last-child { text-align: right; }
+.pf-pay-table td { padding: 13px 14px; font-size: 12px; color: rgba(255,255,255,0.65); border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+.pf-pay-table td:last-child { text-align: right; }
+.pf-pay-table tbody tr:last-child td { border-bottom: none; }
+.pf-pay-table tbody tr:hover td { background: rgba(124,58,237,0.04); }
+.pf-pay-chip {
+  font-family: monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.22); background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06); padding: 3px 8px; border-radius: 3px;
+}
+.pf-pay-amount { font-family: 'Fraunces', serif; font-size: 14px; font-weight: 700; color: #fff; }
+.pf-pay-confirmed {
+  display: flex; align-items: center; gap: 4px; justify-content: flex-end;
+  font-size: 9.5px; font-weight: 700; color: #22c55e; letter-spacing: 0.06em; margin-top: 2px;
+}
+.pf-pay-confirmed::before { content:''; width: 5px; height: 5px; border-radius: 50%; background: #22c55e; }
+.pf-pay-id { font-family: monospace; font-size: 11px; color: rgba(255,255,255,0.28); }
+
+/* ── ACCOUNT INFO ── */
+.pf-info-block {
+  background: rgba(255,255,255,0.02); border: 1px solid rgba(124,58,237,0.1);
+  border-radius: 10px; overflow: hidden; margin-bottom: 14px;
+}
+.pf-info-block-label {
+  padding: 12px 20px; font-size: 9.5px; font-weight: 800; letter-spacing: 0.14em;
+  text-transform: uppercase; color: rgba(255,255,255,0.25);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.pf-info-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 13px 20px; border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.pf-info-row:last-child { border-bottom: none; }
+.pf-info-key { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.35); font-family: 'Plus Jakarta Sans', sans-serif; }
+.pf-info-val { font-size: 12px; font-weight: 600; color: #fff; max-width: 260px; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf-info-val.accent { color: #a78bfa; }
+
+/* empty state */
+.pf-empty {
+  text-align: center; padding: 60px 20px;
+  border: 1px dashed rgba(255,255,255,0.07); border-radius: 10px;
+  color: rgba(255,255,255,0.25); font-size: 13px; font-family: 'Plus Jakarta Sans', sans-serif;
+}
 </style>
 
-<div class="auth-overlay" id="profile-overlay" onclick="closeProfile()"></div>
-<div id="profile-panel">
-
-  <!-- Header -->
-  <div class="pp-header">
-    <div class="pp-avatar">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+<div class="page" id="p-profile">
+  <!-- Top bar -->
+  <div class="pf-topbar">
+    <div class="pf-topbar-left">
+      <button class="pf-back" onclick="go('home')">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </button>
+      <span class="pf-topbar-title">My Account</span>
     </div>
-    <div class="pp-user">
-      <div class="pp-badge">My Account</div>
-      <div class="pp-name" id="profile-name"></div>
-      <div class="pp-email" id="profile-email"></div>
-    </div>
-    <button class="pp-close" onclick="closeProfile()">✕</button>
+    <button class="pf-signout-top" onclick="handleLogout();go('home');">Sign Out</button>
   </div>
 
-  <!-- Tabs -->
-  <div class="pp-tabs">
-    <button class="profile-tab active" id="ptab-orders" onclick="switchProfileTab('orders')">My Projects</button>
-    <button class="profile-tab" id="ptab-account" onclick="switchProfileTab('account')">Account</button>
-  </div>
-
-  <!-- Orders Tab -->
-  <div id="profile-orders-tab" class="pp-tab-body">
-    <div id="profile-orders-list">
-      <div style="text-align:center;padding:48px 0;color:var(--gdim);font-size:13px;">Loading your projects…</div>
-    </div>
-  </div>
-
-  <!-- Account Tab -->
-  <div id="profile-account-tab" class="pp-tab-body" style="display:none;">
-    <div class="pp-account-card">
-      <div class="pp-account-hero">
-        <div class="pp-account-avatar">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+  <div class="pf-body">
+    <!-- Sidebar -->
+    <aside>
+      <div class="pf-id-card">
+        <div class="pf-id-hero">
+          <div class="pf-avatar" id="pf-avatar">U</div>
+          <div class="pf-id-name" id="pf-name">—</div>
+          <div class="pf-id-email" id="pf-email">—</div>
+          <div class="pf-id-badge" id="pf-since">Member</div>
         </div>
-        <div>
-          <div class="pp-account-name" id="profile-account-name"></div>
-          <div class="pp-account-email-sub" id="profile-account-email"></div>
+        <div class="pf-id-stats">
+          <div class="pf-id-stat">
+            <div class="pf-id-stat-val" id="pf-count">0</div>
+            <div class="pf-id-stat-lbl">Projects</div>
+          </div>
+          <div class="pf-id-stat">
+            <div class="pf-id-stat-val" id="pf-spent">₹0</div>
+            <div class="pf-id-stat-lbl">Spent</div>
+          </div>
         </div>
       </div>
-      <div class="pp-info-row">
-        <span class="pp-info-key">Email</span>
-        <span class="pp-info-val" id="profile-info-email"></span>
-      </div>
-      <div class="pp-info-row">
-        <span class="pp-info-key">Phone</span>
-        <span class="pp-info-val" id="profile-info-phone">—</span>
-      </div>
-      <div class="pp-info-row">
-        <span class="pp-info-key">Member Since</span>
-        <span class="pp-info-val" id="profile-info-since"></span>
-      </div>
-      <div class="pp-info-row">
-        <span class="pp-info-key">Total Projects</span>
-        <span class="pp-info-val highlight" id="profile-info-total">0</span>
-      </div>
-    </div>
-    <button class="pp-signout" onclick="handleLogout();closeProfile();">Sign Out</button>
-  </div>
 
+      <div class="pf-nav">
+        <button class="pf-nav-btn pf-active" id="pfn-orders" onclick="pfSwitch('orders')">
+          <span class="pf-nav-icon">◈</span> My Projects
+        </button>
+        <button class="pf-nav-btn" id="pfn-payments" onclick="pfSwitch('payments')">
+          <span class="pf-nav-icon">◎</span> Payment History
+        </button>
+        <button class="pf-nav-btn" id="pfn-account" onclick="pfSwitch('account')">
+          <span class="pf-nav-icon">◉</span> Account
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main>
+      <!-- Projects -->
+      <div class="pf-section pf-active" id="pfs-orders">
+        <div class="pf-section-head">
+          <div class="pf-section-title">My Projects</div>
+          <div class="pf-section-count" id="pf-order-count"></div>
+        </div>
+        <div id="pf-orders-list"><div class="pf-empty">Loading your projects…</div></div>
+      </div>
+
+      <!-- Payments -->
+      <div class="pf-section" id="pfs-payments">
+        <div class="pf-section-head">
+          <div class="pf-section-title">Payment History</div>
+          <div class="pf-section-count">All confirmed payments</div>
+        </div>
+        <div id="pf-payments-list"><div class="pf-empty">Loading…</div></div>
+      </div>
+
+      <!-- Account -->
+      <div class="pf-section" id="pfs-account">
+        <div class="pf-section-head">
+          <div class="pf-section-title">Account</div>
+        </div>
+        <div class="pf-info-block">
+          <div class="pf-info-block-label">Personal Info</div>
+          <div class="pf-info-row"><span class="pf-info-key">Full Name</span><span class="pf-info-val" id="pfa-name">—</span></div>
+          <div class="pf-info-row"><span class="pf-info-key">Email</span><span class="pf-info-val" id="pfa-email">—</span></div>
+          <div class="pf-info-row"><span class="pf-info-key">Phone</span><span class="pf-info-val" id="pfa-phone">—</span></div>
+        </div>
+        <div class="pf-info-block">
+          <div class="pf-info-block-label">Membership</div>
+          <div class="pf-info-row"><span class="pf-info-key">Member Since</span><span class="pf-info-val" id="pfa-since">—</span></div>
+          <div class="pf-info-row"><span class="pf-info-key">Total Projects</span><span class="pf-info-val accent" id="pfa-total">0</span></div>
+          <div class="pf-info-row"><span class="pf-info-key">Total Spent</span><span class="pf-info-val accent" id="pfa-spent">₹0</span></div>
+        </div>
+      </div>
+    </main>
+  </div>
 </div>
-<!-- ═══ END PROFILE PANEL ═══ -->
+<!-- ═══ END PROFILE PAGE ═══ -->
 
 <script>
+function pfSwitch(name) {
+  ['orders','payments','account'].forEach(function(t) {
+    document.getElementById('pfs-' + t).classList.toggle('pf-active', t === name);
+    document.getElementById('pfn-' + t).classList.toggle('pf-active', t === name);
+  });
+}
+
 function openProfile() {
   const user = window.getCurrentUser();
   if (!user) { openAuthModal('login'); return; }
+  go('profile');
+}
 
-  document.getElementById('profile-name').textContent = user.displayName || 'Client';
-  document.getElementById('profile-email').textContent = user.email;
-  document.getElementById('profile-account-name').textContent = user.displayName || 'Client';
-  document.getElementById('profile-account-email').textContent = user.email;
-  document.getElementById('profile-info-email').textContent = user.email;
-  document.getElementById('profile-info-phone').textContent = user.phoneNumber || localStorage.getItem('ph_' + user.uid) || '—';
+function closeProfile() { go('home'); }
 
-  const since = user.metadata.creationTime
+async function loadProfileData() {
+  const user = window.getCurrentUser();
+  if (!user) return;
+
+  const initial = (user.displayName || user.email || 'U')[0].toUpperCase();
+  document.getElementById('pf-avatar').textContent   = initial;
+  document.getElementById('pf-name').textContent     = user.displayName || 'Client';
+  document.getElementById('pf-email').textContent    = user.email || '—';
+  document.getElementById('pfa-name').textContent    = user.displayName || '—';
+  document.getElementById('pfa-email').textContent   = user.email || '—';
+  document.getElementById('pfa-phone').textContent   = user.phoneNumber || localStorage.getItem('ph_' + user.uid) || '—';
+
+  const since = user.metadata && user.metadata.creationTime
     ? new Date(user.metadata.creationTime).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'})
     : '—';
-  document.getElementById('profile-info-since').textContent = since;
+  document.getElementById('pf-since').textContent    = 'Since ' + since;
+  document.getElementById('pfa-since').textContent   = since;
 
-  document.getElementById('profile-overlay').classList.add('open');
-  document.getElementById('profile-panel').style.transform = 'translateX(0)';
-  document.body.style.overflow = 'hidden';
+  document.getElementById('pf-orders-list').innerHTML   = '<div class="pf-empty">Loading…</div>';
+  document.getElementById('pf-payments-list').innerHTML = '<div class="pf-empty">Loading…</div>';
 
-  switchProfileTab('orders');
-  loadOrders();
-}
-
-function closeProfile() {
-  document.getElementById('profile-overlay').classList.remove('open');
-  document.getElementById('profile-panel').style.transform = 'translateX(100%)';
-  document.body.style.overflow = '';
-}
-
-function switchProfileTab(tab) {
-  document.getElementById('profile-orders-tab').style.display  = tab === 'orders'  ? 'block' : 'none';
-  document.getElementById('profile-account-tab').style.display = tab === 'account' ? 'block' : 'none';
-  document.getElementById('ptab-orders').classList.toggle('active',  tab === 'orders');
-  document.getElementById('ptab-account').classList.toggle('active', tab === 'account');
-}
-
-async function loadOrders() {
-  const list = document.getElementById('profile-orders-list');
-  list.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--gdim);font-size:13px;">Loading your projects...</div>';
-
-  if (!window.loadUserOrders) {
-    list.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--gdim);font-size:13px;">Could not load projects.</div>';
-    return;
-  }
-
+  if (!window.loadUserOrders) return;
   const orders = await window.loadUserOrders();
-  document.getElementById('profile-info-total').textContent = orders.length;
 
+  const totalSpent = orders.reduce(function(s, o) {
+    return s + parseFloat((o.price || '0').replace(/[^0-9.]/g,'').replace(',','') || 0);
+  }, 0);
+  const isINR = orders.length ? (orders[0].price || '₹').includes('₹') : true;
+  const fmt = function(n) { return (isINR ? '₹' : '$') + n.toLocaleString('en-IN'); };
+
+  document.getElementById('pf-count').textContent       = orders.length;
+  document.getElementById('pf-spent').textContent       = fmt(totalSpent);
+  document.getElementById('pfa-total').textContent      = orders.length;
+  document.getElementById('pfa-spent').textContent      = fmt(totalSpent);
+  document.getElementById('pf-order-count').textContent = orders.length + ' project' + (orders.length !== 1 ? 's' : '');
+
+  // ── ORDERS ──
   if (orders.length === 0) {
-    list.innerHTML = '<div style="text-align:center;padding:40px 0;"><div style="font-size:32px;margin-bottom:12px;">🎽</div><div style="color:var(--gdim);font-size:13px;">No projects yet. Place your first render order!</div></div>';
-    return;
+    document.getElementById('pf-orders-list').innerHTML = '<div class="pf-empty">No projects yet — place your first render order!</div>';
+  } else {
+    document.getElementById('pf-orders-list').innerHTML = orders.map(function(order, i) {
+      const shortId  = order.id ? order.id.slice(-6).toUpperCase() : '——';
+      const date     = order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'}) : '—';
+      const time     = order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'}) : '';
+      const isVideo  = order.templateType === 'video';
+      const isDone   = order.status === 'done' && order.renderedFile;
+      const isRej    = order.status === 'rejected';
+
+      const statusHtml = isDone ? '<span class="pf-order-status pf-st-done">Completed</span>'
+                       : isRej  ? '<span class="pf-order-status pf-st-reject">Rejected</span>'
+                                : '<span class="pf-order-status pf-st-pending">In Progress</span>';
+
+      const footHtml   = isDone ? '<a href="' + order.renderedFile + '" target="_blank" class="pf-render-link">View Render →</a>'
+                       : isRej  ? '<span class="pf-rejected-note">Not accepted — contact us on WhatsApp.</span>'
+                                : '<span class="pf-eta">Ready within ' + (isVideo ? '6' : '2') + ' hours</span>';
+
+      return '<div class="pf-order">'
+        + '<div class="pf-order-head">'
+        + '<div class="pf-order-id">#' + shortId + '</div>'
+        + '<div><div class="pf-order-name">' + (order.templateName || 'Custom Order') + '</div>'
+        + '<div class="pf-order-meta"><span>' + (isVideo ? 'Video' : 'Still Render') + '</span><span>' + date + (time ? ' · ' + time : '') + '</span>' + (order.brandName ? '<span>' + order.brandName + '</span>' : '') + '</div></div>'
+        + '<div class="pf-order-price">' + (order.price || '—') + '</div>'
+        + statusHtml
+        + '</div>'
+        + '<div class="pf-order-foot">' + footHtml + '</div>'
+        + '</div>';
+    }).join('');
   }
 
-  list.innerHTML = orders.map((order, i) => {
-    const date = order.createdAt
-      ? new Date(order.createdAt.seconds * 1000).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
-      : 'Just now';
-
-    const isVideo    = order.templateType === 'video';
-    const waitTime   = isVideo ? '6 hours' : '2 hours';
-    const isDone     = order.status === 'done' && order.renderedFile;
-    const isRejected = order.status === 'rejected';
-
-    let statusHtml = `<span class="order-status-pending">⏳ In Progress</span>`;
-    if (isDone)     statusHtml = `<span class="order-status-done">✓ Completed</span>`;
-    else if (isRejected) statusHtml = `<span style="background:rgba(107,114,128,0.1);border:1px solid rgba(107,114,128,0.2);color:var(--gdim);border-radius:3px;padding:3px 9px;font-size:9.5px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;">🚫 Rejected</span>`;
-
-    let renderHtml = `<div class="order-result waiting">⏱ Your render will be ready within <strong>${waitTime}</strong>.</div>`;
-    if (isDone)     renderHtml = `<a href="${order.renderedFile}" target="_blank" class="order-view-btn">View Render →</a>`;
-    else if (isRejected) renderHtml = `<div class="order-result rejected">🚫 Order not accepted. Contact us on WhatsApp.</div>`;
-
-    return `
-      <div class="order-card">
-        <div class="order-card-top">
-          <div class="order-card-title">Project ${orders.length - i}</div>
-          ${statusHtml}
-        </div>
-        <div class="order-card-meta">
-          <div class="order-meta-row"><span class="order-meta-icon">📋</span>${order.templateName || 'Custom Order'}</div>
-          <div class="order-meta-row"><span class="order-meta-icon">🕐</span>${date}</div>
-          <div class="order-meta-row"><span class="order-meta-icon">💰</span>${order.price || '—'}</div>
-          <div class="order-meta-row"><span class="order-meta-icon">🏷</span>${order.brandName || '—'}</div>
-        </div>
-        ${renderHtml}
-      </div>`;
-  }).join('');
+  // ── PAYMENTS ──
+  const paid = orders.filter(function(o) { return o.razorpayPaymentId || o.paymentStatus === 'confirmed'; });
+  if (paid.length === 0) {
+    document.getElementById('pf-payments-list').innerHTML = '<div class="pf-empty">No payments yet.</div>';
+  } else {
+    var rows = paid.map(function(o) {
+      const shortId = o.id ? o.id.slice(-6).toUpperCase() : '——';
+      const date    = o.createdAt ? new Date(o.createdAt.seconds * 1000).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'}) : '—';
+      const payId   = o.razorpayPaymentId ? '···' + o.razorpayPaymentId.slice(-6) : '—';
+      return '<tr>'
+        + '<td><span class="pf-pay-chip">#' + shortId + '</span></td>'
+        + '<td>' + (o.templateName || 'Custom') + '</td>'
+        + '<td style="color:rgba(255,255,255,0.35);font-size:11px;">' + date + '</td>'
+        + '<td><span class="pf-pay-id">' + payId + '</span></td>'
+        + '<td><div class="pf-pay-amount">' + (o.price || '—') + '</div><div class="pf-pay-confirmed">Confirmed</div></td>'
+        + '</tr>';
+    }).join('');
+    document.getElementById('pf-payments-list').innerHTML =
+      '<div class="pf-pay-wrap"><table class="pf-pay-table"><thead><tr>'
+      + '<th>Order</th><th>Template</th><th>Date</th><th>Payment ID</th><th>Amount</th>'
+      + '</tr></thead><tbody>' + rows + '</tbody></table></div>';
+  }
 }
 </script>
+
 
 <!-- ═══ ADMIN PAGE ═══ -->
 <div class="page" id="p-admin">
@@ -3588,101 +3750,65 @@ function quickAddToCart(type, title, desc, src, price, btn) {
   // No login required — login only asked at checkout
   window._cart = window._cart || [];
   window._cart.push({
-    id: Date.now(), title, desc, src, price,
-    templateType:  type,
-    priceNum:      parseFloat(price.replace(/[^0-9.]/g,'').replace(',','')),
-    isINR:         price.includes('₹'),
-    refFiles:      [],
-    designFiles:   [null, null, null, null],
-    labels:        ['Front','Back','Sleeves','Logo'],
-    addedAt:       new Date().toLocaleTimeString()
+    id: Date.now(), title, desc, src, price, templateType: type,
+    priceNum: parseFloat(price.replace(/[^0-9.]/g,'').replace(',','')),
+    isINR: price.includes('₹'), refFiles: [],
+    designFiles: [null,null,null,null], labels: ['Front','Back','Sleeves','Logo'],
+    addedAt: new Date().toLocaleTimeString()
   });
   updateCartBadge();
-
   const qty = window._cart.filter(i => i.title === title).length;
-
-  if (btn) {
-    _turnBtnToCounter(btn, title, src, price, type, qty);
-  }
+  if (btn) { _turnBtnToCounter(btn, title, src, price, type, qty); }
   showCartToast(title);
 }
 
-// Safely turn an Add-to-Cart button into a − qty + counter using DOM (no innerHTML onclick hacks)
 function _turnBtnToCounter(btn, title, src, price, type, qty) {
   btn.classList.add('added');
   btn.style.cssText = 'display:inline-flex;align-items:center;gap:0;padding:0;overflow:hidden;border-radius:6px;min-width:90px;justify-content:center;';
   btn.innerHTML = '';
-
   var minus = document.createElement('span');
   minus.textContent = '−';
   minus.style.cssText = 'padding:6px 10px;font-size:15px;font-weight:700;cursor:pointer;user-select:none;border-right:1px solid rgba(255,255,255,0.15);';
-  minus.addEventListener('click', function(e) {
-    e.stopPropagation();
-    _cartQtyStep(title, src, price, type, btn, -1);
-  });
-
+  minus.addEventListener('click', function(e){ e.stopPropagation(); _cartQtyStep(title,src,price,type,btn,-1); });
   var display = document.createElement('span');
   display.className = 'cart-qty-display';
   display.dataset.title = title;
   display.textContent = qty;
   display.style.cssText = 'padding:6px 8px;font-size:12px;font-weight:700;min-width:26px;text-align:center;';
-
   var plus = document.createElement('span');
   plus.textContent = '+';
   plus.style.cssText = 'padding:6px 10px;font-size:15px;font-weight:700;cursor:pointer;user-select:none;border-left:1px solid rgba(255,255,255,0.15);';
-  plus.addEventListener('click', function(e) {
-    e.stopPropagation();
-    _cartQtyStep(title, src, price, type, btn, 1);
-  });
-
-  btn.appendChild(minus);
-  btn.appendChild(display);
-  btn.appendChild(plus);
-  btn.onclick = function(e) { e.stopPropagation(); };
+  plus.addEventListener('click', function(e){ e.stopPropagation(); _cartQtyStep(title,src,price,type,btn,1); });
+  btn.appendChild(minus); btn.appendChild(display); btn.appendChild(plus);
+  btn.onclick = function(e){ e.stopPropagation(); };
 }
 
 function _cartQtyStep(title, src, price, type, btn, delta) {
   window._cart = window._cart || [];
   if (delta === 1) {
-    window._cart.push({
-      id: Date.now(), title, desc:'', src, price, templateType: type,
-      priceNum: parseFloat(price.replace(/[^0-9.]/g,'').replace(',','')),
-      isINR: price.includes('₹'),
-      refFiles:[], designFiles:[null,null,null,null],
-      labels:['Front','Back','Sleeves','Logo'],
-      addedAt: new Date().toLocaleTimeString()
-    });
+    window._cart.push({ id:Date.now(), title, desc:'', src, price, templateType:type,
+      priceNum:parseFloat(price.replace(/[^0-9.]/g,'').replace(',','')),
+      isINR:price.includes('₹'), refFiles:[], designFiles:[null,null,null,null],
+      labels:['Front','Back','Sleeves','Logo'], addedAt:new Date().toLocaleTimeString() });
     showCartToast(title);
   } else {
-    var entries = window._cart.map(function(item,n){ return [item,n]; }).filter(function(x){ return x[0].title === title; });
+    var entries = window._cart.map(function(item,n){ return [item,n]; }).filter(function(x){ return x[0].title===title; });
     if (entries.length) window._cart.splice(entries[entries.length-1][1], 1);
   }
   updateCartBadge();
-  var qty = window._cart.filter(function(i){ return i.title === title; }).length;
-
-  // Update all qty displays for this title
-  document.querySelectorAll('.cart-qty-display').forEach(function(el) {
+  var qty = window._cart.filter(function(i){ return i.title===title; }).length;
+  document.querySelectorAll('.cart-qty-display').forEach(function(el){
     if (el.dataset.title === title) el.textContent = qty;
   });
-
   if (qty === 0 && btn) {
-    // Reset button back to Add to Cart
-    btn.classList.remove('added');
-    btn.style.cssText = '';
+    btn.classList.remove('added'); btn.style.cssText = '';
     btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add to Cart';
-    // Re-attach click — capture vars in closure
-    (function(t,s,p,ty){
-      btn.onclick = function(e){ e.stopPropagation(); quickAddToCart(ty,t,'',s,p,btn); };
-    })(title, src, price, type);
+    (function(t,s,p,ty){ btn.onclick = function(e){ e.stopPropagation(); quickAddToCart(ty,t,'',s,p,btn); }; })(title,src,price,type);
   }
-
   if (qty > 0 && typeof renderCart === 'function') renderCart();
 }
 
-// Keep cartQtyChange as alias in case called elsewhere
-function cartQtyChange(title, src, price, type, btn, delta) {
-  _cartQtyStep(title, src, price, type, btn, delta);
-}
+function cartQtyChange(title, src, price, type, btn, delta) { _cartQtyStep(title,src,price,type,btn,delta); }
 
 </script>
 
@@ -4025,17 +4151,16 @@ onAuthStateChanged(auth, async (user) => {
   if (user) {
     await loadUserProfile(user.uid);
 
-    // Restore cart items that were added before login
     try {
       var saved = sessionStorage.getItem('_pendingCart');
       if (saved) {
         var parsed = JSON.parse(saved);
         if (parsed.length && (!window._cart || window._cart.length === 0)) {
-          window._cart = parsed.map(function(i) {
-            return Object.assign({}, i, { refFiles:[], designFiles:[null,null,null,null], labels:['Front','Back','Sleeves','Logo'] });
+          window._cart = parsed.map(function(i){
+            return Object.assign({},i,{refFiles:[],designFiles:[null,null,null,null],labels:['Front','Back','Sleeves','Logo']});
           });
-          if (typeof updateCartBadge === 'function') updateCartBadge();
-          if (typeof renderCart === 'function') renderCart();
+          if (typeof updateCartBadge==='function') updateCartBadge();
+          if (typeof renderCart==='function') renderCart();
         }
         sessionStorage.removeItem('_pendingCart');
       }
@@ -4948,11 +5073,10 @@ window.checkAdminAccess = function() {
 let _confirmationResult = null;
 
 function openAuthModal(mode) {
-  // Save cart before login so items survive the auth flow
   try {
-    const cartData = (window._cart || []).map(function(i) {
-      return { id:i.id, title:i.title, desc:i.desc, src:i.src, price:i.price,
-               templateType:i.templateType, priceNum:i.priceNum, isINR:i.isINR, addedAt:i.addedAt };
+    var cartData = (window._cart || []).map(function(i){
+      return {id:i.id,title:i.title,desc:i.desc,src:i.src,price:i.price,
+              templateType:i.templateType,priceNum:i.priceNum,isINR:i.isINR,addedAt:i.addedAt};
     });
     if (cartData.length) sessionStorage.setItem('_pendingCart', JSON.stringify(cartData));
   } catch(e) {}
@@ -5901,23 +6025,20 @@ function toggleCartItem(id) {
 }
 
 function removeCartItem(id) {
-  const removing = (window._cart || []).find(i => i.id === id);
-  window._cart = (window._cart || []).filter(i => i.id !== id);
+  var removing = (window._cart || []).find(function(i){ return i.id === id; });
+  window._cart = (window._cart || []).filter(function(i){ return i.id !== id; });
   updateCartBadge();
   if (removing) {
-    const qty = window._cart.filter(i => i.title === removing.title).length;
-    document.querySelectorAll('.cart-qty-display').forEach(function(el) {
+    var qty = window._cart.filter(function(i){ return i.title === removing.title; }).length;
+    document.querySelectorAll('.cart-qty-display').forEach(function(el){
       if (el.dataset.title === removing.title) {
         el.textContent = qty;
         if (qty === 0) {
-          const btn = el.closest('button');
+          var btn = el.closest('button');
           if (btn) {
-            btn.classList.remove('added');
-            btn.style.cssText = '';
+            btn.classList.remove('added'); btn.style.cssText = '';
             btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add to Cart';
-            (function(t,s,p,ty){
-              btn.onclick = function(e){ e.stopPropagation(); quickAddToCart(ty,t,'',s,p,btn); };
-            })(removing.title, removing.src, removing.price, removing.templateType);
+            (function(t,s,p,ty){ btn.onclick = function(e){ e.stopPropagation(); quickAddToCart(ty,t,'',s,p,btn); }; })(removing.title,removing.src,removing.price,removing.templateType);
           }
         }
       }
