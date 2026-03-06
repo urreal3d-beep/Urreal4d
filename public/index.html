@@ -5522,24 +5522,36 @@ function openAuthModal(mode) {
   document.getElementById('auth-modal').classList.add('open');
   switchAuthMethod('phone');
 }
-function _resetRecaptcha() {
+function _fullReset() {
+  // 1. Clear confirmation result
+  _confirmationResult = null;
+  // 2. Destroy Firebase reCAPTCHA verifier
   if (window._recaptchaVerifier) {
     try { window._recaptchaVerifier.clear(); } catch(e) {}
     window._recaptchaVerifier = null;
   }
+  // 3. Replace recaptcha-container div with a fresh empty one
   const old = document.getElementById('recaptcha-container');
   if (old && old.parentNode) {
     const fresh = document.createElement('div');
     fresh.id = 'recaptcha-container';
     old.parentNode.replaceChild(fresh, old);
   }
+  // 4. Clear phone number input
+  const phoneInput = document.getElementById('phone-number-input');
+  if (phoneInput) phoneInput.value = '';
+  // 5. Clear OTP boxes
+  document.querySelectorAll('.otp-box').forEach(b => { b.value = ''; b.classList.remove('filled'); });
+  // 6. Go back to phone step
+  showOtpStep('phone');
+  // 7. Clear all messages
+  clearAuthMsgs();
 }
+
 function closeAuthModal() {
   document.getElementById('auth-overlay').classList.remove('open');
   document.getElementById('auth-modal').classList.remove('open');
-  _confirmationResult = null;
-  _resetRecaptcha();
-  showOtpStep('phone');
+  _fullReset();
 }
 
 // Switch between Phone / Google / Email tabs
@@ -5598,10 +5610,7 @@ document.addEventListener('keydown', function(e) {
 });
 
 function backToPhone() {
-  showOtpStep('phone');
-  document.querySelectorAll('.otp-box').forEach(b => { b.value = ''; b.classList.remove('filled'); });
-  _confirmationResult = null;
-  _resetRecaptcha();
+  _fullReset();
 }
 
 // ── Phone OTP send ──
@@ -5615,8 +5624,17 @@ async function handleSendOTP(isResend) {
   setMsg('phone-msg', '', '');
 
   try {
-    // Always reset first — stale verifier/container causes "Failed to send OTP"
-    _resetRecaptcha();
+    // Always destroy old verifier and recreate fresh container before every attempt
+    if (window._recaptchaVerifier) {
+      try { window._recaptchaVerifier.clear(); } catch(e) {}
+      window._recaptchaVerifier = null;
+    }
+    const old = document.getElementById('recaptcha-container');
+    if (old && old.parentNode) {
+      const fresh = document.createElement('div');
+      fresh.id = 'recaptcha-container';
+      old.parentNode.replaceChild(fresh, old);
+    }
 
     const { RecaptchaVerifier, signInWithPhoneNumber } = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js");
     window._recaptchaVerifier = new RecaptchaVerifier(window._firebaseAuth, 'recaptcha-container', { size: 'invisible' });
@@ -5627,7 +5645,10 @@ async function handleSendOTP(isResend) {
     setMsg('otp-msg', '✓ OTP sent to ' + phone, 'success');
   } catch(e) {
     setMsg('phone-msg', 'Failed to send OTP: ' + (e.message || 'Please try again.'), 'error');
-    _resetRecaptcha();
+    if (window._recaptchaVerifier) {
+      try { window._recaptchaVerifier.clear(); } catch(err) {}
+      window._recaptchaVerifier = null;
+    }
   }
   btn.disabled = false; btn.textContent = 'Send OTP →';
 }
