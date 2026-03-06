@@ -3347,20 +3347,36 @@ async function pfSendPhoneOTP(isResend) {
   const fullPhone = _pfSelectedDial.dial + num;
   const btn = document.getElementById('pfa-send-otp-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+  pfSetMsg('pfa-phone-msg', '', '');
 
   try {
-    const { RecaptchaVerifier, signInWithPhoneNumber } = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js");
+    const { RecaptchaVerifier, PhoneAuthProvider } = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js");
     if (!window._pfRecaptcha || isResend) {
-      window._pfRecaptcha = new RecaptchaVerifier(window._firebaseAuth, 'pfa-recaptcha-container', { size: 'invisible' });
+      // Clear old one if resending
+      if (window._pfRecaptcha) { try { window._pfRecaptcha.clear(); } catch(e) {} window._pfRecaptcha = null; }
+      window._pfRecaptcha = new RecaptchaVerifier(window._firebaseAuth, 'pfa-recaptcha-container', {
+        size: 'invisible',
+        callback: () => {}
+      });
     }
-    _pfConfirmResult = await signInWithPhoneNumber(window._firebaseAuth, fullPhone, window._pfRecaptcha);
+    const provider = new PhoneAuthProvider(window._firebaseAuth);
+    _pfConfirmResult = await provider.verifyPhoneNumber(fullPhone, window._pfRecaptcha);
+    // _pfConfirmResult is now a verificationId string (not a confirmationResult object)
+    window._pfVerificationPhone = fullPhone;
+
     document.getElementById('pfa-phone-step1').style.display = 'none';
     document.getElementById('pfa-phone-step2').style.display = 'block';
     document.getElementById('pfa-otp-sent-txt').textContent  = 'OTP sent to ' + fullPhone;
     pfSetMsg('pfa-phone-msg', '', '');
     setTimeout(() => document.querySelector('.pfa-otp-box')?.focus(), 100);
   } catch(e) {
-    pfSetMsg('pfa-phone-msg', 'Failed to send OTP. Please try again.', 'error');
+    console.error('OTP send error:', e);
+    let msg = 'Failed to send OTP. Please try again.';
+    if (e.code === 'auth/invalid-phone-number')  msg = 'Invalid phone number format.';
+    if (e.code === 'auth/too-many-requests')      msg = 'Too many attempts. Please wait a few minutes.';
+    if (e.code === 'auth/captcha-check-failed')   msg = 'Security check failed. Please refresh and try again.';
+    if (e.code === 'auth/operation-not-allowed')  msg = 'Phone sign-in is not enabled. Please contact support.';
+    pfSetMsg('pfa-phone-msg', msg, 'error');
     window._pfRecaptcha = null;
   }
   if (btn) { btn.disabled = false; btn.textContent = 'Send OTP →'; }
@@ -3393,34 +3409,37 @@ async function pfVerifyPhoneOTP() {
   btn.disabled = true; btn.textContent = 'Verifying…';
 
   try {
-    const result = await _pfConfirmResult.confirm(code);
-    const verifiedPhone = result.user.phoneNumber;
+    const { PhoneAuthProvider, linkWithCredential } = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js");
+    const credential = PhoneAuthProvider.credential(_pfConfirmResult, code);
+    const user = window.getCurrentUser();
 
-    // Save phone to Firestore + localStorage under the *original* user
-    const origUser = window.getCurrentUser();
-    if (origUser && window._saveUserProfile) {
-      // Merge phone into their Firestore doc
-      const { getFirestore, doc, setDoc, getApp } = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js");
-      const db2 = getFirestore(getApp());
-      await setDoc(doc(db2, 'users', origUser.uid), { phone: verifiedPhone }, { merge: true });
-      localStorage.setItem('ph_' + origUser.uid, verifiedPhone);
-      if (window._userProfile) window._userProfile.phone = verifiedPhone;
-    }
+    // Link the verified phone credential to the existing Google account
+    await linkWithCredential(user, credential);
+    const verifiedPhone = user.phoneNumber || window._pfVerificationPhone;
+
+    // Save to Firestore + localStorage
+    const { getFirestore, doc, setDoc, getApp } = await import("https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js");
+    const db2 = getFirestore(getApp());
+    await setDoc(doc(db2, 'users', user.uid), { phone: verifiedPhone }, { merge: true });
+    localStorage.setItem('ph_' + user.uid, verifiedPhone);
+    if (window._userProfile) window._userProfile.phone = verifiedPhone;
 
     // Update UI
     document.getElementById('pfa-phone').textContent             = verifiedPhone;
     document.getElementById('pfa-phone-verified').style.display  = 'inline-flex';
     document.getElementById('pf-email').textContent              = verifiedPhone;
     pfHidePhoneVerify();
-    pfSetMsg('pfa-phone-msg', '', '');
-    // Brief success flash
+
+    // Green flash on phone row
     const phoneRow = document.getElementById('pfa-phone-row');
     if (phoneRow) { phoneRow.style.background = 'rgba(34,197,94,0.07)'; setTimeout(() => phoneRow.style.background = '', 1500); }
 
   } catch(e) {
-    const msg = e.code === 'auth/invalid-verification-code'
-      ? 'Incorrect OTP. Please check and try again.'
-      : 'Verification failed. Please try again.';
+    console.error('OTP verify error:', e);
+    let msg = 'Verification failed. Please try again.';
+    if (e.code === 'auth/invalid-verification-code') msg = 'Incorrect OTP. Please check and try again.';
+    if (e.code === 'auth/provider-already-linked')   msg = 'This phone is already linked to your account.';
+    if (e.code === 'auth/credential-already-in-use') msg = 'This phone number is already used by another account.';
     pfSetMsg('pfa-phone-msg', msg, 'error');
     boxes.forEach(b => { b.value = ''; b.classList.remove('filled'); });
     document.querySelector('.pfa-otp-box')?.focus();
