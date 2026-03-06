@@ -3,8 +3,8 @@
 <head>
 <!-- Social share / WhatsApp preview -->
 <meta property="og:title" content="Urreal3D">
-<meta property="og:description" content="https://urreal4d.onrender.com/images/logo.png">
-<meta property="og:image" content="images/logo.png">
+<meta property="og:description" content="Premium 3D clothing animations and renders for fashion brands, e-commerce, and independent designers. Realistic fabric physics — fast delivery.">
+<meta property="og:image" content="https://urreal4d.onrender.com/images/logo.png">
 <meta property="og:url" content="https://urreal4d.onrender.com">
 <meta property="og:type" content="website">
 <meta charset="UTF-8"/>
@@ -1140,7 +1140,7 @@ setTimeout(function(){
 
   <ul class="nav-center">
     <li><a href="#" onclick="go('home');return false;" id="nl-home" class="active">Home</a></li>
-    <li><a onclick="go('render')" id="nl-render">Render</a></li>
+    <li><a href="#" onclick="go('render');return false;" id="nl-render">Render</a></li>
     <li><a href="#" onclick="go('portfolio');return false;" id="nl-portfolio">Portfolio</a></li>
     <li><a href="#" onclick="go('pricing');return false;" id="nl-pricing">Pricing</a></li>
     <li><a href="#" onclick="go('testimonials');return false;" id="nl-testimonials">Reviews</a></li>
@@ -1238,7 +1238,7 @@ setTimeout(function(){
     <div class="hero-video-wrap">
       <div class="hero-video-glow"></div>
       <video autoplay muted loop playsinline preload="metadata" class="hero-video">
-        <source src="videos/first.mp4" type="video/mp4">
+        <source src="https://firebasestorage.googleapis.com/v0/b/urreal3d-ba986.firebasestorage.app/o/videos%2Ffirst.mp4?alt=media" type="video/mp4">
       </video>
     </div>
   </div>
@@ -1410,7 +1410,7 @@ setTimeout(function(){
   <div class="port-featured">
     <div class="port-featured-card">
       <video autoplay muted loop playsinline preload="metadata">
-        <source src="videos/first.mp4" type="video/mp4">
+        <source src="https://firebasestorage.googleapis.com/v0/b/urreal3d-ba986.firebasestorage.app/o/videos%2Ffirst.mp4?alt=media" type="video/mp4">
       </video>
       <div class="port-featured-overlay">
         <div class="port-featured-label">Showreel · Featured</div>
@@ -1956,12 +1956,6 @@ function closeDrawer(){
   document.getElementById('hbg').classList.remove('open');
 }
 
-// ── Filter Tabs ──
-function filterTab(el){
-  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-}
-
 // ── FAQ ──
 function toggleFaq(el){
   const item=el.parentElement;
@@ -2048,26 +2042,6 @@ function filterTab(btn) {
   });
 }
 </script>
-<!--
-  ================================================================
-  URREAL3D — RENDER PAGE SNIPPET
-  ================================================================
-  HOW TO ADD THIS TO YOUR index.html:
-
-  1. PAGES ARRAY — find this line in your <script>:
-       const pages = ['home','about','portfolio','pricing','testimonials','appointment','policy'];
-     Change to:
-       const pages = ['home','about','portfolio','pricing','testimonials','appointment','policy','render'];
-
-  2. NAV LINK — inside <ul class="nav-links">, add:
-       <li><a onclick="go('render')" id="nl-render">Render</a></li>
-
-  3. DRAWER LINK — inside <div class="drawer">, add:
-       <a onclick="go('render')" id="dl-render">Render</a>
-
-  4. PASTE EVERYTHING BELOW just before the closing </body> tag
-  ================================================================
--->
 
 <!-- ═══ RENDER PAGE ═══ -->
 <div class="page" id="p-render">
@@ -2257,252 +2231,6 @@ function filterTab(btn) {
       </div>
     </div>
   </div><!-- /render-sections-wrap (dynamic) -->
-  <div style="display:none" id="render-old-trash"><div class="render-grid-trash">
-
-      <div class="rt-card" onclick="openRenderPanel('video','Streetwear Float','Minimal streetwear piece drifting through space, illuminated with dramatic rim lighting.','videos/two.mp4','₹1,999')">
-        <div class="rt-media">
-          <video autoplay muted loop playsinline preload="none"><source src="videos/two.mp4" type="video/mp4"></video>
-          <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
-          <div class="rt-price-chip">₹1,999</div>
-        </div>
-        <div class="rt-info">
-          <h4>Streetwear Float</h4><p>Floating tee with rim lighting, dark BG.</p>
-          <div class="rt-info-row">
-            <button class="rt-quick-cart" id="qcart-streetwear-float"
-              onclick="event.stopPropagation();quickAddToCart('video','Streetwear Float','Minimal streetwear piece drifting through space, illuminated with dramatic rim lighting.','videos/two.mp4','₹1,999',this)">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-              Add to Cart
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="rt-card" onclick="openRenderPanel('video','Garage Scene','Streetwear piece presented in a high-contrast garage scene for a rugged, authentic feel.','videos/three.mp4','₹1,999')">
-        <div class="rt-media">
-          <video autoplay muted loop playsinline preload="none"><source src="videos/three.mp4" type="video/mp4"></video>
-          <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
-          <div class="rt-price-chip">₹1,999</div>
-        </div>
-        <div class="rt-info">
-          <h4>Garage Scene</h4><p>Urban environment, rugged &amp; authentic.</p>
-          <div class="rt-info-row">
-            <button class="rt-quick-cart" id="qcart-garage-scene"
-              onclick="event.stopPropagation();quickAddToCart('video','Garage Scene','Streetwear piece presented in a high-contrast garage scene for a rugged, authentic feel.','videos/three.mp4','₹1,999',this)">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-              Add to Cart
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="rt-card" onclick="openRenderPanel('video','Multi Model','Multi-model presentation emphasising structure, drape, and realism from every angle.','videos/five.mp4','₹1,999')">
-        <div class="rt-media">
-          <video autoplay muted loop playsinline preload="none"><source src="videos/five.mp4" type="video/mp4"></video>
-          <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
-          <div class="rt-price-chip">₹1,999</div>
-        </div>
-        <div class="rt-info">
-          <h4>Multi Model</h4><p>Every angle covered, oversized silhouette.</p>
-          <div class="rt-info-row">
-            <button class="rt-quick-cart" id="qcart-multi-model"
-              onclick="event.stopPropagation();quickAddToCart('video','Multi Model','Multi-model presentation emphasising structure, drape, and realism from every angle.','videos/five.mp4','₹1,999',this)">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-              Add to Cart
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="rt-card" onclick="openRenderPanel('video','Dynamic Motion','Dynamic animation with lifelike fabric movement and fluid physics simulation.','videos/six.mp4','₹1,999')">
-        <div class="rt-media">
-          <video autoplay muted loop playsinline preload="none"><source src="videos/six.mp4" type="video/mp4"></video>
-          <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
-          <div class="rt-price-chip">₹1,999</div>
-        </div>
-        <div class="rt-info">
-          <h4>Dynamic Motion</h4><p>Fluid fabric physics, lifelike movement.</p>
-          <div class="rt-info-row">
-            <button class="rt-quick-cart" id="qcart-dynamic-motion"
-              onclick="event.stopPropagation();quickAddToCart('video','Dynamic Motion','Dynamic animation with lifelike fabric movement and fluid physics simulation.','videos/six.mp4','₹1,999',this)">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-              Add to Cart
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="rt-card" onclick="openRenderPanel('video','Medival Age','A modern streetwear silhouette reimagined with medieval textures and atmospheric depth.','videos/seven.mp4','₹1,999')">
-        <div class="rt-media">
-          <video autoplay muted loop playsinline preload="none"><source src="videos/seven.mp4" type="video/mp4"></video>
-          <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
-          <div class="rt-price-chip">₹1,999</div>
-        </div>
-        <div class="rt-info">
-          <h4>Medival Age</h4><p>Streetwear with medieval atmospheric depth.</p>
-          <div class="rt-info-row">
-            <button class="rt-quick-cart" id="qcart-medival-age"
-              onclick="event.stopPropagation();quickAddToCart('video','Medival Age','A modern streetwear silhouette reimagined with medieval textures and atmospheric depth.','videos/seven.mp4','₹1,999',this)">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-              Add to Cart
-            </button>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- old-image-trash-start -->
-
-      <div class="rt-card" onclick="openRenderPanel('image','Lookbook — Silk Wrap','High-res render for a luxury brand lookbook. Clean background with dramatic side light.',['images/one.jpg','images/one-2.jpg','images/one-3.jpg','images/one-4.jpg','images/one-5.jpg'],'₹999')">
-  <div class="rt-media">
-    <div class="rt-img-carousel">
-      <img src="images/one.jpg" class="rt-carousel-img active" loading="lazy">
-      <img src="images/one-2.jpg" class="rt-carousel-img" loading="lazy">
-      <img src="images/one-3.jpg" class="rt-carousel-img" loading="lazy">
-      <img src="images/one-4.jpg" class="rt-carousel-img" loading="lazy">
-      <img src="images/one-5.jpg" class="rt-carousel-img" loading="lazy">
-      <button class="rt-carousel-btn left" onclick="slideCard(this,-1)">‹</button>
-      <button class="rt-carousel-btn right" onclick="slideCard(this,1)">›</button>
-      <div class="rt-carousel-dots">
-        <span class="rt-dot active"></span><span class="rt-dot"></span><span class="rt-dot"></span><span class="rt-dot"></span><span class="rt-dot"></span>
-      </div>
-    </div>
-    <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
-    <div class="rt-price-chip">₹999</div>
-  </div>
-  <div class="rt-info">
-    <h4>Lookbook — Silk Wrap</h4><p>Clean BG, dramatic side lighting.</p>
-    <div class="rt-info-row">
-      <button class="rt-quick-cart" id="qcart-lookbook"
-        onclick="event.stopPropagation();quickAddToCart('image','Lookbook — Silk Wrap','High-res render for a luxury brand lookbook. Clean background with dramatic side light.',['images/one.jpg','images/one-2.jpg','images/one-3.jpg','images/one-4.jpg','images/one-5.jpg'],'₹999',this)">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-        Add to Cart
-      </button>
-    </div>
-  </div>
-</div>
-
-      <div class="rt-card" onclick="openRenderPanel('image','Product Render — Fire','Photorealistic still for e-commerce with stitch detail and fabric texture highlighted.',['images/two.png','images/two-2.png','images/two-3.png','images/two-4.png','images/two-5.png'],'₹999')">
-  <div class="rt-media">
-    <div class="rt-img-carousel">
-      <img src="images/two.png" class="rt-carousel-img active" loading="lazy">
-      <img src="images/two-2.png" class="rt-carousel-img" loading="lazy">
-      <img src="images/two-3.png" class="rt-carousel-img" loading="lazy">
-      <img src="images/two-4.png" class="rt-carousel-img" loading="lazy">
-      <img src="images/two-5.png" class="rt-carousel-img" loading="lazy">
-      <button class="rt-carousel-btn left" onclick="slideCard(this,-1)">‹</button>
-      <button class="rt-carousel-btn right" onclick="slideCard(this,1)">›</button>
-      <div class="rt-carousel-dots">
-        <span class="rt-dot active"></span><span class="rt-dot"></span><span class="rt-dot"></span><span class="rt-dot"></span><span class="rt-dot"></span>
-      </div>
-    </div>
-    <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
-    <div class="rt-price-chip">₹999</div>
-  </div>
-  <div class="rt-info">
-    <h4>Product Render — Fire</h4><p>E-commerce ready, stitch &amp; texture detail.</p>
-    <div class="rt-info-row">
-      <button class="rt-quick-cart" id="qcart-product-fire"
-        onclick="event.stopPropagation();quickAddToCart('image','Product Render — Fire','Photorealistic still for e-commerce with stitch detail and fabric texture highlighted.',['images/two.png','images/two-2.png','images/two-3.png','images/two-4.png','images/two-5.png'],'₹999',this)">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-        Add to Cart
-      </button>
-    </div>
-  </div>
-</div>
-
-      <div class="rt-card" onclick="openRenderPanel('image','Fabric Feel','Flat lay render showing texture depth and colour accuracy for an outwear collection.',['images/three.jpg','images/three-2.jpg','images/three-3.jpg','images/three-4.jpg','images/three-5.jpg'],'₹999')">
-  <div class="rt-media">
-    <div class="rt-img-carousel">
-      <img src="images/three.jpg" class="rt-carousel-img active" loading="lazy">
-      <img src="images/three-2.jpg" class="rt-carousel-img" loading="lazy">
-      <img src="images/three-3.jpg" class="rt-carousel-img" loading="lazy">
-      <img src="images/three-4.jpg" class="rt-carousel-img" loading="lazy">
-      <img src="images/three-5.jpg" class="rt-carousel-img" loading="lazy">
-      <button class="rt-carousel-btn left" onclick="slideCard(this,-1)">‹</button>
-      <button class="rt-carousel-btn right" onclick="slideCard(this,1)">›</button>
-      <div class="rt-carousel-dots">
-        <span class="rt-dot active"></span><span class="rt-dot"></span><span class="rt-dot"></span><span class="rt-dot"></span><span class="rt-dot"></span>
-      </div>
-    </div>
-    <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
-    <div class="rt-price-chip">₹999</div>
-  </div>
-  <div class="rt-info">
-    <h4>Fabric Feel</h4><p>Flat lay, texture depth, colour accuracy.</p>
-    <div class="rt-info-row">
-      <button class="rt-quick-cart" id="qcart-fabric-feel"
-        onclick="event.stopPropagation();quickAddToCart('image','Fabric Feel','Flat lay render showing texture depth and colour accuracy for an outwear collection.',['images/three.jpg','images/three-2.jpg','images/three-3.jpg','images/three-4.jpg','images/three-5.jpg'],'₹999',this)">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-        Add to Cart
-      </button>
-    </div>
-  </div>
-</div>
-
-      <div class="rt-card" onclick="openRenderPanel('image','Campaign Still — Dramatic','Full scene render with character, t-shirt, and mood lighting for a clothing brand campaign.',['images/four.jpg','images/four-2.jpg','images/four-3.jpg','images/four-4.jpg','images/four-5.jpg'],'₹999')">
-  <div class="rt-media">
-    <div class="rt-img-carousel">
-      <img src="images/four.jpg" class="rt-carousel-img active" loading="lazy">
-      <img src="images/four-2.jpg" class="rt-carousel-img" loading="lazy">
-      <img src="images/four-3.jpg" class="rt-carousel-img" loading="lazy">
-      <img src="images/four-4.jpg" class="rt-carousel-img" loading="lazy">
-      <img src="images/four-5.jpg" class="rt-carousel-img" loading="lazy">
-      <button class="rt-carousel-btn left" onclick="slideCard(this,-1)">‹</button>
-      <button class="rt-carousel-btn right" onclick="slideCard(this,1)">›</button>
-      <div class="rt-carousel-dots">
-        <span class="rt-dot active"></span><span class="rt-dot"></span><span class="rt-dot"></span><span class="rt-dot"></span><span class="rt-dot"></span>
-      </div>
-    </div>
-    <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
-    <div class="rt-price-chip">₹999</div>
-  </div>
-  <div class="rt-info">
-    <h4>Campaign Still — Dramatic</h4><p>Full scene, character &amp; mood lighting.</p>
-    <div class="rt-info-row">
-      <button class="rt-quick-cart" id="qcart-campaign-still"
-        onclick="event.stopPropagation();quickAddToCart('image','Campaign Still — Dramatic','Full scene render with character, t-shirt, and mood lighting for a clothing brand campaign.',['images/four.jpg','images/four-2.jpg','images/four-3.jpg','images/four-4.jpg','images/four-5.jpg'],'₹999',this)">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-        Add to Cart
-      </button>
-    </div>
-  </div>
-</div>
-
-      <div class="rt-card" onclick="openRenderPanel('image','Streetwear Editorial','Dark cinematic render for an urban streetwear brand social campaign.',['images/five.jpg','images/five-2.jpg','images/five-3.jpg','images/five-4.jpg','images/five-5.jpg'],'₹999')">
-  <div class="rt-media">
-    <div class="rt-img-carousel">
-      <img src="images/five.jpg" class="rt-carousel-img active" loading="lazy">
-      <img src="images/five-2.jpg" class="rt-carousel-img" loading="lazy">
-      <img src="images/five-3.jpg" class="rt-carousel-img" loading="lazy">
-      <img src="images/five-4.jpg" class="rt-carousel-img" loading="lazy">
-      <img src="images/five-5.jpg" class="rt-carousel-img" loading="lazy">
-      <button class="rt-carousel-btn left" onclick="slideCard(this,-1)">‹</button>
-      <button class="rt-carousel-btn right" onclick="slideCard(this,1)">›</button>
-      <div class="rt-carousel-dots">
-        <span class="rt-dot active"></span><span class="rt-dot"></span><span class="rt-dot"></span><span class="rt-dot"></span><span class="rt-dot"></span>
-      </div>
-    </div>
-    <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
-    <div class="rt-price-chip">₹999</div>
-  </div>
-  <div class="rt-info">
-    <h4>Streetwear Editorial</h4><p>Dark cinematic, urban social campaign.</p>
-    <div class="rt-info-row">
-      <button class="rt-quick-cart" id="qcart-sw-editorial"
-        onclick="event.stopPropagation();quickAddToCart('image','Streetwear Editorial','Dark cinematic render for an urban streetwear brand social campaign.',['images/five.jpg','images/five-2.jpg','images/five-3.jpg','images/five-4.jpg','images/five-5.jpg'],'₹999',this)">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-        Add to Cart
-      </button>
-    </div>
-  </div>
-</div>
-
-    </div>
-  </div>
-
-  </div><!-- /render-old-trash -->
   <footer>
     <div class="footer-logo" style="cursor:pointer;display:flex;align-items:center;gap:8px;" onclick="go('home')"><svg width="18" height="18" viewBox="0 0 30 30" fill="none"><path d="M15 3 L26 9 L26 21 L15 27 L4 21 L4 9 Z" stroke="#7c3aed" stroke-width="1.2" fill="none" opacity="0.5"/><path d="M15 3 L26 9 L15 15 L4 9 Z" fill="#7c3aed" opacity="0.3"/><circle cx="15" cy="15" r="2" fill="#a78bfa"/></svg>Urreal<em>3D</em></div>
     <div class="footer-links"><a onclick="go('policy')">Privacy Policy</a><a onclick="go('appointment')">Contact</a></div>
@@ -5475,20 +5203,33 @@ window.saveInlineEdit = async function() {
 // ════════════════════════════════════════════
 // PAGE CHANGE HOOK — load content on nav
 // ════════════════════════════════════════════
-const origGo = window.go;
-window.go = function(page) {
-  origGo(page);
-  setTimeout(() => {
-    if (page === 'portfolio') loadPortfolioPage();
-    if (page === 'render')    loadRenderPage();
-  }, 80);
+let _portLoading = false, _renderLoading = false;
+
+function safeLoadPortfolio() {
+  if (_portLoading) return;
+  _portLoading = true;
+  loadPortfolioPage().finally(() => setTimeout(() => { _portLoading = false; }, 3000));
+}
+function safeLoadRender() {
+  if (_renderLoading) return;
+  _renderLoading = true;
+  loadRenderPage().finally(() => setTimeout(() => { _renderLoading = false; }, 3000));
 }
 
-// Load on initial page open too
+// Hook nav clicks — go() is a global function so we watch clicks
+document.addEventListener('click', function(e) {
+  const el = e.target.closest('[onclick]');
+  if (!el) return;
+  const fn = el.getAttribute('onclick') || '';
+  if (fn.includes("'portfolio'") || fn.includes('"portfolio"')) setTimeout(safeLoadPortfolio, 150);
+  if (fn.includes("'render'")    || fn.includes('"render"'))    setTimeout(safeLoadRender, 150);
+});
+
+// Initial load on startup
 setTimeout(() => {
-  loadPortfolioPage();
-  loadRenderPage();
-}, 600);
+  safeLoadPortfolio();
+  safeLoadRender();
+}, 900);
 
 </script>
 
