@@ -23,6 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://firebasestorage.googleapis.com" crossorigin>
 <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com">
 <!-- Razorpay -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -4831,9 +4832,11 @@ async function loadPortfolioPage() {
 
   // Render animation cards
   animGrid.innerHTML = pvItems.map(item => buildPortfolioVideoCard(item, admin)).join('') + (admin ? buildPortfolioAddCard('video') : '');
-
-  // Render still cards
   stillGrid.innerHTML = piItems.map(item => buildPortfolioImageCard(item, admin)).join('') + (admin ? buildPortfolioAddCard('image') : '');
+
+  // Hook lazy observers onto every newly created card element
+  animGrid.querySelectorAll('video[data-lazy]').forEach(v => window.observeLazyVideo && window.observeLazyVideo(v));
+  stillGrid.querySelectorAll('img').forEach(img => window.observeLazyImg && window.observeLazyImg(img));
 }
 
 function buildPortfolioVideoCard(item, admin) {
@@ -4858,8 +4861,8 @@ function buildPortfolioVideoCard(item, admin) {
   return `<div class="port-card${admin?' admin-mode':''}" data-category="Animations" id="pc-${item.id}">
     ${adminBar}
     <div class="media-box">
-      <video autoplay muted loop playsinline preload="none" style="width:100%;height:100%;object-fit:cover;">
-        <source src="${url}" type="video/mp4">
+      <video autoplay muted loop playsinline preload="none" style="width:100%;height:100%;object-fit:cover;" data-lazy="1">
+        <source data-src="${url}" type="video/mp4">
       </video>
       <div class="port-card-overlay"><span class="port-overlay-tag">Animation</span></div>
     </div>
@@ -4947,6 +4950,10 @@ async function loadRenderPage() {
   rvGrid.innerHTML = rvItems.map(item => buildRenderVideoCard(item, admin)).join('') + (admin ? buildRenderAddCard('video') : '');
   riGrid.innerHTML = riItems.map(item => buildRenderImageCard(item, admin)).join('') + (admin ? buildRenderAddCard('image') : '');
 
+  // Hook lazy observers onto every newly created card element
+  rvGrid.querySelectorAll('video[data-lazy]').forEach(v => window.observeLazyVideo && window.observeLazyVideo(v));
+  riGrid.querySelectorAll('img').forEach(img => window.observeLazyImg && window.observeLazyImg(img));
+
   // Update filter counts
   const allCount = rvItems.length + riItems.length;
   document.querySelectorAll('.render-pill-btn').forEach(btn => {
@@ -4981,7 +4988,7 @@ function buildRenderVideoCard(item, admin) {
   return `<div class="rt-card${admin?' admin-mode':''}" id="rc-${item.id}" ${cardClick}>
     ${adminBar}
     <div class="rt-media">
-      <video autoplay muted loop playsinline preload="none"><source src="${url}" type="video/mp4"></video>
+      <video autoplay muted loop playsinline preload="none" data-lazy="1"><source data-src="${url}" type="video/mp4"></video>
       <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
       <div class="rt-price-chip">${item.price}</div>
     </div>
@@ -6446,67 +6453,88 @@ async function submitReview() {
 
 <!-- ═══ LAZY LOADING + VIDEO PERFORMANCE ═══ -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  // ── Lazy load portfolio images ──
-  const imgs = document.querySelectorAll('.port-card img');
+(function() {
+  // ─────────────────────────────────────────────────────────
+  // PERSISTENT observers — created once, reused for every
+  // card that gets dynamically injected by Firestore loaders.
+  // Call window.observeLazyVideo(videoEl) or
+  //       window.observeLazyImg(imgEl)
+  // from inside buildPortfolioVideoCard / buildRenderVideoCard
+  // after each element is added to the DOM.
+  // ─────────────────────────────────────────────────────────
+
+  // ── IMAGE lazy loader ──
+  var imgObs = null;
   if ('IntersectionObserver' in window) {
-    const imgObs = new IntersectionObserver(function(entries) {
+    imgObs = new IntersectionObserver(function(entries) {
       entries.forEach(function(e) {
-        if (e.isIntersecting) {
-          const img = e.target;
-          if (img.dataset.src) { img.src = img.dataset.src; delete img.dataset.src; }
-          imgObs.unobserve(img);
+        if (!e.isIntersecting) return;
+        var img = e.target;
+        if (img.dataset.lazySrc) {
+          img.src = img.dataset.lazySrc;
+          delete img.dataset.lazySrc;
         }
+        imgObs.unobserve(img);
       });
-    }, { rootMargin: '200px' });
-    imgs.forEach(function(img) {
-      img.dataset.src = img.src;
-      img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"%3E%3C/svg%3E';
-      imgObs.observe(img);
-    });
+    }, { rootMargin: '300px' }); // start loading 300px before visible
   }
 
-  // ── Video lazy-play: only play videos visible in viewport ──
-  // This prevents ALL videos from loading & playing simultaneously
+  window.observeLazyImg = function(img) {
+    if (!img || !imgObs) return;
+    // Move the real src into data-lazySrc and blank the src
+    if (img.src && !img.dataset.lazySrc && !img.src.startsWith('data:')) {
+      img.dataset.lazySrc = img.src;
+      img.src = 'data:image/svg+xml,%3Csvg xmlns%3D"http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg" viewBox%3D"0 0 9 16"%3E%3C%2Fsvg%3E';
+    }
+    imgObs.observe(img);
+  };
+
+  // ── VIDEO lazy loader ──
+  var videoObs = null;
   if ('IntersectionObserver' in window) {
-    const videoObs = new IntersectionObserver(function(entries) {
+    videoObs = new IntersectionObserver(function(entries) {
       entries.forEach(function(e) {
-        const video = e.target;
+        var video = e.target;
         if (e.isIntersecting) {
-          // Load source only when entering view
-          if (video.dataset.lazySrc && !video.dataset.loaded) {
-            const source = video.querySelector('source');
-            if (source && source.dataset.src) {
+          // First time entering view — load the source
+          if (!video.dataset.loaded) {
+            var source = video.querySelector('source[data-src]');
+            if (source) {
               source.src = source.dataset.src;
+              delete source.dataset.src;
               video.load();
             }
             video.dataset.loaded = '1';
           }
-          video.play().catch(function(){});
+          video.play().catch(function() {});
         } else {
+          // Pause and free memory when out of view
           video.pause();
         }
       });
-    }, { rootMargin: '120px', threshold: 0.1 });
-
-    // Find all non-hero autoplay videos and make them lazy
-    document.querySelectorAll('video[autoplay]').forEach(function(video) {
-      const source = video.querySelector('source');
-      // Skip the main hero video — it's above the fold and should load immediately
-      if (video.classList.contains('hero-video')) {
-        videoObs.observe(video);
-        return;
-      }
-      if (source && source.src && !source.dataset.src) {
-        source.dataset.src = source.src;
-        source.removeAttribute('src');
-        video.dataset.lazySrc = '1';
-        video.load(); // clears the buffer
-      }
-      videoObs.observe(video);
-    });
+    }, { rootMargin: '150px', threshold: 0.1 });
   }
-});
+
+  window.observeLazyVideo = function(video) {
+    if (!video || !videoObs) return;
+    // Skip the hero — it loads eagerly above the fold
+    if (video.classList.contains('hero-video')) return;
+    var source = video.querySelector('source');
+    if (source && source.src && !source.dataset.src) {
+      source.dataset.src = source.src;
+      source.removeAttribute('src');
+      video.load(); // flushes any buffered data
+    }
+    videoObs.observe(video);
+  };
+
+  // ── On page load: catch any static (non-dynamic) videos ──
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('video[autoplay]:not(.hero-video)').forEach(function(v) {
+      window.observeLazyVideo(v);
+    });
+  });
+})();
 </script>
 <!-- ═══ END LAZY LOADING + VIDEO PERFORMANCE ═══ -->
 
