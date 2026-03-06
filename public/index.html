@@ -1423,101 +1423,21 @@ setTimeout(function(){
   <!-- Animations Grid -->
   <div class="port-section-title">
     <h3>Animations &amp; Reels</h3>
-    <span class="pcount">9 pieces</span>
+    <span class="pcount" id="port-anim-count">—</span>
   </div>
-  <div class="port-grid" style="margin-bottom:48px;">
-    <div class="port-card" data-category="Animations">
-      <div class="media-box">
-        <video autoplay muted loop playsinline preload="none" style="width:100%;height:100%;object-fit:cover;"><source src="videos/one.mp4" type="video/mp4"></video>
-        <div class="port-card-overlay"><span class="port-overlay-tag">Animation</span></div>
-      </div>
-      <div class="port-info"><h3>3D Shopify Store</h3><p>Fabric drape with realistic shimmer under soft studio lighting.</p><div class="ptags"><span class="ptag">3D</span><span class="ptag">Luxury</span></div></div>
-    </div>
-    <div class="port-card" data-category="Animations">
-      <div class="media-box">
-        <video autoplay muted loop playsinline preload="none" style="width:100%;height:100%;object-fit:cover;"><source src="videos/two.mp4" type="video/mp4"></video>
-        <div class="port-card-overlay"><span class="port-overlay-tag">Animation</span></div>
-      </div>
-      <div class="port-info"><h3>Streetwear Drop</h3><p>Minimal piece drifting through space with dramatic rim lighting.</p><div class="ptags"><span class="ptag">Streetwear</span></div></div>
-    </div>
-    <div class="port-card" data-category="Animations">
-      <div class="media-box">
-        <video autoplay muted loop playsinline preload="none" style="width:100%;height:100%;object-fit:cover;"><source src="videos/three.mp4" type="video/mp4"></video>
-        <div class="port-card-overlay"><span class="port-overlay-tag">Animation</span></div>
-      </div>
-      <div class="port-info"><h3>3D Garage</h3><p>High-contrast garage scene for a rugged, authentic feel.</p><div class="ptags"><span class="ptag">Scene</span></div></div>
-    </div>
-    <div class="port-card" data-category="Animations">
-      <div class="media-box">
-        <video autoplay muted loop playsinline preload="none" style="width:100%;height:100%;object-fit:cover;"><source src="videos/four.mp4" type="video/mp4"></video>
-        <div class="port-card-overlay"><span class="port-overlay-tag">Animation</span></div>
-      </div>
-      <div class="port-info"><h3>Lost &amp; Found</h3><p>Dynamic animation with lifelike movement and fluid simulation.</p><div class="ptags"><span class="ptag">Realistic</span></div></div>
-    </div>
-    <div class="port-card" data-category="Animations">
-      <div class="media-box">
-        <video autoplay muted loop playsinline preload="none" style="width:100%;height:100%;object-fit:cover;"><source src="videos/five.mp4" type="video/mp4"></video>
-        <div class="port-card-overlay"><span class="port-overlay-tag">Animation</span></div>
-      </div>
-      <div class="port-info"><h3>Multi Model</h3><p>Multi-model presentation emphasizing structure, drape, and realism.</p><div class="ptags"><span class="ptag">Multi</span></div></div>
-    </div>
-    <div class="port-card" data-category="Animations">
-      <div class="media-box">
-        <video autoplay muted loop playsinline preload="none" style="width:100%;height:100%;object-fit:cover;"><source src="videos/six.mp4" type="video/mp4"></video>
-        <div class="port-card-overlay"><span class="port-overlay-tag">Animation</span></div>
-      </div>
-      <div class="port-info"><h3>Invisibility</h3><p>Invisible figure concept with dynamic hoodie physics and cinematic lighting.</p><div class="ptags"><span class="ptag">Hoodie</span></div></div>
-    </div>
-    <div class="port-card" data-category="Animations">
-      <div class="media-box">
-        <video autoplay muted loop playsinline preload="none" style="width:100%;height:100%;object-fit:cover;"><source src="videos/seven.mp4" type="video/mp4"></video>
-        <div class="port-card-overlay"><span class="port-overlay-tag">Animation</span></div>
-      </div>
-      <div class="port-info"><h3>Medieval Age</h3><p>Streetwear reimagined with medieval textures and atmospheric depth.</p><div class="ptags"><span class="ptag">Concept</span></div></div>
-    </div>
-    <div class="port-card" data-category="Animations">
-      <div class="media-box">
-        <video autoplay muted loop playsinline preload="none" style="width:100%;height:100%;object-fit:cover;"><source src="videos/eight.mp4" type="video/mp4"></video>
-        <div class="port-card-overlay"><span class="port-overlay-tag">Animation</span></div>
-      </div>
-      <div class="port-info"><h3>UnHoly</h3><p>Dark conceptual streetwear with cinematic shadows and striking detail.</p><div class="ptags"><span class="ptag">Dark</span></div></div>
-    </div>
-    <div class="port-card" data-category="Animations">
-      <div class="media-box">
-        <video autoplay muted loop playsinline preload="none" style="width:100%;height:100%;object-fit:cover;"><source src="videos/nine.mp4" type="video/mp4"></video>
-        <div class="port-card-overlay"><span class="port-overlay-tag">Animation</span></div>
-      </div>
-      <div class="port-info"><h3>Simplistic Apparel</h3><p>Bright, light fabrics for a unisex clothing brand product reel.</p><div class="ptags"><span class="ptag">UniSex</span></div></div>
-    </div>
+  <div class="port-grid" id="port-anim-grid" style="margin-bottom:48px;">
+    <div style="grid-column:1/-1;text-align:center;padding:40px 0;color:var(--gdim);font-size:13px;">Loading…</div>
   </div>
 
   <!-- Still Renders Grid -->
   <div class="port-section-title" style="padding-top:0;">
     <h3>Still Renders</h3>
-    <span class="pcount">5 pieces</span>
+    <span class="pcount" id="port-still-count">—</span>
   </div>
-  <div class="port-grid" style="margin-bottom:72px;">
-    <div class="port-card" data-category="Still Renders">
-      <div class="photo-box"><img src="images/one.jpg" style="width:100%;height:100%;object-fit:cover;" alt="Lookbook"><div class="port-card-overlay"><span class="port-overlay-tag">Still Render</span></div></div>
-      <div class="port-info"><h3>Lookbook — Silk Wrap</h3><p>Luxury spring lookbook. Clean background, dramatic side light.</p><div class="ptags"><span class="ptag">Lookbook</span><span class="ptag">Silk</span></div></div>
-    </div>
-    <div class="port-card" data-category="Still Renders">
-      <div class="photo-box"><img src="images/two.png" style="width:100%;height:100%;object-fit:cover;" alt="T-shirt"><div class="port-card-overlay"><span class="port-overlay-tag">Still Render</span></div></div>
-      <div class="port-info"><h3>Product Render — T-shirt</h3><p>Photorealistic stills for e-commerce. Stitch detail and fabric texture.</p><div class="ptags"><span class="ptag">E-commerce</span></div></div>
-    </div>
-    <div class="port-card" data-category="Still Renders">
-      <div class="photo-box"><img src="images/three.jpg" style="width:100%;height:100%;object-fit:cover;" alt="Fabric"><div class="port-card-overlay"><span class="port-overlay-tag">Still Render</span></div></div>
-      <div class="port-info"><h3>Fabric Feel</h3><p>Flat lay render showing texture depth and color accuracy for outwear.</p><div class="ptags"><span class="ptag">Flat Lay</span></div></div>
-    </div>
-    <div class="port-card" data-category="Still Renders">
-      <div class="photo-box"><img src="images/four.jpg" style="width:100%;height:100%;object-fit:cover;" alt="Campaign"><div class="port-card-overlay"><span class="port-overlay-tag">Still Render</span></div></div>
-      <div class="port-info"><h3>Campaign Still — Dramatic</h3><p>Full scene with character and mood lighting for a clothing brand.</p><div class="ptags"><span class="ptag">Campaign</span></div></div>
-    </div>
-    <div class="port-card" data-category="Still Renders">
-      <div class="photo-box"><img src="images/five.jpg" style="width:100%;height:100%;object-fit:cover;" alt="Editorial"><div class="port-card-overlay"><span class="port-overlay-tag">Still Render</span></div></div>
-      <div class="port-info"><h3>Streetwear Editorial</h3><p>Dark cinematic render for an urban streetwear brand's social campaign.</p><div class="ptags"><span class="ptag">Editorial</span><span class="ptag">Streetwear</span></div></div>
-    </div>
+  <div class="port-grid" id="port-still-grid" style="margin-bottom:72px;">
+    <div style="grid-column:1/-1;text-align:center;padding:40px 0;color:var(--gdim);font-size:13px;">Loading…</div>
   </div>
+
 
   <footer>
     <div class="footer-logo" style="cursor:pointer;display:flex;align-items:center;gap:8px;" onclick="go('home')"><svg width="18" height="18" viewBox="0 0 30 30" fill="none"><path d="M15 3 L26 9 L26 21 L15 27 L4 21 L4 9 Z" stroke="#7c3aed" stroke-width="1.2" fill="none" opacity="0.5"/><path d="M15 3 L26 9 L15 15 L4 9 Z" fill="#7c3aed" opacity="0.3"/><circle cx="15" cy="15" r="2" fill="#a78bfa"/></svg>Urreal<em>3D</em></div>
@@ -2315,15 +2235,29 @@ function filterTab(btn) {
     </div>
   </div>
   <div class="render-sections-wrap">
-
-
-      <div class="render-section" data-type="video">
+    <div class="render-section" data-type="video">
       <div class="render-section-head">
-      <h3>Video Templates</h3>
-      <span class="rcount">5</span>
-      <span class="rtype-badge">₹1,999 / video</span>
+        <h3>Video Templates</h3>
+        <span class="rcount" id="render-video-count">—</span>
+        <span class="rtype-badge">₹1,999 / video</span>
+      </div>
+      <div class="render-grid" id="render-video-grid">
+        <div style="grid-column:1/-1;text-align:center;padding:40px 0;color:var(--gdim);font-size:13px;">Loading…</div>
+      </div>
     </div>
-    <div class="render-grid">
+
+    <div class="render-section" data-type="image">
+      <div class="render-section-head">
+        <h3>Still Render Templates</h3>
+        <span class="rcount" id="render-image-count">—</span>
+        <span class="rtype-badge">₹999 / 5 images</span>
+      </div>
+      <div class="render-grid" id="render-image-grid">
+        <div style="grid-column:1/-1;text-align:center;padding:40px 0;color:var(--gdim);font-size:13px;">Loading…</div>
+      </div>
+    </div>
+  </div><!-- /render-sections-wrap (dynamic) -->
+  <div style="display:none" id="render-old-trash"><div class="render-grid-trash">
 
       <div class="rt-card" onclick="openRenderPanel('video','Streetwear Float','Minimal streetwear piece drifting through space, illuminated with dramatic rim lighting.','videos/two.mp4','₹1,999')">
         <div class="rt-media">
@@ -2575,7 +2509,7 @@ function filterTab(btn) {
     </div>
   </div>
 
-  </div><!-- /render-sections-wrap -->
+  </div><!-- /render-old-trash -->
   <footer>
     <div class="footer-logo" style="cursor:pointer;display:flex;align-items:center;gap:8px;" onclick="go('home')"><svg width="18" height="18" viewBox="0 0 30 30" fill="none"><path d="M15 3 L26 9 L26 21 L15 27 L4 21 L4 9 Z" stroke="#7c3aed" stroke-width="1.2" fill="none" opacity="0.5"/><path d="M15 3 L26 9 L15 15 L4 9 Z" fill="#7c3aed" opacity="0.3"/><circle cx="15" cy="15" r="2" fill="#a78bfa"/></svg>Urreal<em>3D</em></div>
     <div class="footer-links"><a onclick="go('policy')">Privacy Policy</a><a onclick="go('appointment')">Contact</a></div>
@@ -3480,69 +3414,58 @@ function pfSetMsg(id, text, type) {
 <div class="page" id="p-admin">
 <style>
 /* ── ADMIN PAGE ── */
-.admin-wrap{max-width:1020px;margin:0 auto;padding:90px clamp(16px,5vw,40px) 80px;}
+.admin-wrap{max-width:980px;margin:0 auto;padding:90px clamp(16px,5vw,40px) 80px;}
 
 /* loading / denied */
 .admin-loading-state{text-align:center;padding:120px 20px;color:var(--gdim);}
 .admin-loading-icon{font-size:40px;margin-bottom:14px;}
 .admin-loading-text{font-size:13px;letter-spacing:0.04em;}
-.admin-access-denied{text-align:center;padding:80px 20px;}
+.admin-access-denied{text-align:center;padding:120px 20px;}
 .admin-access-denied .ad-icon{font-size:40px;margin-bottom:14px;}
 .admin-access-denied h2{font-family:'Fraunces',serif;font-size:26px;font-weight:700;margin-bottom:8px;color:#f87171;}
-.admin-access-denied p{font-size:13px;color:var(--gdim);margin-bottom:20px;}
-
-/* password gate */
-.admin-pw-gate{max-width:360px;margin:0 auto;}
-.admin-pw-input{
-  width:100%;background:rgba(255,255,255,0.03);
-  border:1px solid rgba(124,58,237,0.2);border-radius:8px;
-  padding:12px 16px;color:var(--white);font-family:'Plus Jakarta Sans',sans-serif;
-  font-size:14px;margin-bottom:10px;transition:border-color 0.2s;
-}
-.admin-pw-input:focus{outline:none;border-color:var(--pl);background:rgba(124,58,237,0.06);}
-.admin-pw-btn{
-  width:100%;background:var(--purple);color:var(--white);padding:12px;
-  border-radius:8px;border:none;font-family:'Plus Jakarta Sans',sans-serif;
-  font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;
-}
-.admin-pw-btn:hover{background:var(--pm);}
-.admin-pw-err{font-size:12px;color:#f87171;text-align:center;margin-top:8px;min-height:18px;}
+.admin-access-denied p{font-size:13px;color:var(--gdim);}
 
 /* hero */
-.admin-hero{margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(124,58,237,0.1);display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;}
-.admin-hero-left{}
-.admin-hero-eyebrow{font-size:9px;font-weight:800;letter-spacing:0.22em;text-transform:uppercase;color:var(--gdim);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.admin-hero{margin-bottom:32px;padding-bottom:28px;border-bottom:1px solid rgba(124,58,237,0.1);}
+.admin-hero-eyebrow{font-size:9px;font-weight:800;letter-spacing:0.22em;text-transform:uppercase;color:var(--gdim);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
 .admin-hero-eyebrow::before{content:'';width:16px;height:1px;background:var(--purple);}
-.admin-hero h1{font-family:'Fraunces',serif;font-size:clamp(28px,4vw,44px);font-weight:700;line-height:1;letter-spacing:-0.02em;margin-bottom:4px;}
+.admin-hero h1{font-family:'Fraunces',serif;font-size:clamp(30px,5vw,48px);font-weight:700;line-height:1;letter-spacing:-0.02em;margin-bottom:6px;}
 .admin-hero h1 em{font-style:italic;color:var(--pl);font-weight:300;}
-.admin-hero p{font-size:12px;color:var(--gdim);}
-.admin-hero-time{font-size:11px;color:var(--gdim);background:rgba(124,58,237,0.07);border:1px solid rgba(124,58,237,0.15);border-radius:6px;padding:6px 12px;white-space:nowrap;}
+.admin-hero p{font-size:13px;color:var(--gdim);}
 
 /* stats row */
-.admin-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px;}
+.admin-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:28px;}
 @media(max-width:600px){.admin-stats{grid-template-columns:repeat(2,1fr);}}
-.admin-stat{background:rgba(255,255,255,0.02);border:1px solid rgba(124,58,237,0.1);border-radius:8px;padding:14px 16px;transition:border-color 0.2s;}
-.admin-stat:hover{border-color:rgba(124,58,237,0.25);}
-.admin-stat-num{font-family:'Fraunces',serif;font-size:30px;font-weight:700;color:var(--pl);line-height:1;margin-bottom:3px;}
-.admin-stat-lbl{font-size:9px;font-weight:800;color:var(--gdim);letter-spacing:0.12em;text-transform:uppercase;}
-
-/* main tab bar — now 4 tabs */
-.admin-main-tabs{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:0;
-  background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.12);
-  border-radius:8px;padding:4px;margin-bottom:22px;
+.admin-stat{
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(124,58,237,0.1);
+  border-radius:8px;padding:16px 18px;
+  transition:border-color 0.2s;
 }
-@media(max-width:560px){.admin-main-tabs{grid-template-columns:repeat(2,1fr);gap:4px;}}
+.admin-stat:hover{border-color:rgba(124,58,237,0.25);}
+.admin-stat-num{font-family:'Fraunces',serif;font-size:32px;font-weight:700;color:var(--pl);line-height:1;margin-bottom:4px;}
+.admin-stat-lbl{font-size:9.5px;font-weight:800;color:var(--gdim);letter-spacing:0.12em;text-transform:uppercase;}
+
+/* main tab bar */
+.admin-main-tabs{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:0;
+  background:rgba(124,58,237,0.06);
+  border:1px solid rgba(124,58,237,0.12);
+  border-radius:8px;padding:4px;
+  margin-bottom:22px;
+}
 .admin-tab{
-  background:transparent;border:1px solid transparent;
-  color:var(--gdim);padding:9px 10px;border-radius:6px;
-  font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;
-  font-weight:700;letter-spacing:0.03em;cursor:pointer;transition:all 0.2s;
+  background:transparent;
+  border:1px solid transparent;
+  color:var(--gdim);padding:9px 12px;border-radius:6px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:11.5px;
+  font-weight:700;letter-spacing:0.04em;
+  cursor:pointer;transition:all 0.2s;
 }
 .admin-tab:hover{color:var(--white);}
 .admin-tab.active{background:var(--purple);border-color:var(--purple);color:var(--white);box-shadow:0 2px 12px rgba(124,58,237,0.3);}
 
-/* section bar */
+/* section bar (count + refresh) */
 .admin-section-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .admin-count{font-size:11px;font-weight:800;color:var(--pl);letter-spacing:0.06em;text-transform:uppercase;}
 .admin-refresh-btn{
@@ -3553,25 +3476,44 @@ function pfSetMsg(id, text, type) {
 }
 .admin-refresh-btn:hover{border-color:var(--pl);color:var(--pl);}
 
-/* filter chips */
+/* filter chips (orders tab) */
 .admin-filter{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;}
 .admin-filter .admin-tab{padding:6px 14px;font-size:11px;border:1px solid rgba(124,58,237,0.18);}
 
-/* client cards */
-.client-card{background:rgba(255,255,255,0.015);border:1px solid rgba(124,58,237,0.1);border-radius:10px;margin-bottom:10px;overflow:hidden;transition:border-color 0.25s;}
+/* client cards (orders tab) */
+.client-card{
+  background:rgba(255,255,255,0.015);
+  border:1px solid rgba(124,58,237,0.1);
+  border-radius:10px;margin-bottom:10px;
+  overflow:hidden;transition:border-color 0.25s;
+}
 .client-card:hover{border-color:rgba(124,58,237,0.3);}
-.client-card-header{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;gap:12px;}
-.client-avatar{width:36px;height:36px;border-radius:50%;flex-shrink:0;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.25);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:var(--pl);}
+.client-card-header{
+  padding:15px 18px;display:flex;align-items:center;
+  justify-content:space-between;cursor:pointer;user-select:none;
+  gap:12px;
+}
+.client-avatar{
+  width:38px;height:38px;border-radius:50%;flex-shrink:0;
+  background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.25);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif;font-size:16px;font-weight:700;color:var(--pl);
+}
 .client-info{flex:1;margin-left:10px;min-width:0;}
-.client-name{font-family:'Fraunces',serif;font-size:14px;font-weight:600;letter-spacing:-0.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.client-name{font-family:'Fraunces',serif;font-size:15px;font-weight:600;letter-spacing:-0.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .client-meta{font-size:11px;color:var(--gdim);margin-top:2px;}
 .client-chevron{color:var(--gdim);font-size:16px;transition:transform 0.25s;flex-shrink:0;}
 .client-card.open .client-chevron{transform:rotate(180deg);}
 .client-orders{max-height:0;overflow:hidden;transition:max-height 0.4s ease;}
 .client-card.open .client-orders{max-height:2000px;}
 
-/* order items */
-.order-item{margin:0 12px 12px;background:rgba(0,0,0,0.2);border:1px solid rgba(124,58,237,0.1);border-radius:8px;padding:16px;}
+/* order items inside client card */
+.order-item{
+  margin:0 12px 12px;
+  background:rgba(0,0,0,0.2);
+  border:1px solid rgba(124,58,237,0.1);
+  border-radius:8px;padding:16px;
+}
 .order-item-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;}
 .order-item-title{font-family:'Fraunces',serif;font-size:14px;font-weight:600;letter-spacing:-0.01em;}
 .order-item-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
@@ -3584,124 +3526,32 @@ function pfSetMsg(id, text, type) {
 .abadge-done{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);color:var(--green);}
 
 /* link input + done btn */
-.order-link-input{width:100%;background:rgba(255,255,255,0.03);border:1px solid rgba(124,58,237,0.15);border-radius:6px;padding:10px 13px;color:var(--white);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;margin-bottom:8px;transition:border-color 0.2s;}
+.order-link-input{
+  width:100%;background:rgba(255,255,255,0.03);
+  border:1px solid rgba(124,58,237,0.15);
+  border-radius:6px;padding:10px 13px;color:var(--white);
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;
+  margin-bottom:8px;transition:border-color 0.2s;
+}
 .order-link-input:focus{outline:none;border-color:var(--pl);background:rgba(124,58,237,0.06);}
 .order-link-input::placeholder{color:var(--gdim);opacity:0.6;}
-.order-done-btn{width:100%;background:var(--purple);color:var(--white);padding:11px;border-radius:6px;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;cursor:pointer;transition:all 0.22s;box-shadow:0 2px 12px rgba(124,58,237,0.25);}
+.order-done-btn{
+  width:100%;background:var(--purple);color:var(--white);
+  padding:11px;border-radius:6px;border:none;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;
+  font-weight:800;letter-spacing:0.07em;text-transform:uppercase;
+  cursor:pointer;transition:all 0.22s;
+  box-shadow:0 2px 12px rgba(124,58,237,0.25);
+}
 .order-done-btn:hover{background:var(--pm);box-shadow:0 4px 20px rgba(124,58,237,0.4);}
 .order-done-btn.done{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);color:var(--green);cursor:default;box-shadow:none;}
 
 /* empty state */
-.admin-empty{text-align:center;padding:56px 0;color:var(--gdim);font-size:13px;letter-spacing:0.02em;}
+.admin-empty{
+  text-align:center;padding:56px 0;color:var(--gdim);
+  font-size:13px;letter-spacing:0.02em;
+}
 .admin-refresh{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
-
-/* ── MEDIA MANAGER ── */
-.mm-section{margin-bottom:32px;}
-.mm-section-head{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:14px 18px;
-  background:rgba(124,58,237,0.06);
-  border:1px solid rgba(124,58,237,0.14);
-  border-radius:10px 10px 0 0;
-  cursor:pointer;user-select:none;
-}
-.mm-section-head:hover{background:rgba(124,58,237,0.1);}
-.mm-section-title{font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:var(--white);display:flex;align-items:center;gap:10px;}
-.mm-section-badge{font-size:9px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--pl);background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.25);border-radius:3px;padding:3px 8px;}
-.mm-section-chevron{color:var(--gdim);font-size:14px;transition:transform 0.25s;}
-.mm-section.open .mm-section-chevron{transform:rotate(180deg);}
-.mm-section-body{
-  display:none;
-  border:1px solid rgba(124,58,237,0.14);border-top:none;
-  border-radius:0 0 10px 10px;
-  padding:18px;background:rgba(255,255,255,0.01);
-}
-.mm-section.open .mm-section-body{display:block;}
-
-/* upload zone */
-.mm-upload-zone{
-  border:2px dashed rgba(124,58,237,0.25);border-radius:8px;
-  padding:20px;text-align:center;cursor:pointer;
-  transition:all 0.2s;margin-bottom:16px;
-  background:rgba(124,58,237,0.03);
-  position:relative;
-}
-.mm-upload-zone:hover,.mm-upload-zone.drag-over{border-color:var(--pl);background:rgba(124,58,237,0.08);}
-.mm-upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.mm-upload-icon{font-size:24px;margin-bottom:6px;}
-.mm-upload-label{font-size:12px;font-weight:700;color:var(--pl);margin-bottom:3px;}
-.mm-upload-hint{font-size:11px;color:var(--gdim);}
-
-/* upload progress */
-.mm-progress-wrap{margin-bottom:14px;display:none;}
-.mm-progress-bar-bg{height:4px;background:rgba(124,58,237,0.1);border-radius:4px;overflow:hidden;margin-bottom:6px;}
-.mm-progress-bar{height:100%;background:var(--purple);border-radius:4px;transition:width 0.3s;width:0%;}
-.mm-progress-text{font-size:11px;color:var(--gdim);}
-
-/* media grid */
-.mm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;}
-.mm-item{
-  background:rgba(255,255,255,0.02);
-  border:1px solid rgba(124,58,237,0.12);
-  border-radius:8px;overflow:hidden;
-  transition:border-color 0.2s;
-  position:relative;
-}
-.mm-item:hover{border-color:rgba(124,58,237,0.35);}
-.mm-item-thumb{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:rgba(124,58,237,0.05);}
-.mm-item-video{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:#000;}
-.mm-item-info{padding:10px 10px 8px;}
-.mm-item-name{font-size:11px;font-weight:700;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;}
-.mm-item-size{font-size:10px;color:var(--gdim);}
-.mm-item-actions{display:flex;gap:6px;padding:0 10px 10px;}
-.mm-edit-btn{
-  flex:1;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);
-  color:var(--pl);padding:6px;border-radius:5px;font-size:10px;font-weight:700;
-  cursor:pointer;transition:all 0.2s;font-family:'Plus Jakarta Sans',sans-serif;
-}
-.mm-edit-btn:hover{background:rgba(124,58,237,0.2);}
-.mm-del-btn{
-  background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);
-  color:#f87171;padding:6px 10px;border-radius:5px;font-size:11px;
-  cursor:pointer;transition:all 0.2s;font-family:'Plus Jakarta Sans',sans-serif;
-}
-.mm-del-btn:hover{background:rgba(239,68,68,0.18);}
-
-/* edit modal */
-.mm-edit-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:700;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
-.mm-edit-overlay.open{display:flex;}
-.mm-edit-modal{
-  background:linear-gradient(160deg,#110e26,#0c0919);
-  border:1px solid rgba(124,58,237,0.25);border-radius:14px;
-  padding:28px;width:min(480px,92vw);max-height:85vh;overflow-y:auto;
-}
-.mm-edit-modal h3{font-family:'Fraunces',serif;font-size:20px;font-weight:700;margin-bottom:20px;color:var(--white);}
-.mm-edit-modal h3 em{font-style:italic;color:var(--pl);font-weight:300;}
-.mm-field-label{font-size:10px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--gdim);margin-bottom:6px;margin-top:14px;display:block;}
-.mm-field-input,.mm-field-textarea{
-  width:100%;background:rgba(255,255,255,0.03);
-  border:1px solid rgba(124,58,237,0.18);border-radius:7px;
-  padding:10px 13px;color:var(--white);
-  font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;
-  transition:border-color 0.2s;
-}
-.mm-field-input:focus,.mm-field-textarea:focus{outline:none;border-color:var(--pl);background:rgba(124,58,237,0.06);}
-.mm-field-textarea{resize:vertical;min-height:72px;line-height:1.6;}
-.mm-edit-actions{display:flex;gap:10px;margin-top:22px;}
-.mm-save-btn{flex:1;background:var(--purple);color:var(--white);padding:12px;border-radius:7px;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;}
-.mm-save-btn:hover{background:var(--pm);}
-.mm-cancel-btn{background:transparent;border:1px solid rgba(124,58,237,0.2);color:var(--gdim);padding:12px 20px;border-radius:7px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;cursor:pointer;transition:all 0.2s;}
-.mm-cancel-btn:hover{border-color:var(--pl);color:var(--white);}
-.mm-edit-msg{font-size:12px;margin-top:10px;text-align:center;min-height:16px;}
-.mm-edit-msg.success{color:var(--green);}
-.mm-edit-msg.error{color:#f87171;}
-
-/* limit warning */
-.mm-limit-warn{
-  background:rgba(234,179,8,0.06);border:1px solid rgba(234,179,8,0.2);
-  border-radius:7px;padding:10px 14px;font-size:12px;color:var(--yellow);
-  margin-bottom:14px;display:none;
-}
 </style>
 
   <div class="admin-wrap">
@@ -3712,16 +3562,11 @@ function pfSetMsg(id, text, type) {
       <div class="admin-loading-text">Checking access…</div>
     </div>
 
-    <!-- Denied + Password Gate -->
+    <!-- Denied -->
     <div class="admin-access-denied" id="admin-denied" style="display:none;">
       <div class="ad-icon">🔒</div>
-      <h2>Admin Access</h2>
-      <p>Enter the admin password to continue.</p>
-      <div class="admin-pw-gate">
-        <input class="admin-pw-input" type="password" id="admin-pw-input" placeholder="Admin password…" onkeydown="if(event.key==='Enter')checkAdminPassword()">
-        <button class="admin-pw-btn" onclick="checkAdminPassword()">Unlock Panel →</button>
-        <div class="admin-pw-err" id="admin-pw-err"></div>
-      </div>
+      <h2>Access Denied</h2>
+      <p>You don't have permission to view this page.</p>
     </div>
 
     <!-- Main -->
@@ -3729,19 +3574,16 @@ function pfSetMsg(id, text, type) {
 
       <!-- Hero -->
       <div class="admin-hero">
-        <div class="admin-hero-left">
-          <div class="admin-hero-eyebrow">Urreal3D · Admin</div>
-          <h1>Studio <em>Dashboard</em></h1>
-          <p>Manage orders, reviews, and your site media.</p>
-        </div>
-        <div class="admin-hero-time" id="admin-time"></div>
+        <div class="admin-hero-eyebrow">Urreal3D · Admin</div>
+        <h1>Client <em>Dashboard</em></h1>
+        <p>Manage payments, orders and reviews.</p>
       </div>
 
       <!-- Stats -->
       <div class="admin-stats">
         <div class="admin-stat">
           <div class="admin-stat-num" id="ast-total">0</div>
-          <div class="admin-stat-lbl">Total Orders</div>
+          <div class="admin-stat-lbl">Total</div>
         </div>
         <div class="admin-stat">
           <div class="admin-stat-num" id="ast-awaiting" style="color:#f97316;">0</div>
@@ -3753,16 +3595,15 @@ function pfSetMsg(id, text, type) {
         </div>
         <div class="admin-stat">
           <div class="admin-stat-num" id="ast-done" style="color:var(--green);">0</div>
-          <div class="admin-stat-lbl">Delivered</div>
+          <div class="admin-stat-lbl">Done</div>
         </div>
       </div>
 
-      <!-- Main tab bar — 4 tabs -->
+      <!-- Main tab bar -->
       <div class="admin-main-tabs">
         <button class="admin-tab active" id="main-tab-payments" onclick="switchAdminMain('payments')">💳 Payments</button>
         <button class="admin-tab" id="main-tab-orders" onclick="switchAdminMain('orders')">📦 Orders</button>
         <button class="admin-tab" id="main-tab-reviews" onclick="switchAdminMain('reviews')">⭐ Reviews</button>
-        <button class="admin-tab" id="main-tab-media" onclick="switchAdminMain('media')">🎬 Media</button>
       </div>
 
       <!-- PAYMENTS TAB -->
@@ -3799,102 +3640,6 @@ function pfSetMsg(id, text, type) {
         <div id="admin-reviews-list"><div class="admin-empty">Loading…</div></div>
       </div>
 
-      <!-- MEDIA MANAGER TAB -->
-      <div id="admin-media-section" style="display:none;">
-
-        <div class="admin-section-bar">
-          <div class="admin-count">Firebase Storage · images & videos</div>
-          <button class="admin-refresh-btn" onclick="loadMediaManager()">↻ Refresh</button>
-        </div>
-
-        <!-- Portfolio Videos -->
-        <div class="mm-section" id="mm-portfolio">
-          <div class="mm-section-head" onclick="toggleMmSection('mm-portfolio')">
-            <div class="mm-section-title">🎬 Portfolio Videos <span class="mm-section-badge" id="mm-portfolio-count">—</span></div>
-            <span class="mm-section-chevron">⌄</span>
-          </div>
-          <div class="mm-section-body">
-            <div class="mm-limit-warn" id="mm-portfolio-warn">⚠ You have 9 videos. Delete one before uploading to keep page load fast.</div>
-            <div class="mm-upload-zone" id="mm-portfolio-zone" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleMmDrop(event,'portfolio')">
-              <input type="file" accept="video/*" onchange="handleMmUpload(this.files,'portfolio')">
-              <div class="mm-upload-icon">📁</div>
-              <div class="mm-upload-label">Drop video or click to upload</div>
-              <div class="mm-upload-hint">MP4 recommended · Max 80MB per file · Limit 9 videos</div>
-            </div>
-            <div class="mm-progress-wrap" id="mm-portfolio-progress">
-              <div class="mm-progress-bar-bg"><div class="mm-progress-bar" id="mm-portfolio-bar"></div></div>
-              <div class="mm-progress-text" id="mm-portfolio-prog-text">Uploading…</div>
-            </div>
-            <div class="mm-grid" id="mm-portfolio-grid"><div class="admin-empty" style="padding:30px 0;">Loading…</div></div>
-          </div>
-        </div>
-
-        <!-- Render Page Videos -->
-        <div class="mm-section" id="mm-render-videos">
-          <div class="mm-section-head" onclick="toggleMmSection('mm-render-videos')">
-            <div class="mm-section-title">🎥 Render Page Videos <span class="mm-section-badge" id="mm-render-videos-count">—</span></div>
-            <span class="mm-section-chevron">⌄</span>
-          </div>
-          <div class="mm-section-body">
-            <div class="mm-limit-warn" id="mm-render-videos-warn">⚠ You have 5 video templates. Delete one before uploading to keep page load fast.</div>
-            <div class="mm-upload-zone" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleMmDrop(event,'render-videos')">
-              <input type="file" accept="video/*" onchange="handleMmUpload(this.files,'render-videos')">
-              <div class="mm-upload-icon">📁</div>
-              <div class="mm-upload-label">Drop video or click to upload</div>
-              <div class="mm-upload-hint">MP4 recommended · Max 80MB per file · Limit 5 videos</div>
-            </div>
-            <div class="mm-progress-wrap" id="mm-render-videos-progress">
-              <div class="mm-progress-bar-bg"><div class="mm-progress-bar" id="mm-render-videos-bar"></div></div>
-              <div class="mm-progress-text" id="mm-render-videos-prog-text">Uploading…</div>
-            </div>
-            <div class="mm-grid" id="mm-render-videos-grid"><div class="admin-empty" style="padding:30px 0;">Loading…</div></div>
-          </div>
-        </div>
-
-        <!-- Render Page Images -->
-        <div class="mm-section" id="mm-render-images">
-          <div class="mm-section-head" onclick="toggleMmSection('mm-render-images')">
-            <div class="mm-section-title">🖼 Render Page Images <span class="mm-section-badge" id="mm-render-images-count">—</span></div>
-            <span class="mm-section-chevron">⌄</span>
-          </div>
-          <div class="mm-section-body">
-            <div class="mm-limit-warn" id="mm-render-images-warn">⚠ You have 25 images. Delete some before uploading to keep page load fast.</div>
-            <div class="mm-upload-zone" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleMmDrop(event,'render-images')">
-              <input type="file" accept="image/*" multiple onchange="handleMmUpload(this.files,'render-images')">
-              <div class="mm-upload-icon">🖼</div>
-              <div class="mm-upload-label">Drop images or click to upload</div>
-              <div class="mm-upload-hint">JPG/PNG · Max 5MB per file · Max 25 images total</div>
-            </div>
-            <div class="mm-progress-wrap" id="mm-render-images-progress">
-              <div class="mm-progress-bar-bg"><div class="mm-progress-bar" id="mm-render-images-bar"></div></div>
-              <div class="mm-progress-text" id="mm-render-images-prog-text">Uploading…</div>
-            </div>
-            <div class="mm-grid" id="mm-render-images-grid"><div class="admin-empty" style="padding:30px 0;">Loading…</div></div>
-          </div>
-        </div>
-
-      </div><!-- end media section -->
-
-    </div><!-- end admin-main -->
-  </div><!-- end admin-wrap -->
-
-  <!-- Edit Modal -->
-  <div class="mm-edit-overlay" id="mm-edit-overlay">
-    <div class="mm-edit-modal">
-      <h3>Edit <em>Media Info</em></h3>
-      <input type="hidden" id="mm-edit-path">
-      <input type="hidden" id="mm-edit-section">
-      <label class="mm-field-label">Title (shown on render page)</label>
-      <input class="mm-field-input" id="mm-edit-title" placeholder="e.g. Streetwear Float">
-      <label class="mm-field-label">Short description (shown on card)</label>
-      <input class="mm-field-input" id="mm-edit-short" placeholder="e.g. Floating tee with rim lighting, dark BG.">
-      <label class="mm-field-label">Full description (shown in detail panel)</label>
-      <textarea class="mm-field-textarea" id="mm-edit-full" placeholder="e.g. Minimal streetwear piece drifting through space, illuminated with dramatic rim lighting."></textarea>
-      <div class="mm-edit-msg" id="mm-edit-msg"></div>
-      <div class="mm-edit-actions">
-        <button class="mm-cancel-btn" onclick="closeMmEdit()">Cancel</button>
-        <button class="mm-save-btn" onclick="saveMmEdit()">Save to Firestore →</button>
-      </div>
     </div>
   </div>
 
@@ -4933,53 +4678,23 @@ window.loadUserOrders = async function() {
 <!-- ═══ ADMIN SCRIPT ═══ -->
 <script type="module">
 import { getApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, setDoc, getDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
-import { getStorage, ref, listAll, uploadBytesResumable, getDownloadURL, deleteObject, getMetadata } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 const adminDb = getFirestore(getApp());
-const adminStorage = getStorage(getApp());
 let _adminOrders = [];
 let _adminFilter = 'all';
 window._adminOrders = _adminOrders;
 
-// ── ADMIN PASSWORD GATE ──
-const ADMIN_PASSWORD = 'urreal3d@admin2024';
-window.checkAdminPassword = function() {
-  const val = document.getElementById('admin-pw-input').value;
-  const err = document.getElementById('admin-pw-err');
-  if (val === ADMIN_PASSWORD) {
-    sessionStorage.setItem('_adminUnlocked', '1');
-    err.textContent = '';
-    document.getElementById('admin-denied').style.display = 'none';
-    document.getElementById('admin-main').style.display = 'block';
-    window.loadAdminOrders();
-    startAdminClock();
-  } else {
-    err.textContent = 'Incorrect password. Try again.';
-    document.getElementById('admin-pw-input').value = '';
-    document.getElementById('admin-pw-input').focus();
-  }
-}
-
-function startAdminClock() {
-  const el = document.getElementById('admin-time');
-  const tick = () => { if(el) el.textContent = new Date().toLocaleString('en-IN',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); };
-  tick(); setInterval(tick, 30000);
-}
-
-// ── SWITCH TABS ──
 window.switchAdminMain = function(tab) {
-  ['payments','orders','reviews','media'].forEach(t => {
-    const sec = document.getElementById('admin-' + t + '-section');
-    const btn = document.getElementById('main-tab-' + t);
-    if(sec) sec.style.display = t === tab ? 'block' : 'none';
-    if(btn) btn.classList.toggle('active', t === tab);
-  });
+  document.getElementById('admin-payments-section').style.display = tab === 'payments' ? 'block' : 'none';
+  document.getElementById('admin-orders-section').style.display   = tab === 'orders'   ? 'block' : 'none';
+  document.getElementById('admin-reviews-section').style.display  = tab === 'reviews'  ? 'block' : 'none';
+  document.getElementById('main-tab-payments').classList.toggle('active', tab === 'payments');
+  document.getElementById('main-tab-orders').classList.toggle('active',   tab === 'orders');
+  document.getElementById('main-tab-reviews').classList.toggle('active',  tab === 'reviews');
   if (tab === 'reviews') loadAdminReviews();
-  if (tab === 'media') loadMediaManager();
 }
 
-// ── REVIEWS ──
 window.loadAdminReviews = async function() {
   const list = document.getElementById('admin-reviews-list');
   list.innerHTML = '<div class="admin-empty">Loading...</div>';
@@ -5028,7 +4743,6 @@ window.adminDeleteReview = async function(reviewId) {
   } catch(e) { alert('Error: ' + e.message); }
 }
 
-// ── ORDERS ──
 window.loadAdminOrders = async function() {
   const user = window.getCurrentUser();
   if (!user || user.email !== 'urreal3d@gmail.com') return;
@@ -5041,13 +4755,15 @@ window.loadAdminOrders = async function() {
     const awaiting   = _adminOrders.filter(o => o.status === 'pending' && o.paymentStatus === 'confirmed').length;
     const inprogress = _adminOrders.filter(o => o.status === 'pending' && o.paymentStatus === 'confirmed').length;
     const done       = _adminOrders.filter(o => o.status === 'done').length;
-    document.getElementById('ast-total').textContent    = _adminOrders.length;
+    document.getElementById('ast-total').textContent = _adminOrders.length;
     document.getElementById('ast-awaiting').textContent = awaiting;
-    document.getElementById('ast-pending').textContent  = inprogress;
-    document.getElementById('ast-done').textContent     = done;
+    document.getElementById('ast-pending').textContent = inprogress;
+    document.getElementById('ast-done').textContent = done;
     renderPaymentsList();
     renderAdminClients();
-  } catch(e) { alert('Admin load error: ' + e.message); }
+  } catch(e) {
+    alert('Admin load error: ' + e.message);
+  }
 }
 
 function renderPaymentsList() {
@@ -5055,45 +4771,56 @@ function renderPaymentsList() {
   const inProgress = _adminOrders.filter(o => o.status === 'pending' && o.paymentStatus === 'confirmed');
   document.getElementById('payments-count').textContent = inProgress.length + ' order' + (inProgress.length !== 1 ? 's' : '') + ' awaiting render';
   if (inProgress.length === 0) { list.innerHTML = '<div class="admin-empty">✅ No pending renders — all clear!</div>'; return; }
+
+  // Group by client
   const clientMap = {};
   inProgress.forEach(o => {
     const key = o.userEmail || o.whatsapp || 'unknown';
-    if (!clientMap[key]) clientMap[key] = { name: o.clientName || o.userName || 'Unknown', contact: o.userEmail || o.whatsapp || '—', orders: [] };
+    if (!clientMap[key]) clientMap[key] = {
+      name: o.clientName || o.userName || 'Unknown',
+      contact: o.userEmail || o.whatsapp || '—',
+      orders: []
+    };
     clientMap[key].orders.push(o);
   });
+
   list.innerHTML = Object.values(clientMap).map((c, ci) => {
     const initials = c.name.charAt(0).toUpperCase();
     const totalPaid = c.orders.reduce((s, o) => s + parseFloat((o.price||'0').replace(/[^0-9.]/g,'')), 0);
     const sym = c.orders[0]?.price?.includes('₹') ? '₹' : '$';
+
     const orderRows = c.orders.map(o => {
       const date = o.createdAt ? new Date(o.createdAt.seconds*1000).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—';
       const type = o.templateType === 'video' ? '🎬 Video' : '🖼 Image';
-      return `<div style="display:flex;align-items:center;gap:0;padding:11px 18px;border-bottom:1px solid rgba(124,58,237,0.06);">
-        <span style="width:100px;font-size:11px;color:var(--gdim);flex-shrink:0;">${date}</span>
-        <span style="flex:1;font-size:12.5px;font-weight:600;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${o.templateName||'Custom'}</span>
-        <span style="width:80px;font-size:11px;color:var(--gdim);text-align:center;flex-shrink:0;">${type}</span>
-        <span style="width:72px;font-size:12.5px;font-weight:700;color:var(--pl);text-align:right;flex-shrink:0;">${o.price||'—'}</span>
-      </div>`;
+      return `
+        <div style="display:flex;align-items:center;gap:0;padding:11px 18px;border-bottom:1px solid rgba(124,58,237,0.06);">
+          <span style="width:100px;font-size:11px;color:var(--gdim);flex-shrink:0;">${date}</span>
+          <span style="flex:1;font-size:12.5px;font-weight:600;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${o.templateName||'Custom'}</span>
+          <span style="width:80px;font-size:11px;color:var(--gdim);text-align:center;flex-shrink:0;">${type}</span>
+          <span style="width:72px;font-size:12.5px;font-weight:700;color:var(--pl);text-align:right;flex-shrink:0;">${o.price||'—'}</span>
+        </div>`;
     }).join('');
-    return `<div class="client-card" id="pmt-cc-${ci}" style="margin-bottom:10px;">
-      <div class="client-card-header" onclick="document.getElementById('pmt-cc-${ci}').classList.toggle('open')">
-        <div class="client-avatar">${initials}</div>
-        <div class="client-info">
-          <div class="client-name">${c.name}</div>
-          <div class="client-meta">${c.contact} · ${c.orders.length} order${c.orders.length>1?'s':''} · <span style="color:var(--pl);font-weight:700;">${sym}${totalPaid.toLocaleString('en-IN')} paid</span></div>
+
+    return `
+      <div class="client-card" id="pmt-cc-${ci}" style="margin-bottom:10px;">
+        <div class="client-card-header" onclick="document.getElementById('pmt-cc-${ci}').classList.toggle('open')">
+          <div class="client-avatar">${initials}</div>
+          <div class="client-info">
+            <div class="client-name">${c.name}</div>
+            <div class="client-meta">${c.contact} · ${c.orders.length} order${c.orders.length>1?'s':''} · <span style="color:var(--pl);font-weight:700;">${sym}${totalPaid.toLocaleString('en-IN')} paid</span></div>
+          </div>
+          <span class="client-chevron">⌄</span>
         </div>
-        <span class="client-chevron">⌄</span>
-      </div>
-      <div class="client-orders">
-        <div style="display:flex;padding:7px 18px;background:rgba(124,58,237,0.05);border-bottom:1px solid rgba(124,58,237,0.1);">
-          <span style="width:100px;font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--gdim);flex-shrink:0;">Date</span>
-          <span style="flex:1;font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--gdim);">Order</span>
-          <span style="width:80px;font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--gdim);text-align:center;flex-shrink:0;">Type</span>
-          <span style="width:72px;font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--gdim);text-align:right;flex-shrink:0;">Amount</span>
+        <div class="client-orders">
+          <div style="display:flex;padding:7px 18px;background:rgba(124,58,237,0.05);border-bottom:1px solid rgba(124,58,237,0.1);">
+            <span style="width:100px;font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--gdim);flex-shrink:0;">Date</span>
+            <span style="flex:1;font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--gdim);">Order</span>
+            <span style="width:80px;font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--gdim);text-align:center;flex-shrink:0;">Type</span>
+            <span style="width:72px;font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--gdim);text-align:right;flex-shrink:0;">Amount</span>
+          </div>
+          ${orderRows}
         </div>
-        ${orderRows}
-      </div>
-    </div>`;
+      </div>`;
   }).join('');
 }
 
@@ -5103,6 +4830,7 @@ window.adminConfirmPayment = async function(orderId) {
     await updateDoc(doc(adminDb, 'orders', orderId), { paymentStatus: 'confirmed', status: 'pending' });
     const order = _adminOrders.find(o => o.id === orderId);
     if (order) { order.paymentStatus = 'confirmed'; order.status = 'pending'; }
+    // Send Telegram notification
     if (window.sendOrderToTelegram) await window.sendOrderToTelegram(orderId);
     alert('✅ Payment confirmed! Order is now active.');
     window.loadAdminOrders();
@@ -5152,43 +4880,45 @@ function renderAdminClients() {
       else if (isFailed) { badgeClass = ''; badgeText = '❌ Payment Failed'; }
       else if (isRejected) { badgeClass = ''; badgeText = '🚫 Rejected'; }
       else if (isAwaiting) { badgeClass = ''; badgeText = '💳 Awaiting Payment'; }
-      return `<div class="order-item">
-        <div class="order-item-top">
-          <div class="order-item-title">Order ${oi+1} — ${order.templateName||'Custom'}</div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span class="abadge ${badgeClass}" style="${isFailed?'background:rgba(239,68,68,0.12);color:#f87171;border-color:rgba(239,68,68,0.3);':isRejected?'background:rgba(107,114,128,0.1);color:var(--gdim);':isAwaiting?'background:rgba(249,115,22,0.12);color:#f97316;border-color:rgba(249,115,22,0.3);':''}">${badgeText}</span>
-            <button onclick="adminDeleteOrder('${order.id}')" title="Delete order" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:#f87171;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.18)'" onmouseout="this.style.background='rgba(239,68,68,0.08)'">🗑</button>
+      return `
+        <div class="order-item">
+          <div class="order-item-top">
+            <div class="order-item-title">Order ${oi+1} — ${order.templateName||'Custom'}</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="abadge ${badgeClass}" style="${isFailed?'background:rgba(239,68,68,0.12);color:#f87171;border-color:rgba(239,68,68,0.3);':isRejected?'background:rgba(107,114,128,0.1);color:var(--gdim);':isAwaiting?'background:rgba(249,115,22,0.12);color:#f97316;border-color:rgba(249,115,22,0.3);':''}">${badgeText}</span>
+              <button onclick="adminDeleteOrder('${order.id}')" title="Delete order" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:#f87171;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.18)'" onmouseout="this.style.background='rgba(239,68,68,0.08)'">🗑</button>
+            </div>
           </div>
-        </div>
-        <div class="order-item-grid">
-          <div class="orow">👤 Client<strong>${order.clientName||order.userName||'—'}</strong></div>
-          <div class="orow">🏷 Brand<strong>${order.brandName||'—'}</strong></div>
-          <div class="orow">📱 WhatsApp<strong>${order.whatsapp||'—'}</strong></div>
-          <div class="orow">📧 Email<strong>${order.userEmail||'—'}</strong></div>
-          <div class="orow">💰 Price<strong>${order.price||'—'}</strong></div>
-          <div class="orow">📋 Type<strong>${order.templateType==='video'?'🎬 Video':'🖼 Image'}</strong></div>
-          <div class="orow">🔖 Razorpay<strong>${order.razorpayPaymentId||'—'}</strong></div>
-          <div class="orow">🕐 Date<strong>${date}</strong></div>
-        </div>
-        ${isDone && order.renderedFile ? `<a href="${order.renderedFile}" target="_blank" style="display:block;text-align:center;margin-bottom:10px;background:rgba(124,58,237,0.1);border:1px solid var(--pb);color:var(--pl);padding:9px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;">👁 View Uploaded Render</a>` : ''}
-        ${!isFailed && !isRejected && !isAwaiting ? `
-        <input class="order-link-input" id="alink-${order.id}" placeholder="Paste Google Drive link here..." value="${order.renderedFile||''}">
-        <button class="order-done-btn ${isDone?'done':''}" id="abtn-${order.id}" onclick="adminMarkDone('${order.id}')">
-          ${isDone ? '✓ Completed' : '🚀 Upload & Mark Done'}
-        </button>` : ''}
-      </div>`;
+          <div class="order-item-grid">
+            <div class="orow">👤 Client<strong>${order.clientName||order.userName||'—'}</strong></div>
+            <div class="orow">🏷 Brand<strong>${order.brandName||'—'}</strong></div>
+            <div class="orow">📱 WhatsApp<strong>${order.whatsapp||'—'}</strong></div>
+            <div class="orow">📧 Email<strong>${order.userEmail||'—'}</strong></div>
+            <div class="orow">💰 Price<strong>${order.price||'—'}</strong></div>
+            <div class="orow">📋 Type<strong>${order.templateType==='video'?'🎬 Video':'🖼 Image'}</strong></div>
+            <div class="orow">🔖 Razorpay<strong>${order.razorpayPaymentId||'—'}</strong></div>
+            <div class="orow">🕐 Date<strong>${date}</strong></div>
+          </div>
+          ${isDone && order.renderedFile ? `<a href="${order.renderedFile}" target="_blank" style="display:block;text-align:center;margin-bottom:10px;background:rgba(124,58,237,0.1);border:1px solid var(--pb);color:var(--pl);padding:9px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;">👁 View Uploaded Render</a>` : ''}
+          ${!isFailed && !isRejected && !isAwaiting ? `
+          <input class="order-link-input" id="alink-${order.id}" placeholder="Paste Google Drive link here..." value="${order.renderedFile||''}">
+          <button class="order-done-btn ${isDone?'done':''}" id="abtn-${order.id}" onclick="adminMarkDone('${order.id}')">
+            ${isDone ? '✓ Completed' : '🚀 Upload & Mark Done'}
+          </button>` : ''}
+        </div>`;
     }).join('');
-    return `<div class="client-card" id="cc-${ci}">
-      <div class="client-card-header" onclick="toggleClient(${ci})">
-        <div class="client-avatar">${initials}</div>
-        <div class="client-info">
-          <div class="client-name">${client.name}</div>
-          <div class="client-meta">${client.email} · ${client.orders.length} order${client.orders.length>1?'s':''} ${pendingCount>0?'· <span style="color:var(--yellow);">'+pendingCount+' in progress</span>':''}</div>
+    return `
+      <div class="client-card" id="cc-${ci}">
+        <div class="client-card-header" onclick="toggleClient(${ci})">
+          <div class="client-avatar">${initials}</div>
+          <div class="client-info">
+            <div class="client-name">${client.name}</div>
+            <div class="client-meta">${client.email} · ${client.orders.length} order${client.orders.length>1?'s':''} ${pendingCount>0?'· <span style="color:var(--yellow);">'+pendingCount+' in progress</span>':''}</div>
+          </div>
+          <span class="client-chevron">⌄</span>
         </div>
-        <span class="client-chevron">⌄</span>
-      </div>
-      <div class="client-orders">${ordersHtml}</div>
-    </div>`;
+        <div class="client-orders">${ordersHtml}</div>
+      </div>`;
   }).join('');
 }
 
@@ -5201,10 +4931,12 @@ window.adminTabFilter = function(btn, filter) {
   renderAdminClients();
 }
 
-window.adminMarkDone = async function(orderId) {
-  const btn  = document.getElementById('abtn-' + orderId);
-  const link = document.getElementById('alink-' + orderId);
+window.adminMarkDone = async function(orderId, linkId, btnId) {
+  linkId = linkId || ('alink-' + orderId);
+  btnId  = btnId  || ('abtn-'  + orderId);
+  const btn = document.getElementById(btnId);
   if (btn && btn.classList.contains('done')) return;
+  const link = document.getElementById(linkId);
   if (!link || !link.value.trim()) { alert('Please paste the Google Drive link first.'); return; }
   if (btn) { btn.textContent = 'Saving...'; btn.disabled = true; }
   try {
@@ -5212,7 +4944,8 @@ window.adminMarkDone = async function(orderId) {
     const order = _adminOrders.find(o=>o.id===orderId);
     if (order) { order.status='done'; order.renderedFile=link.value.trim(); }
     if (btn) { btn.textContent = '✓ Completed'; btn.classList.add('done'); btn.disabled = false; }
-    document.getElementById('ast-done').textContent = _adminOrders.filter(o=>o.status==='done').length;
+    const done = _adminOrders.filter(o=>o.status==='done').length;
+    document.getElementById('ast-done').textContent = done;
     alert('✓ Done! Client can now see their render.');
   } catch(e) { if(btn){btn.textContent='🚀 Upload & Mark Done';btn.disabled=false;} alert('Error: '+e.message); }
 }
@@ -5227,169 +4960,7 @@ window.adminDeleteOrder = async function(orderId) {
   } catch(e) { alert('Error: ' + e.message); }
 }
 
-// ── MEDIA MANAGER ──
-const MM_LIMITS = { portfolio: { max: 9, sizeMB: 80 }, 'render-videos': { max: 5, sizeMB: 80 }, 'render-images': { max: 25, sizeMB: 5 } };
-const MM_FOLDERS = { portfolio: 'videos', 'render-videos': 'videos', 'render-images': 'images' };
-// Which video filenames belong to render page vs portfolio
-const RENDER_VIDEO_NAMES = ['two.mp4','three.mp4','five.mp4','six.mp4','seven.mp4'];
-
-window.toggleMmSection = function(id) {
-  document.getElementById(id).classList.toggle('open');
-}
-
-window.loadMediaManager = async function() {
-  await loadMmSection('portfolio');
-  await loadMmSection('render-videos');
-  await loadMmSection('render-images');
-}
-
-async function loadMmSection(section) {
-  const grid = document.getElementById('mm-' + section + '-grid');
-  const countEl = document.getElementById('mm-' + section + '-count');
-  const warnEl = document.getElementById('mm-' + section + '-warn');
-  grid.innerHTML = '<div class="admin-empty" style="padding:24px 0;">Loading…</div>';
-  try {
-    const folder = MM_FOLDERS[section];
-    const listRef = ref(adminStorage, folder);
-    const result = await listAll(listRef);
-    let items = result.items;
-
-    // Filter by section
-    if (section === 'portfolio') items = items.filter(i => !RENDER_VIDEO_NAMES.includes(i.name));
-    else if (section === 'render-videos') items = items.filter(i => RENDER_VIDEO_NAMES.includes(i.name));
-    // render-images: all items in images folder
-
-    countEl.textContent = items.length + ' files';
-    const limit = MM_LIMITS[section];
-    if (warnEl) warnEl.style.display = items.length >= limit.max ? 'block' : 'none';
-
-    if (items.length === 0) { grid.innerHTML = '<div class="admin-empty" style="padding:24px 0;">No files yet. Upload your first one above.</div>'; return; }
-
-    // Build cards
-    const cards = await Promise.all(items.map(async itemRef => {
-      const url = await getDownloadURL(itemRef);
-      let meta = {};
-      try { const m = await getMetadata(itemRef); meta = m.customMetadata || {}; } catch(e) {}
-      const isVideo = section !== 'render-images';
-      const thumb = isVideo
-        ? `<video class="mm-item-video" src="${url}" muted preload="none" onmouseover="this.play()" onmouseout="this.pause();this.currentTime=0"></video>`
-        : `<img class="mm-item-thumb" src="${url}" loading="lazy" alt="${itemRef.name}">`;
-      const title = meta.title || itemRef.name;
-      return `<div class="mm-item">
-        ${thumb}
-        <div class="mm-item-info">
-          <div class="mm-item-name" title="${itemRef.name}">${title}</div>
-          <div class="mm-item-size">${itemRef.name}</div>
-        </div>
-        <div class="mm-item-actions">
-          <button class="mm-edit-btn" onclick="openMmEdit('${itemRef.fullPath}','${section}')">✏ Edit Info</button>
-          <button class="mm-del-btn" onclick="deleteMmFile('${itemRef.fullPath}','${section}')">🗑</button>
-        </div>
-      </div>`;
-    }));
-    grid.innerHTML = cards.join('');
-  } catch(e) { grid.innerHTML = '<div class="admin-empty" style="padding:24px 0;color:#f87171;">Error: ' + e.message + '</div>'; }
-}
-
-// Upload
-window.handleMmDrop = function(e, section) {
-  e.preventDefault();
-  document.querySelectorAll('.mm-upload-zone').forEach(z => z.classList.remove('drag-over'));
-  handleMmUpload(e.dataTransfer.files, section);
-}
-
-window.handleMmUpload = async function(files, section) {
-  if (!files || files.length === 0) return;
-  const limit = MM_LIMITS[section];
-  const folder = MM_FOLDERS[section];
-  const progWrap = document.getElementById('mm-' + section + '-progress');
-  const progBar  = document.getElementById('mm-' + section + '-bar');
-  const progText = document.getElementById('mm-' + section + '-prog-text');
-
-  for (const file of Array.from(files)) {
-    const sizeMB = file.size / 1024 / 1024;
-    if (sizeMB > limit.sizeMB) {
-      alert(`❌ "${file.name}" is ${sizeMB.toFixed(1)}MB. Max allowed is ${limit.sizeMB}MB.`);
-      continue;
-    }
-    progWrap.style.display = 'block';
-    progBar.style.width = '0%';
-    progText.textContent = 'Uploading ' + file.name + '…';
-
-    await new Promise((resolve, reject) => {
-      const storageRef = ref(adminStorage, folder + '/' + file.name);
-      const task = uploadBytesResumable(storageRef, file);
-      task.on('state_changed',
-        snap => {
-          const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
-          progBar.style.width = pct + '%';
-          progText.textContent = 'Uploading ' + file.name + ' — ' + pct + '%';
-        },
-        err => { alert('Upload error: ' + err.message); progWrap.style.display = 'none'; reject(err); },
-        () => { progText.textContent = '✅ ' + file.name + ' uploaded!'; setTimeout(() => { progWrap.style.display = 'none'; }, 1500); resolve(); }
-      );
-    });
-  }
-  await loadMmSection(section);
-}
-
-// Delete
-window.deleteMmFile = async function(fullPath, section) {
-  const name = fullPath.split('/').pop();
-  if (!confirm(`Delete "${name}" from Firebase Storage?\n\nThis removes it permanently. Make sure you've replaced it first.`)) return;
-  try {
-    await deleteObject(ref(adminStorage, fullPath));
-    await loadMmSection(section);
-  } catch(e) { alert('Delete error: ' + e.message); }
-}
-
-// Edit modal
-window.openMmEdit = async function(fullPath, section) {
-  document.getElementById('mm-edit-path').value = fullPath;
-  document.getElementById('mm-edit-section').value = section;
-  document.getElementById('mm-edit-msg').textContent = '';
-  document.getElementById('mm-edit-msg').className = 'mm-edit-msg';
-
-  // Load existing metadata from Firestore
-  try {
-    const docSnap = await getDoc(doc(adminDb, 'mediaInfo', fullPath.replace(/\//g,'_')));
-    const data = docSnap.exists() ? docSnap.data() : {};
-    document.getElementById('mm-edit-title').value = data.title || '';
-    document.getElementById('mm-edit-short').value = data.shortDesc || '';
-    document.getElementById('mm-edit-full').value  = data.fullDesc || '';
-  } catch(e) {
-    document.getElementById('mm-edit-title').value = '';
-    document.getElementById('mm-edit-short').value = '';
-    document.getElementById('mm-edit-full').value  = '';
-  }
-  document.getElementById('mm-edit-overlay').classList.add('open');
-}
-
-window.closeMmEdit = function() {
-  document.getElementById('mm-edit-overlay').classList.remove('open');
-}
-
-window.saveMmEdit = async function() {
-  const fullPath   = document.getElementById('mm-edit-path').value;
-  const title      = document.getElementById('mm-edit-title').value.trim();
-  const shortDesc  = document.getElementById('mm-edit-short').value.trim();
-  const fullDesc   = document.getElementById('mm-edit-full').value.trim();
-  const msgEl      = document.getElementById('mm-edit-msg');
-
-  if (!title) { msgEl.textContent = 'Title is required.'; msgEl.className = 'mm-edit-msg error'; return; }
-
-  try {
-    const key = fullPath.replace(/\//g,'_');
-    await setDoc(doc(adminDb, 'mediaInfo', key), { title, shortDesc, fullDesc, path: fullPath, updatedAt: new Date() });
-    msgEl.textContent = '✅ Saved! Refresh the page to see changes live.';
-    msgEl.className = 'mm-edit-msg success';
-    setTimeout(() => closeMmEdit(), 1800);
-  } catch(e) { msgEl.textContent = 'Error: ' + e.message; msgEl.className = 'mm-edit-msg error'; }
-}
-
-// ── ACCESS CHECK ──
 window.checkAdminAccess = function() {
-  const alreadyUnlocked = sessionStorage.getItem('_adminUnlocked') === '1';
   let attempts = 0;
   const check = setInterval(() => {
     attempts++;
@@ -5404,19 +4975,622 @@ window.checkAdminAccess = function() {
     } else if (u || attempts > 20) {
       clearInterval(check);
       document.getElementById('admin-loading').style.display = 'none';
-      if (alreadyUnlocked) {
-        // Password was entered this session — show main
-        document.getElementById('admin-denied').style.display = 'none';
-        document.getElementById('admin-main').style.display = 'block';
-        window.loadAdminOrders();
-        startAdminClock();
-      } else {
-        document.getElementById('admin-denied').style.display = 'block';
-      }
+      document.getElementById('admin-denied').style.display = 'block';
     }
   }, 200);
 }
+
+function startAdminClock() {
+  const el = document.getElementById('admin-time');
+  const tick = () => { if(el) el.textContent = new Date().toLocaleString('en-IN',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); };
+  tick(); setInterval(tick, 30000);
+}
 </script>
+
+<!-- ═══ DYNAMIC CONTENT ENGINE ═══ -->
+<script type="module">
+import { getApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc, updateDoc, query, orderBy, getDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
+
+const db  = getFirestore(getApp());
+const sto = getStorage(getApp());
+
+// ── Firebase Storage base URL builder ──
+const BUCKET = 'urreal3d-ba986.firebasestorage.app';
+function fbUrl(path) {
+  return `https://firebasestorage.googleapis.com/v0/b/${BUCKET}/o/${encodeURIComponent(path)}?alt=media`;
+}
+
+// ── Default seed data (runs once if Firestore collection is empty) ──
+const DEFAULT_PORTFOLIO_VIDEOS = [
+  { id:'pv-1', order:1, title:'3D Shopify Store',    shortDesc:'Fabric drape with realistic shimmer under soft studio lighting.',           tags:['3D','Luxury'],    file:'videos/one.mp4' },
+  { id:'pv-2', order:2, title:'Streetwear Drop',     shortDesc:'Minimal piece drifting through space with dramatic rim lighting.',           tags:['Streetwear'],     file:'videos/two.mp4' },
+  { id:'pv-3', order:3, title:'3D Garage',           shortDesc:'High-contrast garage scene for a rugged, authentic streetwear feel.',        tags:['Scene'],          file:'videos/three.mp4' },
+  { id:'pv-4', order:4, title:'Lost & Found',        shortDesc:'Dynamic animation with lifelike movement and fluid simulation.',             tags:['Realistic'],      file:'videos/four.mp4' },
+  { id:'pv-5', order:5, title:'Multi Model',         shortDesc:'Multi-model presentation emphasizing structure, drape, and realism.',        tags:['Multi'],          file:'videos/five.mp4' },
+  { id:'pv-6', order:6, title:'Invisibility',        shortDesc:'Invisible figure concept with dynamic hoodie physics and cinematic lighting.',tags:['Hoodie'],         file:'videos/six.mp4' },
+  { id:'pv-7', order:7, title:'Medieval Age',        shortDesc:'Streetwear reimagined with medieval textures and atmospheric depth.',        tags:['Concept'],        file:'videos/seven.mp4' },
+  { id:'pv-8', order:8, title:'UnHoly',              shortDesc:'Dark conceptual streetwear with cinematic shadows and striking detail.',     tags:['Dark'],           file:'videos/eight.mp4' },
+  { id:'pv-9', order:9, title:'Simplistic Apparel',  shortDesc:'Bright, light fabrics for a unisex clothing brand product reel.',           tags:['UniSex'],         file:'videos/nine.mp4' },
+];
+const DEFAULT_PORTFOLIO_IMAGES = [
+  { id:'pi-1', order:1, title:'Lookbook — Silk Wrap',       shortDesc:'Luxury spring lookbook. Clean background, dramatic side light.',             tags:['Lookbook','Silk'], file:'images/one.jpg' },
+  { id:'pi-2', order:2, title:'Product Render — T-shirt',   shortDesc:'Photorealistic stills for e-commerce. Stitch detail and fabric texture.',    tags:['E-commerce'],      file:'images/two.png' },
+  { id:'pi-3', order:3, title:'Fabric Feel',                shortDesc:'Flat lay render showing texture depth and color accuracy for outwear.',       tags:['Flat Lay'],        file:'images/three.jpg' },
+  { id:'pi-4', order:4, title:'Campaign Still — Dramatic',  shortDesc:'Full scene with character and mood lighting for a clothing brand.',           tags:['Campaign'],        file:'images/four.jpg' },
+  { id:'pi-5', order:5, title:'Streetwear Editorial',       shortDesc:'Dark cinematic render for an urban streetwear brand\'s social campaign.',     tags:['Editorial','Streetwear'], file:'images/five.jpg' },
+];
+const DEFAULT_RENDER_VIDEOS = [
+  { id:'rv-1', order:1, title:'Streetwear Float',  shortDesc:'Floating tee with rim lighting, dark BG.',            fullDesc:'Minimal streetwear piece drifting through space, illuminated with dramatic rim lighting.',                                 price:'₹1,999', file:'videos/two.mp4' },
+  { id:'rv-2', order:2, title:'Garage Scene',      shortDesc:'Urban environment, rugged & authentic.',              fullDesc:'Streetwear piece presented in a high-contrast garage scene for a rugged, authentic feel.',                              price:'₹1,999', file:'videos/three.mp4' },
+  { id:'rv-3', order:3, title:'Multi Model',       shortDesc:'Every angle covered, oversized silhouette.',          fullDesc:'Multi-model presentation emphasising structure, drape, and realism from every angle.',                                  price:'₹1,999', file:'videos/five.mp4' },
+  { id:'rv-4', order:4, title:'Dynamic Motion',    shortDesc:'Fluid fabric physics, lifelike movement.',            fullDesc:'Dynamic animation with lifelike fabric movement and fluid physics simulation.',                                        price:'₹1,999', file:'videos/six.mp4' },
+  { id:'rv-5', order:5, title:'Medieval Age',      shortDesc:'Streetwear with medieval atmospheric depth.',         fullDesc:'A modern streetwear silhouette reimagined with medieval textures and atmospheric depth.',                               price:'₹1,999', file:'videos/seven.mp4' },
+];
+const DEFAULT_RENDER_IMAGES = [
+  { id:'ri-1', order:1, title:'Lookbook — Silk Wrap',      shortDesc:'Clean BG, dramatic side lighting.',             fullDesc:'High-res render for a luxury brand lookbook. Clean background with dramatic side light.',                             price:'₹999', file:'images/one.jpg',   extraFiles:['images/one-2.jpg','images/one-3.jpg','images/one-4.jpg','images/one-5.jpg'] },
+  { id:'ri-2', order:2, title:'Product Render — Fire',     shortDesc:'E-commerce ready, stitch & texture detail.',    fullDesc:'Photorealistic still for e-commerce with stitch detail and fabric texture highlighted.',                             price:'₹999', file:'images/two.png',   extraFiles:['images/two-2.png','images/two-3.png','images/two-4.png','images/two-5.png'] },
+  { id:'ri-3', order:3, title:'Fabric Feel',               shortDesc:'Flat lay, texture depth, colour accuracy.',     fullDesc:'Flat lay render showing texture depth and colour accuracy for an outwear collection.',                              price:'₹999', file:'images/three.jpg', extraFiles:['images/three-2.jpg','images/three-3.jpg','images/three-4.jpg','images/three-5.jpg'] },
+  { id:'ri-4', order:4, title:'Campaign Still — Dramatic', shortDesc:'Full scene, character & mood lighting.',        fullDesc:'Full scene render with character, t-shirt, and mood lighting for a clothing brand campaign.',                         price:'₹999', file:'images/four.jpg',  extraFiles:['images/four-2.jpg','images/four-3.jpg','images/four-4.jpg','images/four-5.jpg'] },
+  { id:'ri-5', order:5, title:'Streetwear Editorial',      shortDesc:'Dark cinematic, urban social campaign.',        fullDesc:'Dark cinematic render for an urban streetwear brand social campaign.',                                              price:'₹999', file:'images/five.jpg',  extraFiles:['images/five-2.jpg','images/five-3.jpg','images/five-4.jpg','images/five-5.jpg'] },
+];
+
+// ── Seed Firestore if empty ──
+async function seedIfEmpty(colName, defaults) {
+  const snap = await getDocs(collection(db, colName));
+  if (snap.empty) {
+    for (const d of defaults) {
+      await setDoc(doc(db, colName, d.id), { ...d, createdAt: new Date() });
+    }
+  }
+}
+
+// ── Helper: check admin ──
+function isAdmin() { return window.getCurrentUser && window.getCurrentUser()?.email === 'urreal3d@gmail.com'; }
+
+// ── SVG cart icon ──
+const CART_SVG = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>`;
+
+// ════════════════════════════════════════════
+// PORTFOLIO PAGE
+// ════════════════════════════════════════════
+async function loadPortfolioPage() {
+  await seedIfEmpty('portfolioVideos', DEFAULT_PORTFOLIO_VIDEOS);
+  await seedIfEmpty('portfolioImages', DEFAULT_PORTFOLIO_IMAGES);
+
+  const admin = isAdmin();
+  const [pvSnap, piSnap] = await Promise.all([
+    getDocs(query(collection(db,'portfolioVideos'), orderBy('order'))),
+    getDocs(query(collection(db,'portfolioImages'), orderBy('order'))),
+  ]);
+
+  const pvItems = pvSnap.docs.map(d => ({id:d.id,...d.data()}));
+  const piItems = piSnap.docs.map(d => ({id:d.id,...d.data()}));
+
+  const animGrid  = document.getElementById('port-anim-grid');
+  const stillGrid = document.getElementById('port-still-grid');
+  const animCount = document.getElementById('port-anim-count');
+  const stillCount= document.getElementById('port-still-count');
+
+  if (!animGrid || !stillGrid) return;
+
+  animCount.textContent  = pvItems.length + ' pieces';
+  stillCount.textContent = piItems.length + ' pieces';
+
+  // Render animation cards
+  animGrid.innerHTML = pvItems.map(item => buildPortfolioVideoCard(item, admin)).join('') + (admin ? buildPortfolioAddCard('video') : '');
+
+  // Render still cards
+  stillGrid.innerHTML = piItems.map(item => buildPortfolioImageCard(item, admin)).join('') + (admin ? buildPortfolioAddCard('image') : '');
+}
+
+function buildPortfolioVideoCard(item, admin) {
+  const url = fbUrl(item.file);
+  const tags = (item.tags||[]).map(t=>`<span class="ptag">${t}</span>`).join('');
+  const adminBar = admin ? `
+    <div class="admin-card-bar" onclick="event.stopPropagation()">
+      <label class="admin-replace-btn" title="Replace video">
+        📁 Replace
+        <input type="file" accept="video/*" style="display:none" onchange="replacePortfolioMedia('${item.id}','portfolioVideos',this.files[0])">
+      </label>
+      <button class="admin-edit-btn" onclick="openPortfolioEdit('${item.id}','portfolioVideos')">✏ Edit</button>
+      <button class="admin-del-btn" onclick="deletePortfolioCard('${item.id}','portfolioVideos','${item.file}')">🗑</button>
+    </div>` : '';
+  return `<div class="port-card${admin?' admin-mode':''}" data-category="Animations" id="pc-${item.id}">
+    ${adminBar}
+    <div class="media-box">
+      <video autoplay muted loop playsinline preload="none" style="width:100%;height:100%;object-fit:cover;">
+        <source src="${url}" type="video/mp4">
+      </video>
+      <div class="port-card-overlay"><span class="port-overlay-tag">Animation</span></div>
+    </div>
+    <div class="port-info">
+      <h3>${item.title}</h3>
+      <p>${item.shortDesc}</p>
+      <div class="ptags">${tags}</div>
+    </div>
+  </div>`;
+}
+
+function buildPortfolioImageCard(item, admin) {
+  const url = fbUrl(item.file);
+  const tags = (item.tags||[]).map(t=>`<span class="ptag">${t}</span>`).join('');
+  const adminBar = admin ? `
+    <div class="admin-card-bar" onclick="event.stopPropagation()">
+      <label class="admin-replace-btn" title="Replace image">
+        📁 Replace
+        <input type="file" accept="image/*" style="display:none" onchange="replacePortfolioMedia('${item.id}','portfolioImages',this.files[0])">
+      </label>
+      <button class="admin-edit-btn" onclick="openPortfolioEdit('${item.id}','portfolioImages')">✏ Edit</button>
+      <button class="admin-del-btn" onclick="deletePortfolioCard('${item.id}','portfolioImages','${item.file}')">🗑</button>
+    </div>` : '';
+  return `<div class="port-card${admin?' admin-mode':''}" data-category="Still Renders" id="pc-${item.id}">
+    ${adminBar}
+    <div class="photo-box">
+      <img src="${url}" style="width:100%;height:100%;object-fit:cover;" alt="${item.title}" loading="lazy">
+      <div class="port-card-overlay"><span class="port-overlay-tag">Still Render</span></div>
+    </div>
+    <div class="port-info">
+      <h3>${item.title}</h3>
+      <p>${item.shortDesc}</p>
+      <div class="ptags">${tags}</div>
+    </div>
+  </div>`;
+}
+
+function buildPortfolioAddCard(type) {
+  const accept = type === 'video' ? 'video/*' : 'image/*';
+  const col = type === 'video' ? 'portfolioVideos' : 'portfolioImages';
+  return `<div class="port-card admin-add-card" onclick="document.getElementById('port-add-${type}').click()">
+    <input type="file" id="port-add-${type}" accept="${accept}" style="display:none" onchange="addPortfolioCard('${col}','${type}',this.files[0])">
+    <div class="admin-add-inner">
+      <div class="admin-add-icon">+</div>
+      <div class="admin-add-label">Add New ${type === 'video' ? 'Animation' : 'Still Render'}</div>
+      <div class="admin-add-hint">Click to upload</div>
+    </div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════
+// RENDER PAGE
+// ════════════════════════════════════════════
+async function loadRenderPage() {
+  await seedIfEmpty('renderVideos', DEFAULT_RENDER_VIDEOS);
+  await seedIfEmpty('renderImages', DEFAULT_RENDER_IMAGES);
+
+  const admin = isAdmin();
+  const [rvSnap, riSnap] = await Promise.all([
+    getDocs(query(collection(db,'renderVideos'), orderBy('order'))),
+    getDocs(query(collection(db,'renderImages'), orderBy('order'))),
+  ]);
+
+  const rvItems = rvSnap.docs.map(d => ({id:d.id,...d.data()}));
+  const riItems = riSnap.docs.map(d => ({id:d.id,...d.data()}));
+
+  const rvGrid = document.getElementById('render-video-grid');
+  const riGrid = document.getElementById('render-image-grid');
+  if (!rvGrid || !riGrid) return;
+
+  document.getElementById('render-video-count').textContent = rvItems.length;
+  document.getElementById('render-image-count').textContent = riItems.length;
+
+  rvGrid.innerHTML = rvItems.map(item => buildRenderVideoCard(item, admin)).join('') + (admin ? buildRenderAddCard('video') : '');
+  riGrid.innerHTML = riItems.map(item => buildRenderImageCard(item, admin)).join('') + (admin ? buildRenderAddCard('image') : '');
+
+  // Update filter counts
+  const allCount = rvItems.length + riItems.length;
+  document.querySelectorAll('.render-pill-btn').forEach(btn => {
+    const count = btn.querySelector('.pill-count');
+    if (!count) return;
+    const txt = btn.textContent;
+    if (txt.includes('All'))   count.textContent = allCount;
+    if (txt.includes('Video')) count.textContent = rvItems.length;
+    if (txt.includes('Still')) count.textContent = riItems.length;
+  });
+}
+
+function buildRenderVideoCard(item, admin) {
+  const url = fbUrl(item.file);
+  const adminBar = admin ? `
+    <div class="admin-card-bar admin-render-bar" onclick="event.stopPropagation()">
+      <label class="admin-replace-btn">
+        📁 Replace
+        <input type="file" accept="video/*" style="display:none" onchange="replaceRenderMedia('${item.id}','renderVideos',this.files[0])">
+      </label>
+      <button class="admin-edit-btn" onclick="openRenderEdit('${item.id}','renderVideos')">✏ Edit Info</button>
+      <button class="admin-del-btn" onclick="deleteRenderCard('${item.id}','renderVideos','${item.file}')">🗑</button>
+    </div>` : '';
+  return `<div class="rt-card${admin?' admin-mode':''}" id="rc-${item.id}" onclick="${admin?'':` openRenderPanel('video','${item.title.replace(/'/g,"\\'")}','${item.fullDesc.replace(/'/g,"\\'")}','${url}','${item.price}')`}">
+    ${adminBar}
+    <div class="rt-media">
+      <video autoplay muted loop playsinline preload="none"><source src="${url}" type="video/mp4"></video>
+      <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
+      <div class="rt-price-chip">${item.price}</div>
+    </div>
+    <div class="rt-info">
+      <h4>${item.title}</h4><p>${item.shortDesc}</p>
+      <div class="rt-info-row">
+        <button class="rt-quick-cart" onclick="event.stopPropagation();quickAddToCart('video','${item.title.replace(/'/g,"\\'")}','${item.fullDesc.replace(/'/g,"\\'")}','${url}','${item.price}',this)">
+          ${CART_SVG} Add to Cart
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildRenderImageCard(item, admin) {
+  const mainUrl = fbUrl(item.file);
+  const allFiles = [item.file, ...(item.extraFiles||[])];
+  const allUrls  = allFiles.map(fbUrl);
+  const imgs = allUrls.map((u,i) => `<img src="${u}" class="rt-carousel-img${i===0?' active':''}" loading="lazy">`).join('');
+  const dots = allUrls.map((_,i) => `<span class="rt-dot${i===0?' active':''}"></span>`).join('');
+  const adminBar = admin ? `
+    <div class="admin-card-bar admin-render-bar" onclick="event.stopPropagation()">
+      <label class="admin-replace-btn">
+        📁 Replace Main
+        <input type="file" accept="image/*" style="display:none" onchange="replaceRenderMedia('${item.id}','renderImages',this.files[0])">
+      </label>
+      <button class="admin-edit-btn" onclick="openRenderEdit('${item.id}','renderImages')">✏ Edit Info</button>
+      <button class="admin-del-btn" onclick="deleteRenderCard('${item.id}','renderImages','${item.file}')">🗑</button>
+    </div>` : '';
+  const panelClick = admin ? '' : `onclick="openRenderPanel('image','${item.title.replace(/'/g,"\\'")}','${item.fullDesc.replace(/'/g,"\\'")}',${JSON.stringify(allUrls)},'${item.price}')"`;
+  return `<div class="rt-card${admin?' admin-mode':''}" id="rc-${item.id}" ${panelClick}>
+    ${adminBar}
+    <div class="rt-media">
+      <div class="rt-img-carousel">
+        ${imgs}
+        <button class="rt-carousel-btn left" onclick="slideCard(this,-1)">‹</button>
+        <button class="rt-carousel-btn right" onclick="slideCard(this,1)">›</button>
+        <div class="rt-carousel-dots">${dots}</div>
+      </div>
+      <div class="rt-media-overlay"><span class="rt-tap-hint">View &amp; Render →</span></div>
+      <div class="rt-price-chip">${item.price}</div>
+    </div>
+    <div class="rt-info">
+      <h4>${item.title}</h4><p>${item.shortDesc}</p>
+      <div class="rt-info-row">
+        <button class="rt-quick-cart" onclick="event.stopPropagation();quickAddToCart('image','${item.title.replace(/'/g,"\\'")}','${item.fullDesc.replace(/'/g,"\\'")}',${JSON.stringify(allUrls)},'${item.price}',this)">
+          ${CART_SVG} Add to Cart
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildRenderAddCard(type) {
+  const col = type === 'video' ? 'renderVideos' : 'renderImages';
+  const accept = type === 'video' ? 'video/*' : 'image/*';
+  return `<div class="rt-card admin-add-card admin-mode" onclick="document.getElementById('render-add-${type}').click()">
+    <input type="file" id="render-add-${type}" accept="${accept}" style="display:none" onchange="addRenderCard('${col}','${type}',this.files[0])">
+    <div class="rt-media" style="display:flex;align-items:center;justify-content:center;">
+      <div class="admin-add-inner">
+        <div class="admin-add-icon">+</div>
+        <div class="admin-add-label">New ${type === 'video' ? 'Video' : 'Image'} Template</div>
+        <div class="admin-add-hint">Click to upload</div>
+      </div>
+    </div>
+    <div class="rt-info" style="color:var(--gdim);font-size:12px;text-align:center;">Fill title & info after upload</div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════
+// UPLOAD HELPERS — shared progress toast
+// ════════════════════════════════════════════
+function showUploadToast(msg, pct) {
+  let t = document.getElementById('upload-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'upload-toast';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(10,7,23,0.96);border:1px solid rgba(124,58,237,0.35);border-radius:10px;padding:14px 22px;z-index:9999;min-width:260px;text-align:center;font-family:"Plus Jakarta Sans",sans-serif;font-size:13px;color:#fff;box-shadow:0 8px 32px rgba(0,0,0,0.6);';
+    document.body.appendChild(t);
+  }
+  t.style.display = 'block';
+  t.innerHTML = `<div style="margin-bottom:8px;">${msg}</div><div style="height:4px;background:rgba(124,58,237,0.15);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:#7c3aed;border-radius:4px;transition:width 0.3s;"></div></div>`;
+  if (pct >= 100) setTimeout(() => { t.style.display = 'none'; }, 2000);
+}
+
+async function uploadFile(storagePath, file) {
+  return new Promise((resolve, reject) => {
+    const storageRef = ref(sto, storagePath);
+    const task = uploadBytesResumable(storageRef, file);
+    task.on('state_changed',
+      snap => showUploadToast(`Uploading ${file.name}…`, Math.round(snap.bytesTransferred/snap.totalBytes*100)),
+      reject,
+      async () => { const url = await getDownloadURL(storageRef); resolve(storagePath); }
+    );
+  });
+}
+
+// ════════════════════════════════════════════
+// PORTFOLIO ADMIN ACTIONS
+// ════════════════════════════════════════════
+window.replacePortfolioMedia = async function(docId, colName, file) {
+  if (!file) return;
+  const docSnap = await getDoc(doc(db, colName, docId));
+  const data = docSnap.data();
+  const ext = file.name.split('.').pop();
+  const storagePath = data.file; // keep same filename
+  try {
+    await uploadFile(storagePath, file);
+    showUploadToast('✅ Replaced!', 100);
+    await loadPortfolioPage();
+  } catch(e) { alert('Upload error: ' + e.message); }
+}
+
+window.deletePortfolioCard = async function(docId, colName, filePath) {
+  if (!confirm('Delete this card permanently?')) return;
+  try {
+    await deleteDoc(doc(db, colName, docId));
+    try { await deleteObject(ref(sto, filePath)); } catch(e) {}
+    await loadPortfolioPage();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+window.addPortfolioCard = async function(colName, type, file) {
+  if (!file) return;
+  const folder = type === 'video' ? 'videos' : 'images';
+  const storagePath = `${folder}/${Date.now()}_${file.name}`;
+  try {
+    showUploadToast('Uploading…', 0);
+    await uploadFile(storagePath, file);
+    const snap = await getDocs(collection(db, colName));
+    const newOrder = snap.size + 1;
+    const newId = colName + '-' + Date.now();
+    await setDoc(doc(db, colName, newId), {
+      id: newId, order: newOrder,
+      title: 'New ' + (type === 'video' ? 'Animation' : 'Still Render'),
+      shortDesc: 'Click ✏ Edit to update this description.',
+      tags: [], file: storagePath, createdAt: new Date()
+    });
+    await loadPortfolioPage();
+    // Auto-open edit modal for new card
+    openPortfolioEdit(newId, colName);
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+window.openPortfolioEdit = async function(docId, colName) {
+  const docSnap = await getDoc(doc(db, colName, docId));
+  const data = docSnap.data() || {};
+  openEditModal({
+    docId, colName, type:'portfolio',
+    title: data.title || '',
+    shortDesc: data.shortDesc || '',
+    tags: (data.tags||[]).join(', '),
+  });
+}
+
+// ════════════════════════════════════════════
+// RENDER ADMIN ACTIONS
+// ════════════════════════════════════════════
+window.replaceRenderMedia = async function(docId, colName, file) {
+  if (!file) return;
+  const docSnap = await getDoc(doc(db, colName, docId));
+  const data = docSnap.data();
+  try {
+    await uploadFile(data.file, file);
+    showUploadToast('✅ Replaced!', 100);
+    if (colName === 'renderVideos') loadRenderPage(); else loadRenderPage();
+  } catch(e) { alert('Upload error: ' + e.message); }
+}
+
+window.deleteRenderCard = async function(docId, colName, filePath) {
+  if (!confirm('Delete this template permanently? Clients will no longer see it.')) return;
+  try {
+    await deleteDoc(doc(db, colName, docId));
+    try { await deleteObject(ref(sto, filePath)); } catch(e) {}
+    await loadRenderPage();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+window.addRenderCard = async function(colName, type, file) {
+  if (!file) return;
+  const folder = type === 'video' ? 'videos' : 'images';
+  const storagePath = `${folder}/${Date.now()}_${file.name}`;
+  try {
+    showUploadToast('Uploading…', 0);
+    await uploadFile(storagePath, file);
+    const snap = await getDocs(collection(db, colName));
+    const newOrder = snap.size + 1;
+    const newId = colName + '-' + Date.now();
+    await setDoc(doc(db, colName, newId), {
+      id: newId, order: newOrder,
+      title: 'New Template',
+      shortDesc: 'Short description here.',
+      fullDesc: 'Full description shown in the detail panel.',
+      price: type === 'video' ? '₹1,999' : '₹999',
+      file: storagePath,
+      extraFiles: [],
+      createdAt: new Date()
+    });
+    await loadRenderPage();
+    openRenderEdit(newId, colName);
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+window.openRenderEdit = async function(docId, colName) {
+  const docSnap = await getDoc(doc(db, colName, docId));
+  const data = docSnap.data() || {};
+  openEditModal({
+    docId, colName, type:'render',
+    title: data.title || '',
+    shortDesc: data.shortDesc || '',
+    fullDesc: data.fullDesc || '',
+    price: data.price || '',
+  });
+}
+
+// ════════════════════════════════════════════
+// SHARED EDIT MODAL
+// ════════════════════════════════════════════
+let _editCtx = null;
+
+function openEditModal(ctx) {
+  _editCtx = ctx;
+  const m = document.getElementById('inline-edit-modal');
+  const overlay = document.getElementById('inline-edit-overlay');
+  if (!m) return;
+  document.getElementById('iem-title').value     = ctx.title || '';
+  document.getElementById('iem-short').value     = ctx.shortDesc || '';
+  document.getElementById('iem-full').value      = ctx.fullDesc || '';
+  document.getElementById('iem-price').value     = ctx.price || '';
+  document.getElementById('iem-tags').value      = ctx.tags || '';
+  document.getElementById('iem-full-row').style.display  = ctx.type === 'render'    ? 'block' : 'none';
+  document.getElementById('iem-price-row').style.display = ctx.type === 'render'    ? 'block' : 'none';
+  document.getElementById('iem-tags-row').style.display  = ctx.type === 'portfolio' ? 'block' : 'none';
+  document.getElementById('iem-msg').textContent = '';
+  overlay.classList.add('open');
+}
+
+window.closeInlineEdit = function() {
+  document.getElementById('inline-edit-overlay').classList.remove('open');
+  _editCtx = null;
+}
+
+window.saveInlineEdit = async function() {
+  if (!_editCtx) return;
+  const title     = document.getElementById('iem-title').value.trim();
+  const shortDesc = document.getElementById('iem-short').value.trim();
+  const fullDesc  = document.getElementById('iem-full').value.trim();
+  const price     = document.getElementById('iem-price').value.trim();
+  const tagsRaw   = document.getElementById('iem-tags').value.trim();
+  const msgEl     = document.getElementById('iem-msg');
+
+  if (!title) { msgEl.textContent = 'Title is required.'; msgEl.style.color = '#f87171'; return; }
+
+  const update = { title, shortDesc };
+  if (_editCtx.type === 'render') { update.fullDesc = fullDesc; update.price = price; }
+  if (_editCtx.type === 'portfolio') { update.tags = tagsRaw.split(',').map(t=>t.trim()).filter(Boolean); }
+
+  try {
+    await updateDoc(doc(db, _editCtx.colName, _editCtx.docId), update);
+    msgEl.textContent = '✅ Saved!'; msgEl.style.color = '#22c55e';
+    setTimeout(() => {
+      closeInlineEdit();
+      if (_editCtx?.type === 'portfolio') loadPortfolioPage();
+      else loadRenderPage();
+    }, 800);
+  } catch(e) { msgEl.textContent = 'Error: ' + e.message; msgEl.style.color = '#f87171'; }
+}
+
+// ════════════════════════════════════════════
+// PAGE CHANGE HOOK — load content on nav
+// ════════════════════════════════════════════
+const origGo = window.go;
+window.go = function(page) {
+  origGo(page);
+  setTimeout(() => {
+    if (page === 'portfolio') loadPortfolioPage();
+    if (page === 'render')    loadRenderPage();
+  }, 80);
+}
+
+// Load on initial page open too
+setTimeout(() => {
+  loadPortfolioPage();
+  loadRenderPage();
+}, 600);
+
+</script>
+
+<!-- ═══ INLINE EDIT MODAL + ADMIN CARD STYLES ═══ -->
+<style>
+/* Admin card overlay bar */
+.admin-card-bar {
+  position:absolute;top:0;left:0;right:0;z-index:20;
+  display:flex;gap:4px;padding:6px 8px;
+  background:linear-gradient(to bottom,rgba(0,0,0,0.85),transparent);
+  opacity:0;transition:opacity 0.2s;pointer-events:none;
+}
+.admin-mode:hover .admin-card-bar, .admin-mode .admin-card-bar:hover { opacity:1;pointer-events:all; }
+.admin-card-bar.admin-render-bar { opacity:1;pointer-events:all; }
+.admin-replace-btn, .admin-edit-btn, .admin-del-btn {
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:700;
+  border-radius:4px;padding:4px 8px;cursor:pointer;border:none;
+  white-space:nowrap;transition:all 0.15s;
+}
+.admin-replace-btn { background:rgba(124,58,237,0.85);color:#fff; }
+.admin-replace-btn:hover { background:#7c3aed; }
+.admin-edit-btn { background:rgba(251,191,36,0.85);color:#000; }
+.admin-edit-btn:hover { background:#fbbf24; }
+.admin-del-btn  { background:rgba(239,68,68,0.85);color:#fff;margin-left:auto; }
+.admin-del-btn:hover  { background:#ef4444; }
+
+/* Add new card */
+.admin-add-card {
+  border:2px dashed rgba(124,58,237,0.25) !important;
+  cursor:pointer;transition:all 0.2s;
+  display:flex;align-items:center;justify-content:center;
+  min-height:200px;
+}
+.admin-add-card:hover { border-color:rgba(124,58,237,0.6) !important;background:rgba(124,58,237,0.05); }
+.admin-add-inner { text-align:center;padding:20px; }
+.admin-add-icon  { font-size:32px;color:rgba(124,58,237,0.4);margin-bottom:8px;line-height:1; }
+.admin-add-label { font-size:12px;font-weight:700;color:var(--pl);margin-bottom:4px; }
+.admin-add-hint  { font-size:11px;color:var(--gdim); }
+
+/* port-card admin mode: show bar on hover */
+.port-card.admin-mode { position:relative;overflow:visible; }
+.port-card.admin-mode .admin-card-bar { border-radius:8px 8px 0 0; }
+
+/* Inline edit overlay */
+.iem-overlay {
+  position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:800;
+  display:none;align-items:center;justify-content:center;
+  backdrop-filter:blur(10px);
+}
+.iem-overlay.open { display:flex; }
+.iem-modal {
+  background:linear-gradient(160deg,#110e26,#0c0919);
+  border:1px solid rgba(124,58,237,0.28);border-radius:14px;
+  padding:28px;width:min(480px,92vw);max-height:88vh;overflow-y:auto;
+}
+.iem-modal h3 { font-family:'Fraunces',serif;font-size:22px;font-weight:700;margin-bottom:22px;color:#fff; }
+.iem-modal h3 em { font-style:italic;color:var(--pl);font-weight:300; }
+.iem-label { font-size:10px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--gdim);margin-bottom:6px;margin-top:14px;display:block; }
+.iem-input, .iem-textarea {
+  width:100%;background:rgba(255,255,255,0.03);
+  border:1px solid rgba(124,58,237,0.18);border-radius:7px;
+  padding:10px 13px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:13px;transition:border-color 0.2s;
+}
+.iem-input:focus,.iem-textarea:focus { outline:none;border-color:var(--pl);background:rgba(124,58,237,0.06); }
+.iem-textarea { resize:vertical;min-height:72px;line-height:1.6; }
+.iem-actions { display:flex;gap:10px;margin-top:22px; }
+.iem-save { flex:1;background:var(--purple);color:#fff;padding:12px;border-radius:7px;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s; }
+.iem-save:hover { background:var(--pm); }
+.iem-cancel { background:transparent;border:1px solid rgba(124,58,237,0.2);color:var(--gdim);padding:12px 20px;border-radius:7px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;cursor:pointer;transition:all 0.2s; }
+.iem-cancel:hover { border-color:var(--pl);color:#fff; }
+.iem-msg { font-size:12px;margin-top:10px;text-align:center;min-height:16px; }
+</style>
+
+<!-- Inline Edit Modal HTML -->
+<div class="iem-overlay" id="inline-edit-overlay">
+  <div class="iem-modal">
+    <h3>Edit <em>Card Info</em></h3>
+    <label class="iem-label">Title</label>
+    <input class="iem-input" id="iem-title" placeholder="e.g. Streetwear Float">
+    <label class="iem-label">Short description (shown on card)</label>
+    <input class="iem-input" id="iem-short" placeholder="e.g. Floating tee with rim lighting, dark BG.">
+    <div id="iem-full-row">
+      <label class="iem-label">Full description (detail panel)</label>
+      <textarea class="iem-textarea" id="iem-full" placeholder="Longer description shown when client opens the template…"></textarea>
+    </div>
+    <div id="iem-price-row">
+      <label class="iem-label">Price</label>
+      <input class="iem-input" id="iem-price" placeholder="e.g. ₹1,999">
+    </div>
+    <div id="iem-tags-row">
+      <label class="iem-label">Tags (comma separated)</label>
+      <input class="iem-input" id="iem-tags" placeholder="e.g. Streetwear, 3D, Luxury">
+    </div>
+    <div class="iem-msg" id="iem-msg"></div>
+    <div class="iem-actions">
+      <button class="iem-cancel" onclick="closeInlineEdit()">Cancel</button>
+      <button class="iem-save" onclick="saveInlineEdit()">Save Changes →</button>
+    </div>
+  </div>
+</div>
 <!-- ═══ AUTH MODAL ═══ -->
 <style>
 /* ── Overlay ── */
