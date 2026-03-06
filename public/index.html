@@ -3583,38 +3583,33 @@ function updateCartBadge() {
   badge.classList.toggle('show', count > 0);
 }
 
-// ── Quick-add from render page (no login required) ──
+// ── Quick-add from render page (no panel needed) ──
 function quickAddToCart(type, title, desc, src, price, btn) {
-  // NO auth check here — anyone can add to cart
-  // Login is only required at checkout (Pay & Place Order)
+  // No login required to add to cart — login is only asked at checkout
 
-  const item = {
-    id:           Date.now(),
-    title, desc, src, price,
+  window._cart = window._cart || [];
+  window._cart.push({
+    id: Date.now(), title, desc, src, price,
     templateType:  type,
     priceNum:      parseFloat(price.replace(/[^0-9.]/g,'').replace(',','')),
-    isINR:         price.includes('₹'),
+    isINR:         price.includes('\u20b9'),
     refFiles:      [],
     designFiles:   [null, null, null, null],
     labels:        ['Front','Back','Sleeves','Logo'],
     addedAt:       new Date().toLocaleTimeString()
-  };
-
-  window._cart = window._cart || [];
-  window._cart.push(item);
+  });
   updateCartBadge();
 
-  // Show qty counter on button
   const qty = window._cart.filter(i => i.title === title).length;
+
   if (btn) {
     btn.classList.add('added');
     btn.style.cssText = 'display:inline-flex;align-items:center;gap:0;padding:0;overflow:hidden;border-radius:6px;min-width:90px;justify-content:center;';
-    btn.innerHTML = `
-      <span onclick="event.stopPropagation();cartQtyChange('${title}',${type==='video'?`'${src}'`:JSON.stringify(src)},'${price}','${type}',this.closest('button'),-1)"
-        style="padding:6px 10px;font-size:15px;font-weight:700;cursor:pointer;user-select:none;border-right:1px solid rgba(255,255,255,0.15);">−</span>
-      <span class="cart-qty-display" data-title="${title}" style="padding:6px 8px;font-size:12px;font-weight:700;min-width:26px;text-align:center;">${qty}</span>
-      <span onclick="event.stopPropagation();cartQtyChange('${title}',${type==='video'?`'${src}'`:JSON.stringify(src)},'${price}','${type}',this.closest('button'),1)"
-        style="padding:6px 10px;font-size:15px;font-weight:700;cursor:pointer;user-select:none;border-left:1px solid rgba(255,255,255,0.15);">+</span>`;
+    const srcJson = type === 'video' ? JSON.stringify(src) : JSON.stringify(src);
+    btn.innerHTML =
+      '<span onclick="event.stopPropagation();cartQtyChange(' + JSON.stringify(title) + ',' + srcJson + ',' + JSON.stringify(price) + ',' + JSON.stringify(type) + ',this.closest(\'button\'),-1)" style="padding:6px 10px;font-size:15px;font-weight:700;cursor:pointer;user-select:none;border-right:1px solid rgba(255,255,255,0.15);">−</span>' +
+      '<span class="cart-qty-display" data-title="' + title.replace(/"/g,'&quot;') + '" style="padding:6px 8px;font-size:12px;font-weight:700;min-width:26px;text-align:center;">' + qty + '</span>' +
+      '<span onclick="event.stopPropagation();cartQtyChange(' + JSON.stringify(title) + ',' + srcJson + ',' + JSON.stringify(price) + ',' + JSON.stringify(type) + ',this.closest(\'button\'),1)" style="padding:6px 10px;font-size:15px;font-weight:700;cursor:pointer;user-select:none;border-left:1px solid rgba(255,255,255,0.15);">+</span>';
     btn.onclick = function(e) { e.stopPropagation(); };
   }
 
@@ -3627,29 +3622,30 @@ function cartQtyChange(title, src, price, type, btn, delta) {
     window._cart.push({
       id: Date.now(), title, desc:'', src, price, templateType: type,
       priceNum: parseFloat(price.replace(/[^0-9.]/g,'').replace(',','')),
-      isINR: price.includes('₹'), refFiles:[], designFiles:[null,null,null,null],
-      labels:['Front','Back','Sleeves','Logo'], addedAt: new Date().toLocaleTimeString()
+      isINR: price.includes('\u20b9'),
+      refFiles:[], designFiles:[null,null,null,null],
+      labels:['Front','Back','Sleeves','Logo'],
+      addedAt: new Date().toLocaleTimeString()
     });
     showCartToast(title);
   } else {
     const entries = window._cart.map((item,n) => [item,n]).filter(([item]) => item.title === title);
-    if (entries.length) window._cart.splice(entries[entries.length-1][1], 1);
+    if (entries.length) window._cart.splice(entries[entries.length - 1][1], 1);
   }
   updateCartBadge();
   const qty = window._cart.filter(i => i.title === title).length;
-  document.querySelectorAll('.cart-qty-display').forEach(el => {
+  document.querySelectorAll('.cart-qty-display').forEach(function(el) {
     if (el.dataset.title === title) {
       el.textContent = qty;
       if (qty === 0 && btn) {
         btn.classList.remove('added');
         btn.style.cssText = '';
-        btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add to Cart`;
-        const t=title,s=src,p=price,ty=type;
-        btn.onclick = function(e){e.stopPropagation();quickAddToCart(ty,t,'',s,p,btn);};
+        btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add to Cart';
+        (function(t,s,p,ty){ btn.onclick = function(e){e.stopPropagation();quickAddToCart(ty,t,'',s,p,btn);}; })(title,src,price,type);
       }
     }
   });
-  if (qty > 0) renderCart();
+  if (qty > 0 && typeof renderCart === 'function') renderCart();
 }
 
 </script>
@@ -3993,26 +3989,17 @@ onAuthStateChanged(auth, async (user) => {
   if (user) {
     await loadUserProfile(user.uid);
 
-    // Restore any cart items saved before login prompt
+    // Restore cart items that were added before login
     try {
-      const saved = sessionStorage.getItem('_pendingCart');
+      var saved = sessionStorage.getItem('_pendingCart');
       if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.length) {
-          window._cart = window._cart || [];
-          // Only restore items not already in cart (avoid duplicates if user was already logged in)
-          if (window._cart.length === 0) {
-            parsed.forEach(i => {
-              window._cart.push({
-                ...i,
-                refFiles: [],
-                designFiles: [null, null, null, null],
-                labels: ['Front','Back','Sleeves','Logo']
-              });
-            });
-            updateCartBadge();
-            if (typeof renderCart === 'function') renderCart();
-          }
+        var parsed = JSON.parse(saved);
+        if (parsed.length && (!window._cart || window._cart.length === 0)) {
+          window._cart = parsed.map(function(i) {
+            return Object.assign({}, i, { refFiles:[], designFiles:[null,null,null,null], labels:['Front','Back','Sleeves','Logo'] });
+          });
+          if (typeof updateCartBadge === 'function') updateCartBadge();
+          if (typeof renderCart === 'function') renderCart();
         }
         sessionStorage.removeItem('_pendingCart');
       }
@@ -4925,13 +4912,12 @@ window.checkAdminAccess = function() {
 let _confirmationResult = null;
 
 function openAuthModal(mode) {
-  // Save cart items (non-file data) before login so they survive the auth flow
+  // Save cart before login so items survive the auth flow
   try {
-    const cartData = (window._cart || []).map(i => ({
-      id: i.id, title: i.title, desc: i.desc, src: i.src,
-      price: i.price, templateType: i.templateType,
-      priceNum: i.priceNum, isINR: i.isINR, addedAt: i.addedAt
-    }));
+    const cartData = (window._cart || []).map(function(i) {
+      return { id:i.id, title:i.title, desc:i.desc, src:i.src, price:i.price,
+               templateType:i.templateType, priceNum:i.priceNum, isINR:i.isINR, addedAt:i.addedAt };
+    });
     if (cartData.length) sessionStorage.setItem('_pendingCart', JSON.stringify(cartData));
   } catch(e) {}
   document.getElementById('auth-overlay').classList.add('open');
@@ -5165,10 +5151,10 @@ async function detectAndSetPricing() {
 
     // Update rtype-badges
     document.querySelectorAll('.rtype-badge').forEach(el => {
-      if (el.textContent.includes('999') || el.textContent.includes('100')) {
-        el.textContent = pricing.templateImage + ' / 5 image';
-      } else if (el.textContent.includes('1,999') || el.textContent.includes('50')) {
+      if (el.textContent.includes('1,999') || el.textContent.includes('50')) {
         el.textContent = pricing.templateVideo + ' / video';
+      } else if (el.textContent.includes('999') || el.textContent.includes('100')) {
+        el.textContent = pricing.templateImage + ' / 5 image';
       }
     });
 
@@ -5884,16 +5870,15 @@ function removeCartItem(id) {
   updateCartBadge();
   if (removing) {
     const qty = window._cart.filter(i => i.title === removing.title).length;
-    document.querySelectorAll('.cart-qty-display').forEach(el => {
+    document.querySelectorAll('.cart-qty-display').forEach(function(el) {
       if (el.dataset.title === removing.title) {
         el.textContent = qty;
         if (qty === 0) {
           const btn = el.closest('button');
           if (btn) {
             btn.classList.remove('added'); btn.style.cssText = '';
-            btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add to Cart`;
-            const t=removing.title,s=removing.src,p=removing.price,ty=removing.templateType;
-            btn.onclick = function(e){e.stopPropagation();quickAddToCart(ty,t,'',s,p,btn);};
+            btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add to Cart';
+            (function(t,s,p,ty){ btn.onclick = function(e){e.stopPropagation();quickAddToCart(ty,t,'',s,p,btn);}; })(removing.title,removing.src,removing.price,removing.templateType);
           }
         }
       }
