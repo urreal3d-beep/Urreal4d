@@ -680,12 +680,6 @@ body{background:var(--black);color:var(--white);font-family:'Plus Jakarta Sans',
   opacity:1;
 }
 
-@keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
-.media-box::before,.photo-box::before,.rt-media::before{content:'';position:absolute;inset:0;z-index:0;background:linear-gradient(90deg,rgba(124,58,237,0.06) 0%,rgba(124,58,237,0.12) 40%,rgba(124,58,237,0.06) 80%);background-size:600px 100%;animation:shimmer 1.6s infinite linear;pointer-events:none;}
-.media-box.loaded::before,.photo-box.loaded::before,.rt-media.loaded::before{display:none;}
-.media-box video,.photo-box img,.rt-media video,.rt-media img{position:relative;z-index:1;}
-
-
 /* Gradient overlay always visible at bottom for readability */
 .port-card-overlay{
   position:absolute;inset:0;
@@ -1070,32 +1064,55 @@ footer{background:var(--deep);border-top:1px solid var(--pb);padding:32px clamp(
   .nav-login-btn{display:none;}
 }
 
-
-
+/* ── Mobile pricing — single column, horizontal card layout ── */
 @media(max-width:540px){
-  .pricing-grid{grid-template-columns:1fr !important;gap:12px !important;padding-left:16px !important;padding-right:16px !important;margin-top:28px !important;}
-  .price-card{padding:20px 18px 18px !important;border-radius:10px !important;}
-  .price-card.popular{border-radius:10px !important;}
-  .price-icon{font-size:20px !important;margin-bottom:10px !important;}
-  .price-card h3{font-size:17px !important;margin-bottom:6px !important;}
-  .price-card .price-desc{font-size:12.5px !important;line-height:1.6 !important;margin-bottom:12px !important;}
-  .price-num{font-size:26px !important;line-height:1 !important;}
-  .price-num em{font-size:12px !important;}
-  .price-from{font-size:9px !important;margin-bottom:3px !important;}
-  .price-amount{margin-bottom:12px !important;}
-  .price-divider{margin:12px 0 !important;}
-  .price-features{gap:8px !important;margin-bottom:16px !important;}
-  .pf{font-size:12.5px !important;line-height:1.45 !important;}
-  .price-cta{padding:13px !important;font-size:11px !important;border-radius:6px !important;}
-  .popular-badge{font-size:8.5px !important;padding:3px 9px !important;margin-bottom:12px !important;}
-  .pricing-hero h1{font-size:36px !important;line-height:1 !important;}
-  .pricing-hero p{font-size:13px !important;max-width:100% !important;}
-  .pricing-trust{gap:14px !important;}
-  .pricing-note{font-size:11.5px !important;padding:16px 16px 8px !important;}
-  .pricing-faq-title{font-size:24px !important;margin-bottom:20px !important;}
-  .faq-q{font-size:13px !important;padding:14px 0 !important;}
-  .faq-a-inner{font-size:12px !important;line-height:1.7 !important;}
-}gin-top:3px !important; }
+  .pricing-grid{
+    grid-template-columns:1fr !important;
+    gap:12px !important;
+    padding-left:16px !important;
+    padding-right:16px !important;
+    margin-top:28px !important;
+  }
+  .price-card{
+    display:grid;
+    grid-template-columns:1fr;
+    padding:20px 18px 18px !important;
+    border-radius:10px !important;
+  }
+  .price-card.popular{
+    border-radius:10px !important;
+  }
+  .price-icon{ font-size:20px !important; margin-bottom:10px !important; }
+  .price-card h3{ font-size:17px !important; margin-bottom:6px !important; }
+  .price-card .price-desc{
+    font-size:12.5px !important;
+    line-height:1.6 !important;
+    margin-bottom:12px !important;
+    color:rgba(160,160,180,0.85) !important;
+  }
+  .price-num{
+    font-size:26px !important;
+    line-height:1 !important;
+  }
+  .price-num em{ font-size:12px !important; }
+  .price-from{ font-size:9px !important; margin-bottom:3px !important; }
+  .price-amount{ margin-bottom:12px !important; }
+  .price-divider{ margin:12px 0 !important; }
+  .price-features{ gap:8px !important; margin-bottom:16px !important; }
+  .pf{ font-size:12.5px !important; line-height:1.45 !important; gap:9px !important; }
+  .pf-check{ font-size:11px !important; margin-top:1px !important; }
+  .price-cta{
+    padding:13px !important;
+    font-size:11px !important;
+    border-radius:6px !important;
+    letter-spacing:0.08em !important;
+  }
+  .popular-badge{
+    font-size:8.5px !important;
+    padding:3px 9px !important;
+    margin-bottom:12px !important;
+  }
+  .price-range{ font-size:10.5px !important; margin-top:3px !important; }
 
   /* Hero on mobile */
   .pricing-hero h1{ font-size:36px !important; line-height:1 !important; }
@@ -3185,266 +3202,798 @@ async function pfVerifyPhoneOTP() {
 
     // Update UI
     document.getElementById('pfa-phone').textContent            = verifiedPhone;
+    document.getElementById('pfa-phone-verified').style.display = 'inline-flex';
+    document.getElementById('pf-email').textContent             = verifiedPhone;
+    pfHidePhoneVerify();
+
+    const phoneRow = document.getElementById('pfa-phone-row');
+    if (phoneRow) { phoneRow.style.background = 'rgba(34,197,94,0.07)'; setTimeout(() => phoneRow.style.background = '', 1500); }
+
+  } catch(e) {
+    console.error('OTP verify error:', e.code, e.message);
+    let msg = 'Verification failed. Please try again.';
+    if (e.code === 'auth/invalid-verification-code') msg = 'Incorrect OTP. Please check and try again.';
+    if (e.code === 'auth/code-expired')              msg = 'OTP expired. Please request a new one.';
+    if (e.code === 'auth/provider-already-linked')   msg = 'Phone already linked to your account.';
+    if (e.code === 'auth/credential-already-in-use') msg = 'This number is used by another account.';
+    pfSetMsg('pfa-phone-msg', msg, 'error');
+    boxes.forEach(b => { b.value = ''; b.classList.remove('filled'); });
+    document.querySelector('.pfa-otp-box')?.focus();
+  }
+  btn.disabled = false; btn.textContent = 'Verify OTP →';
+}
+
+function pfSetMsg(id, text, type) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text;
+  el.style.color = type === 'error' ? '#f87171' : type === 'success' ? '#22c55e' : 'var(--gdim)';
+}
+</script>
+
+
 <!-- ═══ ADMIN PAGE ═══ -->
 <div class="page" id="p-admin">
 <style>
-/* ═══════════════════════════════════════════
-   ADMIN DASHBOARD — FULL REDESIGN
-═══════════════════════════════════════════ */
-.adm-shell{display:flex;min-height:100vh;background:#07051a;}
-.adm-sidebar{width:220px;flex-shrink:0;background:#080619;border-right:1px solid rgba(124,58,237,0.1);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:10;padding:0;}
-.adm-sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid rgba(124,58,237,0.08);display:flex;align-items:center;gap:9px;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#fff;letter-spacing:-0.01em;}
-.adm-sidebar-logo em{color:var(--pl);font-style:normal;}
-.adm-sidebar-badge{margin-left:auto;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.25);color:#a78bfa;font-size:8px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;padding:3px 7px;border-radius:4px;font-family:'Plus Jakarta Sans',sans-serif;}
-.adm-nav{flex:1;padding:16px 10px;display:flex;flex-direction:column;gap:2px;}
-.adm-nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;color:rgba(106,88,128,0.9);transition:all 0.18s;border:none;background:none;text-align:left;width:100%;letter-spacing:0.01em;position:relative;}
-.adm-nav-item svg{flex-shrink:0;opacity:0.7;transition:opacity 0.18s;}
-.adm-nav-item:hover{background:rgba(124,58,237,0.08);color:#c4b5fd;}
+/* ══════════════════════════════════════════
+   ADMIN DASHBOARD — PROFESSIONAL REDESIGN
+══════════════════════════════════════════ */
+
+/* ── Layout shell ── */
+.adm-shell{
+  display:flex;min-height:100vh;background:var(--black);
+  font-family:'Plus Jakarta Sans',sans-serif;
+}
+
+/* ── SIDEBAR ── */
+.adm-sidebar{
+  width:240px;flex-shrink:0;
+  background:var(--deep);
+  border-right:1px solid rgba(124,58,237,0.1);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;bottom:0;
+  z-index:10;overflow-y:auto;
+  padding-bottom:24px;
+}
+.adm-sidebar-brand{
+  padding:28px 22px 20px;
+  border-bottom:1px solid rgba(124,58,237,0.08);
+  display:flex;align-items:center;gap:10px;
+}
+.adm-brand-icon{
+  width:34px;height:34px;border-radius:8px;
+  background:linear-gradient(135deg,rgba(124,58,237,0.4),rgba(91,33,182,0.3));
+  border:1px solid rgba(124,58,237,0.35);
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;flex-shrink:0;
+}
+.adm-brand-text{}
+.adm-brand-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--white);line-height:1;letter-spacing:-0.01em;}
+.adm-brand-name span{color:var(--pl);}
+.adm-brand-sub{font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gdim);margin-top:3px;}
+
+.adm-sidebar-section{
+  padding:16px 14px 6px;
+  font-size:9px;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--gdim);
+}
+.adm-nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 16px;margin:1px 8px;border-radius:8px;
+  color:var(--gdim);font-size:12.5px;font-weight:600;
+  cursor:pointer;transition:all 0.18s;
+  border:1px solid transparent;user-select:none;
+}
+.adm-nav-item svg{flex-shrink:0;opacity:0.6;transition:opacity 0.18s;}
+.adm-nav-item:hover{background:rgba(124,58,237,0.07);color:var(--white);border-color:rgba(124,58,237,0.12);}
 .adm-nav-item:hover svg{opacity:1;}
-.adm-nav-item.active{background:rgba(124,58,237,0.12);color:#e2d9ff;}
+.adm-nav-item.active{
+  background:rgba(124,58,237,0.12);color:var(--white);
+  border-color:rgba(124,58,237,0.2);
+}
 .adm-nav-item.active svg{opacity:1;}
-.adm-nav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:2px;background:#7c3aed;border-radius:0 2px 2px 0;}
-.adm-nav-badge{margin-left:auto;min-width:18px;height:18px;padding:0 5px;background:#f97316;color:#fff;border-radius:9px;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;}
-.adm-nav-section{font-size:8.5px;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;color:rgba(106,88,128,0.4);padding:14px 12px 6px;font-family:'Plus Jakarta Sans',sans-serif;}
-.adm-sidebar-footer{padding:16px 10px;border-top:1px solid rgba(124,58,237,0.08);}
-.adm-sidebar-time{font-size:10.5px;color:rgba(106,88,128,0.6);font-family:'Plus Jakarta Sans',sans-serif;padding:0 4px;line-height:1.5;}
-.adm-main{margin-left:220px;flex:1;min-height:100vh;}
-.adm-topbar{height:58px;padding:0 32px;border-bottom:1px solid rgba(124,58,237,0.08);display:flex;align-items:center;justify-content:space-between;background:rgba(7,5,26,0.9);backdrop-filter:blur(10px);position:sticky;top:0;z-index:5;}
-.adm-topbar-title{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:#fff;letter-spacing:-0.02em;}
+.adm-nav-badge{
+  margin-left:auto;min-width:18px;height:18px;border-radius:9px;
+  background:rgba(124,58,237,0.25);color:var(--pl);
+  font-size:9px;font-weight:800;padding:0 5px;
+  display:flex;align-items:center;justify-content:center;
+}
+.adm-nav-badge.orange{background:rgba(249,115,22,0.2);color:#f97316;}
+.adm-nav-badge.green{background:rgba(34,197,94,0.15);color:#22c55e;}
+
+.adm-sidebar-bottom{
+  margin-top:auto;padding:16px 14px 0;
+  border-top:1px solid rgba(124,58,237,0.07);
+}
+.adm-clock{
+  font-size:11px;color:var(--gdim);padding:10px 4px;
+  letter-spacing:0.02em;line-height:1.5;
+}
+
+/* ── MAIN CONTENT ── */
+.adm-main{
+  margin-left:240px;flex:1;
+  min-height:100vh;
+  padding-top:68px;
+}
+
+/* ── TOP BAR ── */
+.adm-topbar{
+  position:fixed;top:0;left:240px;right:0;height:68px;z-index:9;
+  background:rgba(10,7,24,0.92);
+  backdrop-filter:blur(24px);
+  border-bottom:1px solid rgba(124,58,237,0.1);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;
+}
+.adm-topbar-left{display:flex;align-items:center;gap:12px;}
+.adm-topbar-title{font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:var(--white);letter-spacing:-0.02em;}
 .adm-topbar-title em{font-style:italic;color:var(--pl);font-weight:300;}
 .adm-topbar-right{display:flex;align-items:center;gap:10px;}
-.adm-refresh-btn{display:flex;align-items:center;gap:6px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.18);color:#a78bfa;padding:7px 14px;border-radius:7px;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all 0.18s;letter-spacing:0.04em;}
-.adm-refresh-btn:hover{background:rgba(124,58,237,0.16);border-color:#a78bfa;color:#e2d9ff;}
-.adm-content{padding:28px 32px 60px;}
-.adm-stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px;}
-@media(max-width:700px){.adm-stats-row{grid-template-columns:repeat(2,1fr);}}
-.adm-stat-card{background:rgba(255,255,255,0.018);border:1px solid rgba(124,58,237,0.1);border-radius:10px;padding:18px 20px;transition:border-color 0.2s,transform 0.2s;cursor:default;}
-.adm-stat-card:hover{border-color:rgba(124,58,237,0.28);transform:translateY(-1px);}
-.adm-stat-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;}
-.adm-stat-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;}
-.adm-stat-num{font-family:'Fraunces',serif;font-size:30px;font-weight:700;line-height:1;letter-spacing:-0.02em;}
-.adm-stat-lbl{font-size:10px;font-weight:700;color:var(--gdim);letter-spacing:0.1em;text-transform:uppercase;margin-top:3px;font-family:'Plus Jakarta Sans',sans-serif;}
-.adm-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(124,58,237,0.07);}
-.adm-section-title{font-family:'Fraunces',serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:-0.01em;}
+.adm-topbar-pill{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(34,197,94,0.08);
+  border:1px solid rgba(34,197,94,0.2);
+  border-radius:100px;padding:5px 12px;
+  font-size:11px;font-weight:700;color:#22c55e;
+}
+.adm-topbar-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;animation:blink 2s infinite;}
+.adm-back-btn{
+  background:rgba(124,58,237,0.07);border:1px solid rgba(124,58,237,0.15);
+  color:var(--gdim);padding:7px 14px;border-radius:7px;
+  font-size:11.5px;font-weight:600;cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;transition:all 0.18s;
+}
+.adm-back-btn:hover{color:var(--white);border-color:var(--pl);}
+.adm-refresh-pill{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(124,58,237,0.07);border:1px solid rgba(124,58,237,0.15);
+  color:var(--gdim);padding:7px 14px;border-radius:7px;
+  font-size:11.5px;font-weight:600;cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;transition:all 0.18s;
+}
+.adm-refresh-pill:hover{color:var(--white);border-color:var(--pl);}
+
+/* ── CONTENT PANELS ── */
+.adm-panel{display:none;padding:28px 32px 60px;}
+.adm-panel.active{display:block;animation:fadeUp 0.28s ease both;}
+
+/* ── STAT CARDS ── */
+.adm-stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:28px;}
+.adm-stat-card{
+  background:var(--card);border:1px solid rgba(124,58,237,0.1);
+  border-radius:12px;padding:18px 20px;
+  transition:border-color 0.2s,transform 0.2s;
+  position:relative;overflow:hidden;
+}
+.adm-stat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--purple),transparent);
+  opacity:0;transition:opacity 0.2s;
+}
+.adm-stat-card:hover{border-color:rgba(124,58,237,0.25);transform:translateY(-2px);}
+.adm-stat-card:hover::before{opacity:1;}
+.adm-stat-icon{font-size:18px;margin-bottom:10px;display:block;}
+.adm-stat-num{font-family:'Fraunces',serif;font-size:34px;font-weight:700;line-height:1;margin-bottom:4px;color:var(--white);}
+.adm-stat-num.purple{color:var(--pl);}
+.adm-stat-num.orange{color:#f97316;}
+.adm-stat-num.yellow{color:var(--yellow);}
+.adm-stat-num.green{color:var(--green);}
+.adm-stat-num.red{color:#f87171;}
+.adm-stat-lbl{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gdim);}
+
+/* ── SECTION HEADER ── */
+.adm-section-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:20px;padding-bottom:16px;
+  border-bottom:1px solid rgba(124,58,237,0.08);
+}
+.adm-section-title{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--white);}
 .adm-section-title em{font-style:italic;color:var(--pl);font-weight:300;}
-.adm-section-meta{font-size:11px;color:var(--gdim);margin-top:2px;font-family:'Plus Jakarta Sans',sans-serif;}
-.adm-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;}
-.adm-pill{padding:5px 14px;border-radius:100px;border:1px solid rgba(124,58,237,0.18);background:transparent;color:rgba(106,88,128,0.9);font-family:'Plus Jakarta Sans',sans-serif;font-size:10.5px;font-weight:700;cursor:pointer;transition:all 0.18s;letter-spacing:0.04em;}
-.adm-pill:hover{border-color:rgba(124,58,237,0.4);color:#c4b5fd;}
-.adm-pill.active{background:rgba(124,58,237,0.15);border-color:#7c3aed;color:#e2d9ff;}
-.adm-client-card{background:rgba(255,255,255,0.014);border:1px solid rgba(124,58,237,0.09);border-radius:12px;margin-bottom:10px;overflow:hidden;transition:border-color 0.22s;}
-.adm-client-card:hover{border-color:rgba(124,58,237,0.24);}
-.adm-client-hdr{padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none;}
-.adm-avatar{width:38px;height:38px;border-radius:10px;flex-shrink:0;background:rgba(124,58,237,0.14);border:1px solid rgba(124,58,237,0.22);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:16px;font-weight:700;color:#a78bfa;}
+.adm-section-sub{font-size:12px;color:var(--gdim);margin-top:2px;}
+.adm-section-actions{display:flex;gap:8px;align-items:center;}
+
+/* ── FILTER BAR ── */
+.adm-filter-bar{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
+.adm-chip{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(124,58,237,0.04);
+  border:1px solid rgba(124,58,237,0.14);
+  color:var(--gdim);padding:7px 14px;border-radius:100px;
+  font-size:11.5px;font-weight:600;cursor:pointer;
+  transition:all 0.18s;
+  font-family:'Plus Jakarta Sans',sans-serif;
+}
+.adm-chip:hover{border-color:rgba(124,58,237,0.3);color:var(--white);}
+.adm-chip.active{background:var(--purple);border-color:var(--purple);color:#fff;box-shadow:0 2px 12px rgba(124,58,237,0.3);}
+
+/* ── TABLE ── */
+.adm-table-wrap{
+  background:var(--card);border:1px solid rgba(124,58,237,0.1);
+  border-radius:12px;overflow:hidden;
+}
+.adm-table{width:100%;border-collapse:collapse;}
+.adm-table thead tr{background:rgba(124,58,237,0.06);border-bottom:1px solid rgba(124,58,237,0.12);}
+.adm-table th{
+  padding:11px 16px;text-align:left;
+  font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--gdim);white-space:nowrap;
+}
+.adm-table th:first-child{padding-left:20px;}
+.adm-table th:last-child{padding-right:20px;text-align:right;}
+.adm-table tbody tr{border-bottom:1px solid rgba(124,58,237,0.06);transition:background 0.15s;}
+.adm-table tbody tr:last-child{border-bottom:none;}
+.adm-table tbody tr:hover{background:rgba(124,58,237,0.04);}
+.adm-table td{padding:13px 16px;font-size:13px;color:var(--gray);vertical-align:middle;}
+.adm-table td:first-child{padding-left:20px;}
+.adm-table td:last-child{padding-right:20px;text-align:right;}
+.adm-td-name{font-weight:700;color:var(--white);font-size:13.5px;}
+.adm-td-sub{font-size:11px;color:var(--gdim);margin-top:1px;}
+.adm-td-mono{font-size:11.5px;color:var(--gdim);font-family:monospace;}
+.adm-td-amount{font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:var(--pl);}
+
+/* ── BADGES ── */
+.adm-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  border-radius:100px;padding:4px 10px;
+  font-size:10px;font-weight:800;letter-spacing:0.06em;white-space:nowrap;
+}
+.adm-badge-pending{background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.2);color:var(--yellow);}
+.adm-badge-done{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);color:var(--green);}
+.adm-badge-failed{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;}
+.adm-badge-rejected{background:rgba(107,114,128,0.1);border:1px solid rgba(107,114,128,0.2);color:var(--gdim);}
+.adm-badge-awaiting{background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.2);color:#f97316;}
+.adm-badge-live{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);color:var(--green);}
+
+/* ── CLIENT CARDS (ORDERS VIEW) ── */
+.adm-client-card{
+  background:var(--card);border:1px solid rgba(124,58,237,0.1);
+  border-radius:12px;margin-bottom:12px;overflow:hidden;
+  transition:border-color 0.2s;
+}
+.adm-client-card:hover{border-color:rgba(124,58,237,0.22);}
+.adm-client-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;cursor:pointer;user-select:none;gap:12px;
+}
+.adm-client-avatar{
+  width:40px;height:40px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,rgba(124,58,237,0.3),rgba(91,33,182,0.15));
+  border:1px solid rgba(124,58,237,0.25);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif;font-size:17px;font-weight:700;color:var(--pl);
+}
 .adm-client-info{flex:1;min-width:0;}
-.adm-client-name{font-family:'Fraunces',serif;font-size:14.5px;font-weight:600;color:#fff;letter-spacing:-0.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.adm-client-sub{font-size:10.5px;color:var(--gdim);margin-top:2px;font-family:'Plus Jakarta Sans',sans-serif;}
-.adm-client-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
-.adm-chevron{color:var(--gdim);transition:transform 0.25s;}
+.adm-client-name{font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:var(--white);letter-spacing:-0.01em;}
+.adm-client-meta{font-size:11px;color:var(--gdim);margin-top:2px;}
+.adm-client-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.adm-chevron{color:var(--gdim);transition:transform 0.25s;font-size:14px;display:flex;align-items:center;}
 .adm-client-card.open .adm-chevron{transform:rotate(180deg);}
-.adm-orders-body{max-height:0;overflow:hidden;transition:max-height 0.4s ease;}
-.adm-client-card.open .adm-orders-body{max-height:3000px;}
-.adm-order-item{margin:0 12px 12px;background:rgba(0,0,0,0.22);border:1px solid rgba(124,58,237,0.08);border-radius:10px;overflow:hidden;}
-.adm-order-top{padding:14px 16px 0;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;}
-.adm-order-name{font-family:'Fraunces',serif;font-size:13.5px;font-weight:600;color:#fff;letter-spacing:-0.01em;}
+.adm-client-orders{max-height:0;overflow:hidden;transition:max-height 0.38s ease;}
+.adm-client-card.open .adm-client-orders{max-height:3000px;}
+
+/* ── ORDER ITEM ── */
+.adm-order-item{
+  margin:0 12px 12px;
+  background:rgba(0,0,0,0.25);
+  border:1px solid rgba(124,58,237,0.1);
+  border-radius:10px;padding:18px;
+}
+.adm-order-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px;}
+.adm-order-title{font-family:'Fraunces',serif;font-size:14.5px;font-weight:700;color:var(--white);letter-spacing:-0.01em;}
 .adm-order-actions{display:flex;align-items:center;gap:6px;}
-.adm-order-del{width:28px;height:28px;border-radius:7px;cursor:pointer;background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.18);color:#f87171;display:flex;align-items:center;justify-content:center;transition:all 0.18s;flex-shrink:0;}
-.adm-order-del:hover{background:rgba(239,68,68,0.16);border-color:rgba(239,68,68,0.4);}
-.adm-order-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0 16px 14px;}
-.adm-orow{background:rgba(124,58,237,0.04);border-radius:7px;padding:9px 11px;font-family:'Plus Jakarta Sans',sans-serif;}
-.adm-orow-lbl{font-size:9px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:rgba(106,88,128,0.7);margin-bottom:3px;}
-.adm-orow-val{font-size:12px;font-weight:600;color:#e2d9ff;line-height:1.3;}
-.adm-upload-zone{margin:0 16px 14px;border:1px solid rgba(124,58,237,0.15);border-radius:10px;overflow:hidden;}
-.adm-upload-zone-head{padding:11px 14px;background:rgba(124,58,237,0.06);border-bottom:1px solid rgba(124,58,237,0.1);font-size:9.5px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:#a78bfa;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;gap:7px;}
-.adm-upload-zone-body{padding:14px;display:flex;flex-direction:column;gap:10px;}
-.adm-drop-area{border:1px dashed rgba(124,58,237,0.25);border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:all 0.2s;background:rgba(124,58,237,0.03);position:relative;}
-.adm-drop-area:hover,.adm-drop-area.drag-over{border-color:rgba(124,58,237,0.55);background:rgba(124,58,237,0.08);}
-.adm-drop-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.adm-drop-icon{width:36px;height:36px;border-radius:9px;margin:0 auto 8px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);display:flex;align-items:center;justify-content:center;}
-.adm-drop-title{font-size:12px;font-weight:700;color:#c4b5fd;font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:3px;}
-.adm-drop-sub{font-size:10px;color:var(--gdim);font-family:'Plus Jakarta Sans',sans-serif;}
-.adm-upload-progress{height:4px;background:rgba(124,58,237,0.12);border-radius:4px;overflow:hidden;display:none;}
-.adm-upload-progress-bar{height:100%;width:0;background:#7c3aed;border-radius:4px;transition:width 0.25s;}
-.adm-upload-status{font-size:10.5px;color:var(--gdim);font-family:'Plus Jakarta Sans',sans-serif;display:none;}
-.adm-uploaded-file{display:flex;align-items:center;gap:8px;padding:9px 12px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:11.5px;color:#22c55e;display:none;}
-.adm-uploaded-file svg{flex-shrink:0;}
-.adm-uploaded-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.adm-done-btn{width:100%;padding:12px;border-radius:8px;border:none;background:var(--purple);color:#fff;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;transition:all 0.22s;box-shadow:0 4px 18px rgba(124,58,237,0.28);display:flex;align-items:center;justify-content:center;gap:8px;}
-.adm-done-btn:hover{background:var(--pm);box-shadow:0 6px 24px rgba(124,58,237,0.4);transform:translateY(-1px);}
-.adm-done-btn:disabled{opacity:0.55;cursor:not-allowed;transform:none;}
-.adm-done-btn.done{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);color:#22c55e;cursor:default;box-shadow:none;transform:none;}
-.adm-view-render{display:flex;align-items:center;justify-content:center;gap:7px;padding:10px;border-radius:8px;text-decoration:none;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);color:#a78bfa;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;transition:all 0.18s;margin:0 16px 14px;}
-.adm-view-render:hover{background:rgba(124,58,237,0.16);border-color:#7c3aed;color:#e2d9ff;}
-.adm-badge{display:inline-flex;align-items:center;gap:5px;border-radius:100px;padding:4px 10px;font-size:9px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;border:1px solid transparent;}
-.adm-badge-progress{background:rgba(234,179,8,0.1);border-color:rgba(234,179,8,0.25);color:#eab308;}
-.adm-badge-done{background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.25);color:#22c55e;}
-.adm-badge-failed{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.25);color:#f87171;}
-.adm-badge-rejected{background:rgba(107,114,128,0.1);border-color:rgba(107,114,128,0.2);color:var(--gdim);}
-.adm-badge-awaiting{background:rgba(249,115,22,0.1);border-color:rgba(249,115,22,0.25);color:#f97316;}
-.adm-review-card{background:rgba(255,255,255,0.014);border-radius:12px;padding:18px 20px;margin-bottom:10px;border:1px solid rgba(124,58,237,0.09);transition:border-color 0.2s;}
-.adm-review-card:hover{border-color:rgba(124,58,237,0.22);}
+
+.adm-order-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;
+}
+.adm-orow{
+  background:rgba(124,58,237,0.04);
+  border:1px solid rgba(124,58,237,0.08);
+  border-radius:7px;padding:10px 12px;
+}
+.adm-orow-label{font-size:9.5px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gdim);margin-bottom:3px;}
+.adm-orow-val{font-size:12.5px;font-weight:600;color:var(--white);line-height:1.3;word-break:break-all;}
+
+/* ── UPLOAD ACTION AREA ── */
+.adm-upload-area{
+  border:1.5px dashed rgba(124,58,237,0.2);
+  border-radius:10px;padding:16px;
+  background:rgba(124,58,237,0.03);
+  transition:all 0.2s;
+}
+.adm-upload-area:hover,.adm-upload-area.drag-over{
+  border-color:rgba(124,58,237,0.45);
+  background:rgba(124,58,237,0.07);
+}
+.adm-upload-inner{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.adm-upload-icon-box{
+  width:40px;height:40px;border-radius:8px;flex-shrink:0;
+  background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.2);
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+}
+.adm-upload-text{flex:1;min-width:140px;}
+.adm-upload-title{font-size:13px;font-weight:700;color:var(--white);}
+.adm-upload-sub{font-size:11px;color:var(--gdim);margin-top:2px;}
+.adm-upload-btn{
+  background:var(--purple);color:#fff;padding:9px 18px;border-radius:8px;border:none;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;
+  cursor:pointer;transition:all 0.2s;letter-spacing:0.04em;
+  display:flex;align-items:center;gap:6px;flex-shrink:0;
+}
+.adm-upload-btn:hover{background:var(--pm);box-shadow:0 4px 16px rgba(124,58,237,0.4);}
+.adm-upload-btn:disabled{opacity:0.5;cursor:default;box-shadow:none;}
+
+/* Progress bar */
+.adm-progress-wrap{margin-top:12px;display:none;}
+.adm-progress-wrap.show{display:block;}
+.adm-progress-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.adm-progress-name{font-size:11.5px;color:var(--gray);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%;}
+.adm-progress-pct{font-size:11.5px;color:var(--pl);font-weight:800;}
+.adm-progress-bar{height:4px;background:rgba(124,58,237,0.15);border-radius:2px;overflow:hidden;}
+.adm-progress-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--pl));border-radius:2px;width:0%;transition:width 0.3s ease;}
+
+.adm-mark-done-btn{
+  width:100%;background:linear-gradient(135deg,var(--purple),#5b21b6);color:#fff;
+  padding:11px;border-radius:8px;border:none;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;font-weight:800;
+  letter-spacing:0.07em;text-transform:uppercase;
+  cursor:pointer;transition:all 0.2s;margin-top:10px;
+  box-shadow:0 2px 14px rgba(124,58,237,0.3);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.adm-mark-done-btn:hover:not(:disabled){box-shadow:0 4px 24px rgba(124,58,237,0.5);transform:translateY(-1px);}
+.adm-mark-done-btn:disabled{opacity:0.45;cursor:default;transform:none;box-shadow:none;}
+.adm-mark-done-btn.done-state{
+  background:rgba(34,197,94,0.1);
+  border:1px solid rgba(34,197,94,0.25);
+  color:var(--green);box-shadow:none;cursor:default;
+}
+
+/* Delete button */
+.adm-del-btn{
+  background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.18);
+  color:#f87171;width:30px;height:30px;border-radius:7px;
+  cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;
+  transition:all 0.18s;flex-shrink:0;
+}
+.adm-del-btn:hover{background:rgba(239,68,68,0.18);border-color:rgba(239,68,68,0.35);}
+
+/* ── REVIEW CARDS ── */
+.adm-review-card{
+  background:var(--card);border:1px solid rgba(124,58,237,0.1);
+  border-radius:12px;padding:22px;margin-bottom:12px;
+  transition:border-color 0.2s;
+}
 .adm-review-card.approved{border-color:rgba(34,197,94,0.2);}
-.adm-review-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:10px;}
-.adm-review-name{font-family:'Fraunces',serif;font-size:15px;font-weight:600;color:#fff;}
-.adm-review-brand{font-size:10.5px;color:var(--gdim);margin-top:2px;font-family:'Plus Jakarta Sans',sans-serif;}
-.adm-review-stars{color:#eab308;font-size:14px;margin-bottom:8px;letter-spacing:1px;}
-.adm-review-text{font-size:12.5px;color:var(--gray);line-height:1.65;margin-bottom:14px;font-style:italic;}
+.adm-review-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px;}
+.adm-review-author{}
+.adm-review-name{font-family:'Fraunces',serif;font-size:15px;font-weight:700;color:var(--white);}
+.adm-review-brand{font-size:11.5px;color:var(--gdim);margin-top:2px;}
+.adm-review-stars{display:flex;gap:2px;margin-bottom:12px;}
+.adm-star{font-size:14px;color:#eab308;}
+.adm-star-empty{font-size:14px;color:rgba(58,48,80,0.8);}
+.adm-review-text{
+  font-size:13px;color:var(--gray);line-height:1.75;font-style:italic;
+  border-left:2px solid rgba(124,58,237,0.2);padding-left:14px;margin-bottom:16px;
+}
 .adm-review-actions{display:flex;gap:8px;}
-.adm-approve-btn{flex:1;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);color:#22c55e;padding:9px;border-radius:8px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:700;transition:all 0.18s;}
-.adm-approve-btn:hover{background:rgba(34,197,94,0.2);border-color:#22c55e;}
-.adm-del-review-btn{flex:1;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:#f87171;padding:9px;border-radius:8px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:700;transition:all 0.18s;}
-.adm-del-review-btn:hover{background:rgba(239,68,68,0.18);border-color:#f87171;}
-.adm-pmt-card{background:rgba(255,255,255,0.014);border:1px solid rgba(124,58,237,0.09);border-radius:12px;margin-bottom:10px;overflow:hidden;transition:border-color 0.22s;}
-.adm-pmt-card:hover{border-color:rgba(124,58,237,0.24);}
-.adm-pmt-hdr{padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none;}
-.adm-pmt-orders{padding:0 12px 12px;display:flex;flex-direction:column;gap:6px;max-height:0;overflow:hidden;transition:max-height 0.35s ease;}
-.adm-pmt-card.open .adm-pmt-orders{max-height:600px;}
-.adm-empty{text-align:center;padding:52px 0;color:var(--gdim);font-size:12.5px;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:0.02em;}
-.adm-empty-icon{font-size:28px;margin-bottom:10px;opacity:0.6;}
-.adm-gate{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:40px;}
-.adm-gate-icon{width:52px;height:52px;border-radius:14px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;}
-.adm-gate h2{font-family:'Fraunces',serif;font-size:24px;font-weight:700;margin-bottom:8px;}
-.adm-gate p{font-size:12.5px;color:var(--gdim);font-family:'Plus Jakarta Sans',sans-serif;}
-@media(max-width:768px){
-  .adm-sidebar{width:100%;height:52px;flex-direction:row;bottom:auto;border-right:none;border-bottom:1px solid rgba(124,58,237,0.1);}
-  .adm-sidebar-logo{padding:0 16px;border-bottom:none;border-right:1px solid rgba(124,58,237,0.1);}
-  .adm-nav{flex-direction:row;padding:0 8px;gap:0;overflow-x:auto;align-items:center;}
-  .adm-nav-section{display:none;}
-  .adm-nav-item{padding:6px 10px;font-size:11px;white-space:nowrap;}
-  .adm-nav-item::before{display:none;}
-  .adm-sidebar-footer{display:none;}
-  .adm-main{margin-left:0;margin-top:52px;}
-  .adm-topbar{padding:0 16px;}
-  .adm-content{padding:20px 16px 60px;}
-  .adm-order-grid{grid-template-columns:1fr;}
+.adm-approve-btn{
+  flex:1;background:rgba(34,197,94,0.1);color:var(--green);
+  border:1px solid rgba(34,197,94,0.25);padding:9px;border-radius:8px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;
+  transition:all 0.2s;
+}
+.adm-approve-btn:hover{background:rgba(34,197,94,0.18);}
+.adm-review-del-btn{
+  flex:1;background:rgba(239,68,68,0.08);color:#f87171;
+  border:1px solid rgba(239,68,68,0.2);padding:9px;border-radius:8px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;
+  transition:all 0.2s;
+}
+.adm-review-del-btn:hover{background:rgba(239,68,68,0.15);}
+
+/* ── UPLOAD VIDEO TAB ── */
+.adm-upload-page{}
+.adm-order-select-label{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gdim);margin-bottom:8px;}
+.adm-order-select{
+  width:100%;background:rgba(255,255,255,0.04);
+  border:1px solid rgba(124,58,237,0.18);border-radius:9px;
+  padding:13px 16px;color:var(--white);
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:13.5px;font-weight:600;
+  cursor:pointer;transition:border-color 0.2s;margin-bottom:20px;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%236a5880' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;
+  padding-right:36px;
+}
+.adm-order-select:focus{outline:none;border-color:rgba(124,58,237,0.5);}
+.adm-order-select option{background:#0f0b1e;color:#f0ebff;}
+
+.adm-dropzone{
+  border:2px dashed rgba(124,58,237,0.25);border-radius:14px;
+  padding:48px 24px;text-align:center;
+  background:rgba(124,58,237,0.03);
+  transition:all 0.25s;cursor:pointer;
+  margin-bottom:20px;
+}
+.adm-dropzone:hover,.adm-dropzone.drag-over{
+  border-color:rgba(124,58,237,0.5);
+  background:rgba(124,58,237,0.07);
+}
+.adm-dropzone-icon{font-size:40px;margin-bottom:14px;display:block;}
+.adm-dropzone-title{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--white);margin-bottom:6px;}
+.adm-dropzone-sub{font-size:13px;color:var(--gdim);line-height:1.6;}
+.adm-dropzone-sub strong{color:var(--pl);}
+.adm-dropzone-hint{font-size:11px;color:var(--gdim);margin-top:10px;opacity:0.7;}
+
+.adm-file-selected{
+  display:none;align-items:center;gap:14px;
+  background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.2);
+  border-radius:10px;padding:14px 16px;margin-bottom:16px;
+}
+.adm-file-selected.show{display:flex;}
+.adm-file-thumb{
+  width:44px;height:44px;border-radius:8px;background:rgba(124,58,237,0.15);
+  border:1px solid rgba(124,58,237,0.2);
+  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;
+}
+.adm-file-info{flex:1;min-width:0;}
+.adm-file-name{font-size:13.5px;font-weight:700;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.adm-file-size{font-size:11px;color:var(--gdim);margin-top:2px;}
+.adm-file-clear{
+  background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.18);
+  color:#f87171;width:28px;height:28px;border-radius:6px;
+  cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;
+  transition:all 0.18s;flex-shrink:0;
+}
+.adm-file-clear:hover{background:rgba(239,68,68,0.16);}
+
+.adm-big-upload-progress{margin-bottom:20px;display:none;}
+.adm-big-upload-progress.show{display:block;}
+.adm-big-prog-label{display:flex;justify-content:space-between;margin-bottom:8px;}
+.adm-big-prog-name{font-size:12.5px;font-weight:700;color:var(--white);}
+.adm-big-prog-pct{font-size:12.5px;font-weight:800;color:var(--pl);}
+.adm-big-prog-bar{height:6px;background:rgba(124,58,237,0.12);border-radius:3px;overflow:hidden;}
+.adm-big-prog-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--pl));border-radius:3px;width:0%;transition:width 0.3s;}
+.adm-big-prog-status{font-size:11px;color:var(--gdim);margin-top:6px;}
+
+.adm-big-upload-btn{
+  width:100%;background:linear-gradient(135deg,var(--purple) 0%,#5b21b6 100%);
+  color:#fff;padding:16px;border-radius:10px;border:none;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;
+  letter-spacing:0.1em;text-transform:uppercase;
+  cursor:pointer;transition:all 0.25s;
+  box-shadow:0 4px 28px rgba(124,58,237,0.4);
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.adm-big-upload-btn:hover:not(:disabled){
+  box-shadow:0 6px 40px rgba(124,58,237,0.6);transform:translateY(-2px);
+}
+.adm-big-upload-btn:disabled{opacity:0.4;cursor:default;transform:none;box-shadow:none;}
+
+.adm-upload-success{
+  display:none;background:rgba(34,197,94,0.07);
+  border:1px solid rgba(34,197,94,0.22);border-radius:12px;padding:22px;
+  text-align:center;margin-top:16px;
+}
+.adm-upload-success.show{display:block;}
+.adm-upload-success-icon{font-size:32px;margin-bottom:10px;}
+.adm-upload-success-title{font-family:'Fraunces',serif;font-size:17px;font-weight:700;color:var(--green);margin-bottom:4px;}
+.adm-upload-success-sub{font-size:12px;color:var(--gdim);line-height:1.6;}
+
+/* ── EMPTY STATE ── */
+.adm-empty{
+  text-align:center;padding:64px 20px;
+  color:var(--gdim);font-size:13px;line-height:1.7;
+}
+.adm-empty-icon{font-size:36px;margin-bottom:12px;display:block;opacity:0.5;}
+
+/* ── LOADING / DENIED ── */
+.admin-loading-state,.admin-access-denied{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100vh;text-align:center;gap:12px;padding:40px;
+}
+.admin-loading-icon,.ad-icon{font-size:42px;}
+.admin-loading-text{font-size:13px;color:var(--gdim);letter-spacing:0.04em;}
+.admin-access-denied h2{font-family:'Fraunces',serif;font-size:26px;font-weight:700;color:#f87171;}
+.admin-access-denied p{font-size:13px;color:var(--gdim);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .adm-sidebar{width:200px;}
+  .adm-main{margin-left:200px;}
+  .adm-topbar{left:200px;}
+  .adm-stats-row{grid-template-columns:repeat(3,1fr);}
+  .adm-order-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:680px){
+  .adm-sidebar{display:none;}
+  .adm-main{margin-left:0;}
+  .adm-topbar{left:0;}
+  .adm-stats-row{grid-template-columns:repeat(2,1fr);}
+  .adm-panel{padding:20px 18px 60px;}
+}
+@media(max-width:540px){
+  .adm-order-grid{grid-template-columns:1fr 1fr;}
+  .adm-table th:nth-child(3),.adm-table td:nth-child(3){display:none;}
 }
 </style>
 
-<div class="adm-shell">
-  <aside class="adm-sidebar">
-    <div class="adm-sidebar-logo">
-      <svg width="20" height="20" viewBox="0 0 30 30" fill="none"><path d="M15 3 L26 9 L26 21 L15 27 L4 21 L4 9 Z" stroke="#7c3aed" stroke-width="1.2" fill="none" opacity="0.5"/><path d="M15 3 L26 9 L15 15 L4 9 Z" fill="#7c3aed" opacity="0.3"/><circle cx="15" cy="15" r="2" fill="#a78bfa"/></svg>
-      Urreal<em>3D</em>
-      <span class="adm-sidebar-badge">Admin</span>
-    </div>
-    <nav class="adm-nav">
-      <div class="adm-nav-section">Workspace</div>
-      <button class="adm-nav-item active" id="nav-queue" onclick="switchAdminMain('payments')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        Render Queue
-        <span class="adm-nav-badge" id="nav-queue-count" style="display:none">0</span>
-      </button>
-      <button class="adm-nav-item" id="nav-orders" onclick="switchAdminMain('orders')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+  <!-- LOADING STATE -->
+  <div id="admin-loading" style="display:none;" class="admin-loading-state">
+    <div class="admin-loading-icon">⏳</div>
+    <div class="admin-loading-text">Checking access…</div>
+  </div>
+
+  <!-- DENIED STATE -->
+  <div class="admin-access-denied" id="admin-denied" style="display:none;">
+    <div class="ad-icon">🔒</div>
+    <h2>Access Denied</h2>
+    <p>You don't have permission to view this page.</p>
+  </div>
+
+  <!-- MAIN ADMIN SHELL -->
+  <div id="admin-main" class="adm-shell" style="display:none;">
+
+    <!-- SIDEBAR -->
+    <nav class="adm-sidebar">
+      <div class="adm-sidebar-brand">
+        <div class="adm-brand-icon">⚡</div>
+        <div class="adm-brand-text">
+          <div class="adm-brand-name">Urreal<span>3D</span></div>
+          <div class="adm-brand-sub">Admin Console</div>
+        </div>
+      </div>
+
+      <div class="adm-sidebar-section">Overview</div>
+      <div class="adm-nav-item active" onclick="admGo('dashboard')" id="admNav-dashboard">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+        Dashboard
+      </div>
+
+      <div class="adm-sidebar-section">Orders</div>
+      <div class="adm-nav-item" onclick="admGo('payments')" id="admNav-payments">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="4" width="14" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M1 7h14" stroke="currentColor" stroke-width="1.3"/><circle cx="4.5" cy="10" r="1" fill="currentColor"/></svg>
+        Payments
+        <div class="adm-nav-badge orange" id="sideNav-payments-badge">0</div>
+      </div>
+      <div class="adm-nav-item" onclick="admGo('orders')" id="admNav-orders">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 3h10a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.3"/><path d="M5 7h6M5 10h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
         All Orders
-      </button>
-      <button class="adm-nav-item" id="nav-reviews" onclick="switchAdminMain('reviews')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <div class="adm-nav-badge" id="sideNav-orders-badge">0</div>
+      </div>
+
+      <div class="adm-sidebar-section">Deliver</div>
+      <div class="adm-nav-item" onclick="admGo('upload')" id="admNav-upload">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 11V3M5 6l3-3 3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 13h12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Upload Video
+      </div>
+
+      <div class="adm-sidebar-section">Community</div>
+      <div class="adm-nav-item" onclick="admGo('reviews')" id="admNav-reviews">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 3.5H14l-3.5 2.5 1.5 4-4-2.5L4 12l1.5-4L2 5.5h4.5L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
         Reviews
-        <span class="adm-nav-badge" id="nav-reviews-count" style="display:none;background:#eab308;">0</span>
-      </button>
-      <div class="adm-nav-section">Site</div>
-      <button class="adm-nav-item" onclick="go('home')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        View Site
-      </button>
+        <div class="adm-nav-badge" id="sideNav-reviews-badge">0</div>
+      </div>
+
+      <div class="adm-sidebar-bottom">
+        <div class="adm-clock" id="admin-time">—</div>
+        <div class="adm-nav-item" onclick="go('home');closeDrawer();" style="margin:4px 0 0;">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 12H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M8 15V8M5 11l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to Site
+        </div>
+      </div>
     </nav>
-    <div class="adm-sidebar-footer">
-      <div class="adm-sidebar-time" id="admin-time">—</div>
-    </div>
-  </aside>
 
-  <main class="adm-main">
-    <div id="admin-loading" style="display:none;">
-      <div class="adm-gate">
-        <div class="adm-gate-icon" style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>
-        </div>
-        <h2 style="color:#fff;">Checking access…</h2>
-        <p>Verifying your admin credentials.</p>
-      </div>
-    </div>
-    <div id="admin-denied" style="display:none;">
-      <div class="adm-gate">
-        <div class="adm-gate-icon" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        </div>
-        <h2 style="color:#f87171;">Access Denied</h2>
-        <p>This page is restricted to admins only.</p>
-      </div>
-    </div>
+    <!-- MAIN AREA -->
+    <main class="adm-main">
 
-    <div id="admin-main" style="display:none;">
+      <!-- TOP BAR -->
       <div class="adm-topbar">
-        <div class="adm-topbar-title" id="adm-topbar-title">Render <em>Queue</em></div>
+        <div class="adm-topbar-left">
+          <div class="adm-topbar-title" id="adm-topbar-title">Client <em>Dashboard</em></div>
+        </div>
         <div class="adm-topbar-right">
-          <button class="adm-refresh-btn" onclick="loadAdminOrders()">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          <div class="adm-topbar-pill">
+            <div class="adm-topbar-dot"></div>
+            Live
+          </div>
+          <button class="adm-refresh-pill" onclick="loadAdminOrders()">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M11 6.5A4.5 4.5 0 1 1 6.5 2c1.2 0 2.3.46 3.1 1.2L11 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M9 2h2V4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
             Refresh
           </button>
         </div>
       </div>
-      <div class="adm-content">
+
+      <!-- ── DASHBOARD PANEL ── -->
+      <div class="adm-panel active" id="adm-panel-dashboard">
         <div class="adm-stats-row">
           <div class="adm-stat-card">
-            <div class="adm-stat-card-top">
-              <div><div class="adm-stat-num" id="ast-total" style="color:#e2d9ff;">0</div><div class="adm-stat-lbl">Total Orders</div></div>
-              <div class="adm-stat-icon" style="background:rgba(124,58,237,0.1);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg></div>
-            </div>
+            <span class="adm-stat-icon">📊</span>
+            <div class="adm-stat-num purple" id="ast-total">0</div>
+            <div class="adm-stat-lbl">Total Orders</div>
           </div>
           <div class="adm-stat-card">
-            <div class="adm-stat-card-top">
-              <div><div class="adm-stat-num" id="ast-awaiting" style="color:#f97316;">0</div><div class="adm-stat-lbl">Render Queue</div></div>
-              <div class="adm-stat-icon" style="background:rgba(249,115,22,0.1);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-            </div>
+            <span class="adm-stat-icon">🔥</span>
+            <div class="adm-stat-num orange" id="ast-awaiting">0</div>
+            <div class="adm-stat-lbl">Awaiting Render</div>
           </div>
           <div class="adm-stat-card">
-            <div class="adm-stat-card-top">
-              <div><div class="adm-stat-num" id="ast-pending" style="color:#eab308;">0</div><div class="adm-stat-lbl">In Progress</div></div>
-              <div class="adm-stat-icon" style="background:rgba(234,179,8,0.1);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
-            </div>
+            <span class="adm-stat-icon">⚙️</span>
+            <div class="adm-stat-num yellow" id="ast-pending">0</div>
+            <div class="adm-stat-lbl">In Progress</div>
           </div>
           <div class="adm-stat-card">
-            <div class="adm-stat-card-top">
-              <div><div class="adm-stat-num" id="ast-done" style="color:#22c55e;">0</div><div class="adm-stat-lbl">Completed</div></div>
-              <div class="adm-stat-icon" style="background:rgba(34,197,94,0.1);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-            </div>
+            <span class="adm-stat-icon">✅</span>
+            <div class="adm-stat-num green" id="ast-done">0</div>
+            <div class="adm-stat-lbl">Completed</div>
+          </div>
+          <div class="adm-stat-card">
+            <span class="adm-stat-icon">⭐</span>
+            <div class="adm-stat-num" id="ast-reviews">0</div>
+            <div class="adm-stat-lbl">Reviews</div>
           </div>
         </div>
 
-        <div id="admin-payments-section">
-          <div class="adm-section-head">
-            <div><div class="adm-section-title">Render <em>Queue</em></div><div class="adm-section-meta" id="payments-count">Paid orders waiting for your render upload</div></div>
+        <div class="adm-section-head">
+          <div>
+            <div class="adm-section-title">Pending <em>Renders</em></div>
+            <div class="adm-section-sub" id="dash-pending-sub">Orders awaiting delivery</div>
           </div>
-          <div id="admin-payments-list"><div class="adm-empty"><div class="adm-empty-icon">⏳</div>Loading…</div></div>
+          <div class="adm-section-actions">
+            <button class="adm-chip" onclick="admGo('upload')">⬆ Upload Video</button>
+          </div>
         </div>
+        <div id="adm-dash-list"><div class="adm-empty"><span class="adm-empty-icon">🎬</span>Loading…</div></div>
+      </div>
 
-        <div id="admin-orders-section" style="display:none;">
-          <div class="adm-section-head">
-            <div><div class="adm-section-title">All <em>Orders</em></div><div class="adm-section-meta" id="admin-count">Every order ever placed</div></div>
+      <!-- ── PAYMENTS PANEL ── -->
+      <div class="adm-panel" id="adm-panel-payments">
+        <div class="adm-section-head">
+          <div>
+            <div class="adm-section-title">Payment <em>Queue</em></div>
+            <div class="adm-section-sub" id="payments-count">Orders awaiting render</div>
           </div>
-          <div class="adm-pills">
-            <button class="adm-pill active" onclick="adminTabFilter(this,'all')">All</button>
-            <button class="adm-pill" onclick="adminTabFilter(this,'pending')">In Progress</button>
-            <button class="adm-pill" onclick="adminTabFilter(this,'done')">Completed</button>
-            <button class="adm-pill" onclick="adminTabFilter(this,'payment_failed')">Failed</button>
-            <button class="adm-pill" onclick="adminTabFilter(this,'rejected')">Rejected</button>
-          </div>
-          <div id="admin-clients-list"><div class="adm-empty"><div class="adm-empty-icon">📦</div>Loading orders…</div></div>
         </div>
-
-        <div id="admin-reviews-section" style="display:none;">
-          <div class="adm-section-head">
-            <div><div class="adm-section-title">Client <em>Reviews</em></div><div class="adm-section-meta" id="reviews-count">Approve or remove submitted reviews</div></div>
-          </div>
-          <div id="admin-reviews-list"><div class="adm-empty"><div class="adm-empty-icon">⭐</div>Loading…</div></div>
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead>
+              <tr>
+                <th>Client</th>
+                <th>Template</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody id="admin-payments-list">
+              <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gdim);">Loading…</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
-    </div>
-  </main>
-</div>
 
-  <footer style="margin-left:220px;">
+      <!-- ── ORDERS PANEL ── -->
+      <div class="adm-panel" id="adm-panel-orders">
+        <div class="adm-section-head">
+          <div>
+            <div class="adm-section-title">All <em>Orders</em></div>
+            <div class="adm-section-sub" id="admin-count">Loading…</div>
+          </div>
+        </div>
+        <div class="adm-filter-bar">
+          <button class="adm-chip active" onclick="adminTabFilter(this,'all')">All</button>
+          <button class="adm-chip" onclick="adminTabFilter(this,'pending')">⏳ In Progress</button>
+          <button class="adm-chip" onclick="adminTabFilter(this,'done')">✓ Done</button>
+          <button class="adm-chip" onclick="adminTabFilter(this,'payment_failed')">❌ Failed</button>
+          <button class="adm-chip" onclick="adminTabFilter(this,'rejected')">🚫 Rejected</button>
+        </div>
+        <div id="admin-clients-list"><div class="adm-empty"><span class="adm-empty-icon">📦</span>Loading orders…</div></div>
+      </div>
+
+      <!-- ── UPLOAD VIDEO PANEL ── -->
+      <div class="adm-panel" id="adm-panel-upload">
+        <div class="adm-section-head">
+          <div>
+            <div class="adm-section-title">Upload <em>Delivery Video</em></div>
+            <div class="adm-section-sub">Upload directly to client — no file size limit</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start;">
+
+          <!-- LEFT: Upload form -->
+          <div>
+            <div class="adm-order-select-label">Select Client Order</div>
+            <select class="adm-order-select" id="adm-order-select">
+              <option value="">— Choose an order to deliver —</option>
+            </select>
+
+            <!-- Selected order info card -->
+            <div id="adm-selected-order-info" style="display:none;background:var(--card);border:1px solid rgba(124,58,237,0.15);border-radius:12px;padding:18px;margin-bottom:20px;">
+              <div style="font-size:10px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:var(--gdim);margin-bottom:10px;">Order Details</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;" id="adm-order-info-grid"></div>
+            </div>
+
+            <!-- Drop zone -->
+            <div class="adm-dropzone" id="adm-dropzone" onclick="document.getElementById('adm-video-input').click()">
+              <span class="adm-dropzone-icon">🎬</span>
+              <div class="adm-dropzone-title">Drop video here or click to browse</div>
+              <div class="adm-dropzone-sub">Supports <strong>MP4, MOV, AVI, MKV, WEBM</strong> and more</div>
+              <div class="adm-dropzone-hint">No file size limit — uploads directly to Firebase Storage</div>
+            </div>
+            <input type="file" id="adm-video-input" accept="video/*" style="display:none;">
+
+            <!-- File selected preview -->
+            <div class="adm-file-selected" id="adm-file-selected">
+              <div class="adm-file-thumb">🎞️</div>
+              <div class="adm-file-info">
+                <div class="adm-file-name" id="adm-file-name">—</div>
+                <div class="adm-file-size" id="adm-file-size">—</div>
+              </div>
+              <button class="adm-file-clear" onclick="admClearFile()">✕</button>
+            </div>
+
+            <!-- Progress -->
+            <div class="adm-big-upload-progress" id="adm-big-prog">
+              <div class="adm-big-prog-label">
+                <span class="adm-big-prog-name" id="adm-big-prog-name">Uploading…</span>
+                <span class="adm-big-prog-pct" id="adm-big-prog-pct">0%</span>
+              </div>
+              <div class="adm-big-prog-bar"><div class="adm-big-prog-fill" id="adm-big-prog-fill"></div></div>
+              <div class="adm-big-prog-status" id="adm-big-prog-status">Starting upload…</div>
+            </div>
+
+            <!-- Upload button -->
+            <button class="adm-big-upload-btn" id="adm-big-upload-btn" onclick="admUploadVideo()" disabled>
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 13V5M6 8l3-3 3 3" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 15h14" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+              Upload & Deliver to Client
+            </button>
+
+            <!-- Success state -->
+            <div class="adm-upload-success" id="adm-upload-success">
+              <div class="adm-upload-success-icon">🎉</div>
+              <div class="adm-upload-success-title">Delivered Successfully!</div>
+              <div class="adm-upload-success-sub" id="adm-upload-success-sub">The video has been uploaded and the order has been marked as complete. Your client can now view it.</div>
+            </div>
+          </div>
+
+          <!-- RIGHT: Quick info panel -->
+          <div>
+            <div style="background:var(--card);border:1px solid rgba(124,58,237,0.1);border-radius:12px;padding:22px;">
+              <div style="font-size:10px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:var(--gdim);margin-bottom:14px;">Pending Deliveries</div>
+              <div id="adm-pending-quick-list"><div style="color:var(--gdim);font-size:12px;">Loading…</div></div>
+            </div>
+
+            <div style="background:rgba(124,58,237,0.05);border:1px solid rgba(124,58,237,0.12);border-radius:12px;padding:20px;margin-top:14px;">
+              <div style="font-size:10px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:var(--gdim);margin-bottom:10px;">ℹ️ How it works</div>
+              <div style="font-size:12px;color:var(--gdim);line-height:1.8;">
+                1. Select the client's order above<br>
+                2. Choose the finished video file<br>
+                3. Click Upload — video uploads directly to Firebase<br>
+                4. Order is automatically marked as Done<br>
+                5. Client sees their render immediately
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── REVIEWS PANEL ── -->
+      <div class="adm-panel" id="adm-panel-reviews">
+        <div class="adm-section-head">
+          <div>
+            <div class="adm-section-title">Client <em>Reviews</em></div>
+            <div class="adm-section-sub" id="reviews-count">—</div>
+          </div>
+        </div>
+        <div id="admin-reviews-list"><div class="adm-empty"><span class="adm-empty-icon">⭐</span>Loading reviews…</div></div>
+      </div>
+
+    </main>
+  </div>
+
+  <footer style="display:none;" id="adm-footer">
     <div class="footer-logo" style="cursor:pointer;display:flex;align-items:center;gap:8px;" onclick="go('home')"><svg width="18" height="18" viewBox="0 0 30 30" fill="none"><path d="M15 3 L26 9 L26 21 L15 27 L4 21 L4 9 Z" stroke="#7c3aed" stroke-width="1.2" fill="none" opacity="0.5"/><path d="M15 3 L26 9 L15 15 L4 9 Z" fill="#7c3aed" opacity="0.3"/><circle cx="15" cy="15" r="2" fill="#a78bfa"/></svg>Urreal<em>3D</em></div>
     <div class="footer-links"><a onclick="go('policy')">Privacy Policy</a><a onclick="go('appointment')">Contact</a></div>
     <div class="footer-copy">© 2024 Urreal3D · Stephen R Christian</div>
@@ -4446,272 +4995,507 @@ window.saveOrderToFirestore = async function(orderData) {
   const user    = auth.currentUser;
   const profile = window._userProfile || {};
   try {
+    const docRef = await addDoc(collection(db, 'orders'), {
+      ...orderData,
+      userId:    user.uid,
+      userEmail: user.email || profile.email || '',
+      userName:  user.displayName || profile.name || '',
+      userPhone: user.phoneNumber || profile.phone || '',
+      createdAt: serverTimestamp(),
+      status:            orderData.status        || 'pending',
+      paymentStatus:     orderData.paymentStatus || 'confirmed',
+      razorpayPaymentId: orderData.razorpayPaymentId || null,
+      renderedFile: null
+    });
+    return docRef.id;
+  } catch(e) { console.log('Order save failed:', e); }
+}
+
+// ── Load user orders ──
+window.loadUserOrders = async function() {
+  try {
+    const q = query(
+      collection(db, 'orders'),
+      where('userId', '==', auth.currentUser.uid),
+      orderBy('createdAt', 'desc')
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch(e) { console.log('Load orders failed:', e); return []; }
+}
+</script>
+
 <!-- ═══ ADMIN SCRIPT ═══ -->
 <script type="module">
 import { getApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
 import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
 
-const adminDb=getFirestore(getApp()); const adminSto=getStorage(getApp());
-let _adminOrders=[]; let _adminFilter='all';
-window._adminOrders=_adminOrders;
+const adminDb = getFirestore(getApp());
+const adminSto = getStorage(getApp());
+let _adminOrders = [];
+let _adminFilter = 'all';
+window._adminOrders = _adminOrders;
 
-window.switchAdminMain=function(tab){
-  document.getElementById('admin-payments-section').style.display=tab==='payments'?'block':'none';
-  document.getElementById('admin-orders-section').style.display=tab==='orders'?'block':'none';
-  document.getElementById('admin-reviews-section').style.display=tab==='reviews'?'block':'none';
-  document.getElementById('nav-queue').classList.toggle('active',tab==='payments');
-  document.getElementById('nav-orders').classList.toggle('active',tab==='orders');
-  document.getElementById('nav-reviews').classList.toggle('active',tab==='reviews');
-  const titles={payments:'Render <em>Queue</em>',orders:'All <em>Orders</em>',reviews:'Client <em>Reviews</em>'};
-  document.getElementById('adm-topbar-title').innerHTML=titles[tab]||'Dashboard';
-  if(tab==='reviews') loadAdminReviews();
+/* ── Navigation ── */
+const ADM_TITLES = {
+  dashboard: 'Client <em>Dashboard</em>',
+  payments:  'Payment <em>Queue</em>',
+  orders:    'All <em>Orders</em>',
+  upload:    'Upload <em>Delivery Video</em>',
+  reviews:   'Client <em>Reviews</em>',
+};
+
+window.admGo = function(panel) {
+  document.querySelectorAll('.adm-nav-item').forEach(el => el.classList.remove('active'));
+  const navEl = document.getElementById('admNav-' + panel);
+  if (navEl) navEl.classList.add('active');
+  document.querySelectorAll('.adm-panel').forEach(el => el.classList.remove('active'));
+  const panelEl = document.getElementById('adm-panel-' + panel);
+  if (panelEl) panelEl.classList.add('active');
+  const titleEl = document.getElementById('adm-topbar-title');
+  if (titleEl) titleEl.innerHTML = ADM_TITLES[panel] || panel;
+  if (panel === 'reviews') loadAdminReviews();
+  if (panel === 'upload') admPopulateOrderSelect();
+};
+
+/* ────────────────────────────────────────
+   LOAD ALL ORDERS
+──────────────────────────────────────── */
+window.loadAdminOrders = async function() {
+  const user = window.getCurrentUser();
+  if (!user || user.email !== 'urreal3d@gmail.com') return;
+  try {
+    const snap = await getDocs(query(collection(adminDb, 'orders'), orderBy('createdAt', 'desc')));
+    _adminOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    window._adminOrders = _adminOrders;
+
+    const awaiting   = _adminOrders.filter(o => o.status === 'pending' && o.paymentStatus === 'confirmed').length;
+    const inprogress = _adminOrders.filter(o => o.status === 'pending' && o.paymentStatus === 'confirmed').length;
+    const done       = _adminOrders.filter(o => o.status === 'done').length;
+
+    document.getElementById('ast-total').textContent    = _adminOrders.length;
+    document.getElementById('ast-awaiting').textContent = awaiting;
+    document.getElementById('ast-pending').textContent  = inprogress;
+    document.getElementById('ast-done').textContent     = done;
+
+    document.getElementById('sideNav-payments-badge').textContent = awaiting;
+    document.getElementById('sideNav-orders-badge').textContent   = _adminOrders.length;
+
+    renderDashboard();
+    renderPaymentsList();
+    renderAdminClients();
+    admPopulateOrderSelect();
+    admRenderPendingQuickList();
+  } catch(e) {
+    alert('Admin load error: ' + e.message);
+  }
+};
+
+/* ────────────────────────────────────────
+   DASHBOARD
+──────────────────────────────────────── */
+function renderDashboard() {
+  const pending = _adminOrders.filter(o => o.status === 'pending' && o.paymentStatus === 'confirmed');
+  const sub = document.getElementById('dash-pending-sub');
+  if (sub) sub.textContent = pending.length + ' order' + (pending.length !== 1 ? 's' : '') + ' awaiting delivery';
+  const list = document.getElementById('adm-dash-list');
+  if (!list) return;
+  if (pending.length === 0) {
+    list.innerHTML = '<div class="adm-empty"><span class="adm-empty-icon">🎉</span>All clear — no pending renders!</div>';
+    return;
+  }
+  const clientMap = {};
+  pending.forEach(o => {
+    const key = o.userEmail || o.whatsapp || 'unknown';
+    if (!clientMap[key]) clientMap[key] = { name: o.clientName || o.userName || 'Unknown', contact: o.userEmail || o.whatsapp || '—', orders: [] };
+    clientMap[key].orders.push(o);
+  });
+  list.innerHTML = '<div class="adm-table-wrap"><table class="adm-table"><thead><tr><th>Client</th><th>Template</th><th>Type</th><th>Date</th><th>Amount</th><th>Action</th></tr></thead><tbody>' +
+    pending.map(o => {
+      const date = o.createdAt ? new Date(o.createdAt.seconds*1000).toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : '—';
+      const type = o.templateType === 'video' ? '🎬 Video' : '🖼 Image';
+      return `<tr>
+        <td><div class="adm-td-name">${o.clientName||o.userName||'Unknown'}</div><div class="adm-td-sub">${o.userEmail||o.whatsapp||'—'}</div></td>
+        <td>${o.templateName||'Custom'}</td>
+        <td><span style="font-size:12px;">${type}</span></td>
+        <td><span class="adm-td-mono">${date}</span></td>
+        <td><div class="adm-td-amount">${o.price||'—'}</div></td>
+        <td><button onclick="admGo('upload');setTimeout(()=>{const s=document.getElementById('adm-order-select');if(s){s.value='${o.id}';admOnOrderSelect('${o.id}');}},200)" style="background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.25);color:var(--pl);padding:6px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">⬆ Upload</button></td>
+      </tr>`;
+    }).join('') +
+    '</tbody></table></div>';
 }
 
-window.loadAdminReviews=async function(){
-  const list=document.getElementById('admin-reviews-list');
-  list.innerHTML='<div class="adm-empty"><div class="adm-empty-icon">⭐</div>Loading…</div>';
-  try{
-    const snap=await getDocs(query(collection(adminDb,'reviews'),orderBy('createdAt','desc')));
-    const reviews=snap.docs.map(d=>({id:d.id,...d.data()}));
-    const pending=reviews.filter(r=>!r.approved);
-    document.getElementById('reviews-count').textContent=pending.length+' pending · '+reviews.length+' total';
-    const nb=document.getElementById('nav-reviews-count');
-    if(nb){nb.textContent=pending.length;nb.style.display=pending.length?'flex':'none';}
-    if(!reviews.length){list.innerHTML='<div class="adm-empty"><div class="adm-empty-icon">⭐</div>No reviews yet.</div>';return;}
-    list.innerHTML=reviews.map(r=>{
-      const stars='★'.repeat(r.rating||0)+'☆'.repeat(5-(r.rating||0));
-      const date=r.createdAt?new Date(r.createdAt.seconds*1000).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';
+/* ────────────────────────────────────────
+   PAYMENTS TABLE
+──────────────────────────────────────── */
+function renderPaymentsList() {
+  const tbody = document.getElementById('admin-payments-list');
+  if (!tbody) return;
+  const inProgress = _adminOrders.filter(o => o.status === 'pending' && o.paymentStatus === 'confirmed');
+  document.getElementById('payments-count').textContent =
+    inProgress.length + ' order' + (inProgress.length !== 1 ? 's' : '') + ' awaiting render';
+  if (inProgress.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;"><div class="adm-empty" style="padding:20px 0;"><span class="adm-empty-icon">✅</span>No pending renders — all clear!</div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = inProgress.map(o => {
+    const date = o.createdAt ? new Date(o.createdAt.seconds*1000).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—';
+    const type = o.templateType === 'video' ? '🎬 Video' : '🖼 Image';
+    return `<tr>
+      <td>
+        <div class="adm-td-name">${o.clientName||o.userName||'Unknown'}</div>
+        <div class="adm-td-sub">${o.userEmail||o.whatsapp||'—'}</div>
+      </td>
+      <td>${o.templateName||'Custom'}</td>
+      <td><span style="font-size:12px;">${type}</span></td>
+      <td><span class="adm-td-mono">${date}</span></td>
+      <td><div class="adm-td-amount">${o.price||'—'}</div></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ────────────────────────────────────────
+   ALL ORDERS — CLIENT CARDS
+──────────────────────────────────────── */
+function renderAdminClients() {
+  const list = document.getElementById('admin-clients-list');
+  if (!list) return;
+  let orders = _adminOrders;
+  if (_adminFilter === 'pending') orders = orders.filter(o => o.status === 'pending' && o.paymentStatus === 'confirmed');
+  else if (_adminFilter === 'done') orders = orders.filter(o => o.status === 'done');
+  else if (_adminFilter === 'payment_failed') orders = orders.filter(o => o.status === 'payment_failed');
+  else if (_adminFilter === 'rejected') orders = orders.filter(o => o.status === 'rejected');
+
+  const clientMap = {};
+  orders.forEach(order => {
+    const key = order.userEmail || 'unknown';
+    if (!clientMap[key]) clientMap[key] = { name: order.userName || order.clientName || 'Unknown', email: order.userEmail || '—', orders: [] };
+    clientMap[key].orders.push(order);
+  });
+  const clients = Object.values(clientMap);
+  document.getElementById('admin-count').textContent = clients.length + ' client' + (clients.length !== 1 ? 's' : '') + ' · ' + orders.length + ' orders';
+  if (clients.length === 0) { list.innerHTML = '<div class="adm-empty"><span class="adm-empty-icon">📭</span>No orders match this filter.</div>'; return; }
+
+  list.innerHTML = clients.map((client, ci) => {
+    const initials = client.name.charAt(0).toUpperCase();
+    const pendingCount = client.orders.filter(o => o.status === 'pending').length;
+
+    const ordersHtml = client.orders.map((order, oi) => {
+      const date = order.createdAt ? new Date(order.createdAt.seconds*1000).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+      const isDone = order.status === 'done';
+      const isFailed = order.status === 'payment_failed';
+      const isRejected = order.status === 'rejected';
+      const isAwaiting = order.paymentStatus === 'payment_pending';
+
+      let badgeClass = 'adm-badge-pending', badgeText = '⏳ In Progress';
+      if (isDone) { badgeClass = 'adm-badge-done'; badgeText = '✓ Done'; }
+      else if (isFailed) { badgeClass = 'adm-badge-failed'; badgeText = '❌ Payment Failed'; }
+      else if (isRejected) { badgeClass = 'adm-badge-rejected'; badgeText = '🚫 Rejected'; }
+      else if (isAwaiting) { badgeClass = 'adm-badge-awaiting'; badgeText = '💳 Awaiting Payment'; }
+
+      const canDeliver = !isDone && !isFailed && !isRejected && !isAwaiting;
+      const deliverBtn = canDeliver
+        ? `<button onclick="admGo('upload');setTimeout(()=>{const s=document.getElementById('adm-order-select');if(s){s.value='${order.id}';admOnOrderSelect('${order.id}');}},250)" style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);color:var(--pl);padding:6px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;">⬆ Upload</button>`
+        : '';
+
+      return `<div class="adm-order-item">
+        <div class="adm-order-top">
+          <div class="adm-order-title">Order ${oi+1} — ${order.templateName||'Custom'}</div>
+          <div class="adm-order-actions">
+            <span class="adm-badge ${badgeClass}">${badgeText}</span>
+            ${deliverBtn}
+            <button class="adm-del-btn" onclick="adminDeleteOrder('${order.id}')" title="Delete">🗑</button>
+          </div>
+        </div>
+        <div class="adm-order-grid">
+          <div class="adm-orow"><div class="adm-orow-label">👤 Client</div><div class="adm-orow-val">${order.clientName||order.userName||'—'}</div></div>
+          <div class="adm-orow"><div class="adm-orow-label">🏷 Brand</div><div class="adm-orow-val">${order.brandName||'—'}</div></div>
+          <div class="adm-orow"><div class="adm-orow-label">📱 WhatsApp</div><div class="adm-orow-val">${order.whatsapp||'—'}</div></div>
+          <div class="adm-orow"><div class="adm-orow-label">📧 Email</div><div class="adm-orow-val">${order.userEmail||'—'}</div></div>
+          <div class="adm-orow"><div class="adm-orow-label">💰 Price</div><div class="adm-orow-val">${order.price||'—'}</div></div>
+          <div class="adm-orow"><div class="adm-orow-label">📋 Type</div><div class="adm-orow-val">${order.templateType==='video'?'🎬 Video':'🖼 Image'}</div></div>
+          <div class="adm-orow"><div class="adm-orow-label">🔖 Razorpay</div><div class="adm-orow-val" style="font-size:10.5px;">${order.razorpayPaymentId||'—'}</div></div>
+          <div class="adm-orow"><div class="adm-orow-label">🕐 Date</div><div class="adm-orow-val" style="font-size:11px;">${date}</div></div>
+        </div>
+        ${isDone && order.renderedFile ? `<a href="${order.renderedFile}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);color:var(--green);padding:10px;border-radius:8px;font-size:12.5px;font-weight:700;text-decoration:none;">👁 View Delivered Video</a>` : ''}
+      </div>`;
+    }).join('');
+
+    return `<div class="adm-client-card" id="cc-${ci}">
+      <div class="adm-client-header" onclick="toggleAdmClient(${ci})">
+        <div class="adm-client-avatar">${initials}</div>
+        <div class="adm-client-info">
+          <div class="adm-client-name">${client.name}</div>
+          <div class="adm-client-meta">${client.email} · ${client.orders.length} order${client.orders.length>1?'s':''}${pendingCount>0?' · <span style="color:var(--yellow);">'+pendingCount+' pending</span>':''}</div>
+        </div>
+        <div class="adm-client-right">
+          <div class="adm-chevron"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+        </div>
+      </div>
+      <div class="adm-client-orders">${ordersHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+window.toggleAdmClient = function(ci) {
+  document.getElementById('cc-'+ci).classList.toggle('open');
+};
+
+window.adminTabFilter = function(btn, filter) {
+  document.querySelectorAll('#adm-panel-orders .adm-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  _adminFilter = filter;
+  renderAdminClients();
+};
+
+window.adminDeleteOrder = async function(orderId) {
+  if (!confirm('Delete this order permanently? This cannot be undone.')) return;
+  try {
+    await deleteDoc(doc(adminDb, 'orders', orderId));
+    _adminOrders = _adminOrders.filter(o => o.id !== orderId);
+    window._adminOrders = _adminOrders;
+    window.loadAdminOrders();
+  } catch(e) { alert('Error: ' + e.message); }
+};
+
+/* ────────────────────────────────────────
+   REVIEWS
+──────────────────────────────────────── */
+window.loadAdminReviews = async function() {
+  const list = document.getElementById('admin-reviews-list');
+  list.innerHTML = '<div class="adm-empty"><span class="adm-empty-icon" style="font-size:24px;">⏳</span>Loading…</div>';
+  try {
+    const snap = await getDocs(query(collection(adminDb, 'reviews'), orderBy('createdAt', 'desc')));
+    const reviews = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const pending = reviews.filter(r => !r.approved);
+    document.getElementById('reviews-count').textContent = pending.length + ' pending · ' + reviews.length + ' total';
+    document.getElementById('sideNav-reviews-badge').textContent = pending.length;
+    document.getElementById('ast-reviews').textContent = reviews.length;
+    if (reviews.length === 0) { list.innerHTML = '<div class="adm-empty"><span class="adm-empty-icon">⭐</span>No reviews yet.</div>'; return; }
+    list.innerHTML = reviews.map(r => {
+      const stars = Array.from({length:5},(_,i)=>`<span class="${i<r.rating?'adm-star':'adm-star-empty'}">★</span>`).join('');
+      const date = r.createdAt ? new Date(r.createdAt.seconds*1000).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—';
       return `<div class="adm-review-card ${r.approved?'approved':''}">
         <div class="adm-review-top">
-          <div><div class="adm-review-name">${r.name||'—'}</div><div class="adm-review-brand">${r.brand||'—'} · ${date}</div></div>
-          <span class="adm-badge ${r.approved?'adm-badge-done':'adm-badge-progress'}">${r.approved?'Live':'Pending'}</span>
+          <div class="adm-review-author">
+            <div class="adm-review-name">${r.name||'—'}</div>
+            <div class="adm-review-brand">${r.brand||'—'} · ${date}</div>
+          </div>
+          <span class="adm-badge ${r.approved?'adm-badge-live':'adm-badge-awaiting'}">${r.approved?'✓ Live':'⏳ Pending'}</span>
         </div>
         <div class="adm-review-stars">${stars}</div>
         <div class="adm-review-text">"${r.text||''}"</div>
         <div class="adm-review-actions">
-          ${!r.approved?`<button class="adm-approve-btn" onclick="adminApproveReview('${r.id}')">Approve &amp; Publish</button>`:''}
-          <button class="adm-del-review-btn" onclick="adminDeleteReview('${r.id}')">Delete</button>
-        </div></div>`;
-    }).join('');
-  }catch(e){list.innerHTML='<div class="adm-empty">Error: '+e.message+'</div>';}
-}
-window.adminApproveReview=async function(id){try{await updateDoc(doc(adminDb,'reviews',id),{approved:true});loadAdminReviews();}catch(e){alert('Error: '+e.message);}}
-window.adminDeleteReview=async function(id){if(!confirm('Delete this review permanently?'))return;try{await deleteDoc(doc(adminDb,'reviews',id));loadAdminReviews();}catch(e){alert('Error: '+e.message);}}
-
-window.loadAdminOrders=async function(){
-  const user=window.getCurrentUser();
-  if(!user||user.email!=='urreal3d@gmail.com')return;
-  document.getElementById('admin-payments-list').innerHTML='<div class="adm-empty"><div class="adm-empty-icon">⏳</div>Loading…</div>';
-  document.getElementById('admin-clients-list').innerHTML='<div class="adm-empty"><div class="adm-empty-icon">📦</div>Loading…</div>';
-  try{
-    const snap=await getDocs(query(collection(adminDb,'orders'),orderBy('createdAt','desc')));
-    _adminOrders=snap.docs.map(d=>({id:d.id,...d.data()}));
-    window._adminOrders=_adminOrders;
-    const queue=_adminOrders.filter(o=>o.status==='pending'&&o.paymentStatus==='confirmed').length;
-    const inprog=_adminOrders.filter(o=>o.status==='pending').length;
-    const done=_adminOrders.filter(o=>o.status==='done').length;
-    document.getElementById('ast-total').textContent=_adminOrders.length;
-    document.getElementById('ast-awaiting').textContent=queue;
-    document.getElementById('ast-pending').textContent=inprog;
-    document.getElementById('ast-done').textContent=done;
-    const nb=document.getElementById('nav-queue-count');
-    if(nb){nb.textContent=queue;nb.style.display=queue?'flex':'none';}
-    renderPaymentsList(); renderAdminClients();
-  }catch(e){alert('Admin load error: '+e.message);}
-}
-
-function renderPaymentsList(){
-  const list=document.getElementById('admin-payments-list');
-  const queue=_adminOrders.filter(o=>o.status==='pending'&&o.paymentStatus==='confirmed');
-  document.getElementById('payments-count').textContent=queue.length?queue.length+' order'+(queue.length!==1?'s':'')+ ' waiting for render upload':'All renders delivered — queue is clear';
-  if(!queue.length){list.innerHTML='<div class="adm-empty"><div class="adm-empty-icon">✅</div>Queue is clear! All renders delivered.</div>';return;}
-  const clientMap={};
-  queue.forEach(o=>{const key=o.userEmail||o.whatsapp||'unknown';if(!clientMap[key])clientMap[key]={name:o.clientName||o.userName||'Unknown',contact:o.userEmail||o.whatsapp||'—',orders:[]};clientMap[key].orders.push(o);});
-  list.innerHTML=Object.values(clientMap).map((c,ci)=>{
-    const initials=c.name.charAt(0).toUpperCase();
-    const totalPaid=c.orders.reduce((s,o)=>s+parseFloat((o.price||'0').replace(/[^0-9.]/g,'')),0);
-    const sym=c.orders[0]?.price?.includes('₹')?'₹':'$';
-    return `<div class="adm-pmt-card" id="pmt-cc-${ci}">
-      <div class="adm-pmt-hdr" onclick="document.getElementById('pmt-cc-${ci}').classList.toggle('open')">
-        <div class="adm-avatar">${initials}</div>
-        <div class="adm-client-info"><div class="adm-client-name">${c.name}</div><div class="adm-client-sub">${c.contact} · ${c.orders.length} order${c.orders.length!==1?'s':''} · ${sym}${totalPaid.toLocaleString('en-IN')} paid</div></div>
-        <span class="adm-badge adm-badge-awaiting">${c.orders.length} pending</span>
-        <svg class="adm-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </div>
-      <div class="adm-pmt-orders">${c.orders.map(o=>buildOrderUploadCard(o)).join('')}</div>
-    </div>`;
-  }).join('');
-}
-
-function buildOrderUploadCard(o){
-  const date=o.createdAt?new Date(o.createdAt.seconds*1000).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):' —';
-  const isDone=o.status==='done';
-  return `<div style="background:rgba(0,0,0,0.2);border:1px solid rgba(124,58,237,0.08);border-radius:10px;margin-bottom:8px;overflow:hidden;">
-    <div style="padding:13px 16px 0;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px;">
-      <div style="font-family:'Fraunces',serif;font-size:13.5px;font-weight:600;color:#fff;">${o.templateName||'Custom Order'}</div>
-      <div style="display:flex;align-items:center;gap:6px;">
-        <span class="adm-badge ${isDone?'adm-badge-done':'adm-badge-awaiting'}">${isDone?'Delivered':'Awaiting Upload'}</span>
-        <button class="adm-order-del" onclick="adminDeleteOrder('${o.id}')" title="Delete"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0 16px 12px;">
-      <div class="adm-orow"><div class="adm-orow-lbl">Client</div><div class="adm-orow-val">${o.clientName||o.userName||'—'}</div></div>
-      <div class="adm-orow"><div class="adm-orow-lbl">Type</div><div class="adm-orow-val">${o.templateType==='video'?'Video':'Image'}</div></div>
-      <div class="adm-orow"><div class="adm-orow-lbl">Price</div><div class="adm-orow-val">${o.price||'—'}</div></div>
-      <div class="adm-orow"><div class="adm-orow-lbl">Date</div><div class="adm-orow-val">${date}</div></div>
-    </div>
-    ${isDone&&o.renderedFile?`<a href="${o.renderedFile}" target="_blank" class="adm-view-render"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>View Delivered Render</a>`:''}
-    ${!isDone?buildUploadZone(o.id):''}
-  </div>`;
-}
-
-function buildUploadZone(orderId){
-  return `<div class="adm-upload-zone" style="margin:0 16px 14px;">
-    <div class="adm-upload-zone-head"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload Render File — No size limit</div>
-    <div class="adm-upload-zone-body">
-      <div class="adm-drop-area" id="drop-${orderId}" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleRenderDrop(event,'${orderId}')">
-        <input type="file" accept="video/*,image/*" onchange="handleRenderFileSelect(this,'${orderId}')">
-        <div class="adm-drop-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
-        <div class="adm-drop-title">Drop file here or click to browse</div>
-        <div class="adm-drop-sub">Video or image · Any size · Direct Firebase upload</div>
-      </div>
-      <div class="adm-upload-progress" id="prog-${orderId}"><div class="adm-upload-progress-bar" id="progbar-${orderId}"></div></div>
-      <div class="adm-upload-status" id="progstatus-${orderId}"></div>
-      <div class="adm-uploaded-file" id="uploaded-chip-${orderId}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span class="adm-uploaded-name" id="uploaded-name-${orderId}">File ready</span></div>
-      <button class="adm-done-btn" id="done-btn-${orderId}" onclick="adminMarkDone('${orderId}')" disabled>
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Mark as Delivered
-      </button>
-    </div>
-  </div>`;
-}
-
-window.handleRenderDrop=function(e,orderId){e.preventDefault();document.getElementById('drop-'+orderId)?.classList.remove('drag-over');const file=e.dataTransfer?.files?.[0];if(file)startRenderUpload(file,orderId);}
-window.handleRenderFileSelect=function(input,orderId){const file=input.files?.[0];if(file)startRenderUpload(file,orderId);}
-
-const _pendingRenderUrls={};
-function startRenderUpload(file,orderId){
-  const progWrap=document.getElementById('prog-'+orderId);
-  const progBar=document.getElementById('progbar-'+orderId);
-  const status=document.getElementById('progstatus-'+orderId);
-  const chip=document.getElementById('uploaded-chip-'+orderId);
-  const nameEl=document.getElementById('uploaded-name-'+orderId);
-  const doneBtn=document.getElementById('done-btn-'+orderId);
-  if(chip)chip.style.display='none';
-  if(doneBtn)doneBtn.disabled=true;
-  if(progWrap)progWrap.style.display='block';
-  if(status){status.style.display='block';status.textContent='Starting upload…';}
-  const ext=file.name.split('.').pop();
-  const path=`renders/${orderId}_${Date.now()}.${ext}`;
-  const storageRef=ref(adminSto,path);
-  const task=uploadBytesResumable(storageRef,file);
-  task.on('state_changed',
-    snap=>{const pct=Math.round(snap.bytesTransferred/snap.totalBytes*100);if(progBar)progBar.style.width=pct+'%';const mb=(snap.bytesTransferred/1048576).toFixed(1);const total=(snap.totalBytes/1048576).toFixed(1);if(status)status.textContent=`Uploading… ${mb} MB / ${total} MB (${pct}%)`;},
-    err=>{if(status)status.textContent='Upload failed: '+err.message;if(progWrap)progWrap.style.display='none';},
-    async()=>{
-      const url=await getDownloadURL(storageRef);
-      _pendingRenderUrls[orderId]=url;
-      if(progWrap)progWrap.style.display='none';
-      if(status){status.textContent='';status.style.display='none';}
-      if(chip)chip.style.display='flex';
-      if(nameEl)nameEl.textContent=file.name;
-      if(doneBtn){doneBtn.disabled=false;doneBtn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Mark as Delivered';}
-    }
-  );
-}
-
-window.adminMarkDone=async function(orderId){
-  const url=_pendingRenderUrls[orderId];
-  const btn=document.getElementById('done-btn-'+orderId);
-  if(!url){alert('Please upload the render file first.');return;}
-  if(btn){btn.disabled=true;btn.textContent='Saving…';}
-  try{
-    await updateDoc(doc(adminDb,'orders',orderId),{status:'done',renderedFile:url});
-    const order=_adminOrders.find(o=>o.id===orderId);
-    if(order){order.status='done';order.renderedFile=url;}
-    document.getElementById('ast-done').textContent=_adminOrders.filter(o=>o.status==='done').length;
-    if(btn){btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Delivered!';btn.classList.add('done');btn.disabled=true;}
-    delete _pendingRenderUrls[orderId];
-    setTimeout(()=>window.loadAdminOrders(),1200);
-  }catch(e){if(btn){btn.disabled=false;btn.textContent='Mark as Delivered';}alert('Error: '+e.message);}
-}
-
-function renderAdminClients(){
-  const list=document.getElementById('admin-clients-list');
-  let orders=_adminOrders;
-  if(_adminFilter==='pending') orders=orders.filter(o=>o.status==='pending'&&o.paymentStatus==='confirmed');
-  else if(_adminFilter==='done') orders=orders.filter(o=>o.status==='done');
-  else if(_adminFilter==='payment_failed') orders=orders.filter(o=>o.status==='payment_failed');
-  else if(_adminFilter==='rejected') orders=orders.filter(o=>o.status==='rejected');
-  const clientMap={};
-  orders.forEach(o=>{const key=o.userEmail||'unknown';if(!clientMap[key])clientMap[key]={name:o.userName||o.clientName||'Unknown',email:o.userEmail||'—',orders:[]};clientMap[key].orders.push(o);});
-  const clients=Object.values(clientMap);
-  document.getElementById('admin-count').textContent=clients.length+' client'+(clients.length!==1?'s':'')+ ' · '+orders.length+' order'+(orders.length!==1?'s':'');
-  if(!clients.length){list.innerHTML='<div class="adm-empty"><div class="adm-empty-icon">📦</div>No orders found.</div>';return;}
-  list.innerHTML=clients.map((client,ci)=>{
-    const initials=client.name.charAt(0).toUpperCase();
-    const pendingCt=client.orders.filter(o=>o.status==='pending').length;
-    const ordersHtml=client.orders.map((o,oi)=>{
-      const date=o.createdAt?new Date(o.createdAt.seconds*1000).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):' —';
-      const isDone=o.status==='done',isFailed=o.status==='payment_failed',isRej=o.status==='rejected',isAwait=o.paymentStatus==='payment_pending';
-      let cls='adm-badge-progress',txt='In Progress';
-      if(isDone){cls='adm-badge-done';txt='Completed';}
-      else if(isFailed){cls='adm-badge-failed';txt='Payment Failed';}
-      else if(isRej){cls='adm-badge-rejected';txt='Rejected';}
-      else if(isAwait){cls='adm-badge-awaiting';txt='Awaiting Payment';}
-      return `<div class="adm-order-item">
-        <div class="adm-order-top">
-          <div class="adm-order-name">Order ${oi+1} — ${o.templateName||'Custom'}</div>
-          <div class="adm-order-actions">
-            <span class="adm-badge ${cls}">${txt}</span>
-            <button class="adm-order-del" onclick="adminDeleteOrder('${o.id}')" title="Delete order"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
-          </div>
+          ${!r.approved?`<button class="adm-approve-btn" onclick="adminApproveReview('${r.id}')">✅ Approve & Publish</button>`:''}
+          <button class="adm-review-del-btn" onclick="adminDeleteReview('${r.id}')">🗑 Delete</button>
         </div>
-        <div class="adm-order-grid">
-          <div class="adm-orow"><div class="adm-orow-lbl">Client</div><div class="adm-orow-val">${o.clientName||o.userName||'—'}</div></div>
-          <div class="adm-orow"><div class="adm-orow-lbl">Brand</div><div class="adm-orow-val">${o.brandName||'—'}</div></div>
-          <div class="adm-orow"><div class="adm-orow-lbl">WhatsApp</div><div class="adm-orow-val">${o.whatsapp||'—'}</div></div>
-          <div class="adm-orow"><div class="adm-orow-lbl">Email</div><div class="adm-orow-val">${o.userEmail||'—'}</div></div>
-          <div class="adm-orow"><div class="adm-orow-lbl">Price</div><div class="adm-orow-val">${o.price||'—'}</div></div>
-          <div class="adm-orow"><div class="adm-orow-lbl">Type</div><div class="adm-orow-val">${o.templateType==='video'?'Video':'Image'}</div></div>
-          <div class="adm-orow"><div class="adm-orow-lbl">Razorpay</div><div class="adm-orow-val" style="font-size:10px;">${o.razorpayPaymentId||'—'}</div></div>
-          <div class="adm-orow"><div class="adm-orow-lbl">Date</div><div class="adm-orow-val">${date}</div></div>
-        </div>
-        ${isDone&&o.renderedFile?`<a href="${o.renderedFile}" target="_blank" class="adm-view-render"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>View Delivered Render</a>`:''}
       </div>`;
     }).join('');
-    return `<div class="adm-client-card" id="cc-${ci}">
-      <div class="adm-client-hdr" onclick="toggleAdmClient(${ci})">
-        <div class="adm-avatar">${initials}</div>
-        <div class="adm-client-info"><div class="adm-client-name">${client.name}</div><div class="adm-client-sub">${client.email} · ${client.orders.length} order${client.orders.length!==1?'s':''} ${pendingCt?'· <span style="color:#eab308;">'+pendingCt+' in progress</span>':''}</div></div>
-        <svg class="adm-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </div>
-      <div class="adm-orders-body">${ordersHtml}</div>
-    </div>`;
-  }).join('');
-}
+  } catch(e) { list.innerHTML = '<div class="adm-empty">Error: ' + e.message + '</div>'; }
+};
 
-window.toggleAdmClient=function(ci){document.getElementById('cc-'+ci)?.classList.toggle('open');}
-window.adminTabFilter=function(btn,filter){document.querySelectorAll('#admin-orders-section .adm-pill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');_adminFilter=filter;renderAdminClients();}
-window.adminDeleteOrder=async function(orderId){if(!confirm('Delete this order permanently?'))return;try{await deleteDoc(doc(adminDb,'orders',orderId));_adminOrders=_adminOrders.filter(o=>o.id!==orderId);window._adminOrders=_adminOrders;window.loadAdminOrders();}catch(e){alert('Error: '+e.message);}}
-
-window.checkAdminAccess=function(){
-  let attempts=0;
-  const check=setInterval(()=>{
-    attempts++;
-    const u=window.getCurrentUser();
-    if(u&&u.email==='urreal3d@gmail.com'){clearInterval(check);document.getElementById('admin-loading').style.display='none';document.getElementById('admin-denied').style.display='none';document.getElementById('admin-main').style.display='block';window.loadAdminOrders();startAdminClock();}
-    else if(u||attempts>20){clearInterval(check);document.getElementById('admin-loading').style.display='none';document.getElementById('admin-denied').style.display='block';}
-  },200);
-}
-function startAdminClock(){const el=document.getElementById('admin-time');const tick=()=>{if(el)el.textContent=new Date().toLocaleString('en-IN',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});};tick();setInterval(tick,30000);}
-</script>
-
-    window._adminOrders = _adminOrders;
-    window.loadAdminOrders();
+window.adminApproveReview = async function(reviewId) {
+  try {
+    await updateDoc(doc(adminDb, 'reviews', reviewId), { approved: true });
+    loadAdminReviews();
   } catch(e) { alert('Error: ' + e.message); }
+};
+
+window.adminDeleteReview = async function(reviewId) {
+  if (!confirm('Delete this review permanently?')) return;
+  try {
+    await deleteDoc(doc(adminDb, 'reviews', reviewId));
+    loadAdminReviews();
+  } catch(e) { alert('Error: ' + e.message); }
+};
+
+/* ────────────────────────────────────────
+   UPLOAD VIDEO TO FIREBASE
+──────────────────────────────────────── */
+let _selectedUploadFile = null;
+let _selectedOrderId = null;
+
+function admPopulateOrderSelect() {
+  const sel = document.getElementById('adm-order-select');
+  if (!sel) return;
+  const pending = _adminOrders.filter(o => o.status !== 'done' && o.status !== 'payment_failed' && o.status !== 'rejected' && o.paymentStatus === 'confirmed');
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">— Choose an order to deliver —</option>' +
+    pending.map(o => `<option value="${o.id}">${o.clientName||o.userName||'Unknown'} — ${o.templateName||'Custom'} (${o.price||'?'})</option>`).join('');
+  if (prev) { sel.value = prev; if (sel.value === prev) admOnOrderSelect(prev); }
 }
 
+function admRenderPendingQuickList() {
+  const list = document.getElementById('adm-pending-quick-list');
+  if (!list) return;
+  const pending = _adminOrders.filter(o => o.status !== 'done' && o.status !== 'payment_failed' && o.status !== 'rejected' && o.paymentStatus === 'confirmed');
+  if (pending.length === 0) { list.innerHTML = '<div style="color:var(--green);font-size:12px;">✅ All orders delivered!</div>'; return; }
+  list.innerHTML = pending.slice(0,6).map(o => `
+    <div onclick="const s=document.getElementById('adm-order-select');if(s){s.value='${o.id}';admOnOrderSelect('${o.id}');}" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(124,58,237,0.07);cursor:pointer;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+      <div style="width:32px;height:32px;border-radius:7px;background:rgba(124,58,237,0.12);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">🎬</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12.5px;font-weight:700;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${o.clientName||o.userName||'Unknown'}</div>
+        <div style="font-size:10.5px;color:var(--gdim);">${o.templateName||'Custom'}</div>
+      </div>
+      <div style="font-size:12px;color:var(--pl);font-weight:700;flex-shrink:0;">${o.price||'—'}</div>
+    </div>`).join('') +
+    (pending.length > 6 ? `<div style="font-size:11px;color:var(--gdim);padding-top:8px;">+${pending.length-6} more…</div>` : '');
+}
+
+window.admOnOrderSelect = function(orderId) {
+  _selectedOrderId = orderId;
+  const infoBox = document.getElementById('adm-selected-order-info');
+  const grid = document.getElementById('adm-order-info-grid');
+  if (!orderId) { if (infoBox) infoBox.style.display = 'none'; return; }
+  const order = _adminOrders.find(o => o.id === orderId);
+  if (!order || !infoBox || !grid) return;
+  infoBox.style.display = 'block';
+  grid.innerHTML = [
+    ['👤 Client', order.clientName||order.userName||'—'],
+    ['📧 Email', order.userEmail||'—'],
+    ['📱 WhatsApp', order.whatsapp||'—'],
+    ['🏷 Brand', order.brandName||'—'],
+    ['💰 Amount', order.price||'—'],
+    ['📋 Template', order.templateName||'Custom'],
+  ].map(([l,v])=>`<div class="adm-orow"><div class="adm-orow-label">${l}</div><div class="adm-orow-val">${v}</div></div>`).join('');
+  admCheckUploadReady();
+};
+
+// Wire up select
+document.addEventListener('DOMContentLoaded', function() {
+  const sel = document.getElementById('adm-order-select');
+  if (sel) sel.addEventListener('change', e => admOnOrderSelect(e.target.value));
+
+  const inp = document.getElementById('adm-video-input');
+  if (inp) inp.addEventListener('change', function() {
+    if (this.files && this.files[0]) admSetFile(this.files[0]);
+  });
+
+  const dz = document.getElementById('adm-dropzone');
+  if (dz) {
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+    dz.addEventListener('drop', e => {
+      e.preventDefault(); dz.classList.remove('drag-over');
+      if (e.dataTransfer.files[0]) admSetFile(e.dataTransfer.files[0]);
+    });
+  }
+});
+
+function admSetFile(file) {
+  _selectedUploadFile = file;
+  const nameEl = document.getElementById('adm-file-name');
+  const sizeEl = document.getElementById('adm-file-size');
+  const sel = document.getElementById('adm-file-selected');
+  const dz = document.getElementById('adm-dropzone');
+  if (nameEl) nameEl.textContent = file.name;
+  if (sizeEl) sizeEl.textContent = (file.size / 1024 / 1024).toFixed(1) + ' MB  ·  ' + file.type;
+  if (sel) sel.classList.add('show');
+  if (dz) dz.style.display = 'none';
+  admCheckUploadReady();
+}
+
+window.admClearFile = function() {
+  _selectedUploadFile = null;
+  const sel = document.getElementById('adm-file-selected');
+  const dz = document.getElementById('adm-dropzone');
+  const inp = document.getElementById('adm-video-input');
+  if (sel) sel.classList.remove('show');
+  if (dz) dz.style.display = '';
+  if (inp) inp.value = '';
+  admCheckUploadReady();
+};
+
+function admCheckUploadReady() {
+  const btn = document.getElementById('adm-big-upload-btn');
+  if (!btn) return;
+  btn.disabled = !(_selectedUploadFile && _selectedOrderId);
+}
+
+window.admUploadVideo = async function() {
+  if (!_selectedUploadFile || !_selectedOrderId) return;
+  const order = _adminOrders.find(o => o.id === _selectedOrderId);
+  if (!order) { alert('Order not found.'); return; }
+
+  const btn     = document.getElementById('adm-big-upload-btn');
+  const prog    = document.getElementById('adm-big-prog');
+  const fill    = document.getElementById('adm-big-prog-fill');
+  const pct     = document.getElementById('adm-big-prog-pct');
+  const status  = document.getElementById('adm-big-prog-status');
+  const success = document.getElementById('adm-upload-success');
+  const sub     = document.getElementById('adm-upload-success-sub');
+
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="animation:spin 1s linear infinite"><circle cx="8" cy="8" r="6" stroke="white" stroke-width="2" stroke-dasharray="20" stroke-dashoffset="10"/></svg> Uploading…';
+  if (prog) prog.classList.add('show');
+  if (success) success.classList.remove('show');
+
+  const ext = _selectedUploadFile.name.split('.').pop();
+  const safeName = _selectedUploadFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const path = `deliveries/${_selectedOrderId}/${Date.now()}_${safeName}`;
+  const storageRef = ref(adminSto, path);
+  const uploadTask = uploadBytesResumable(storageRef, _selectedUploadFile);
+
+  uploadTask.on('state_changed',
+    snapshot => {
+      const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+      if (fill) fill.style.width = progress + '%';
+      if (pct) pct.textContent = progress + '%';
+      const mb = (snapshot.bytesTransferred / 1024 / 1024).toFixed(1);
+      const total = (snapshot.totalBytes / 1024 / 1024).toFixed(1);
+      if (status) status.textContent = `Uploaded ${mb} MB of ${total} MB…`;
+    },
+    err => {
+      if (status) status.textContent = 'Upload failed: ' + err.message;
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 13V5M6 8l3-3 3 3" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 15h14" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg> Upload & Deliver to Client';
+    },
+    async () => {
+      try {
+        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        await updateDoc(doc(adminDb, 'orders', _selectedOrderId), {
+          status: 'done',
+          renderedFile: downloadURL,
+          deliveredAt: new Date(),
+        });
+        const o = _adminOrders.find(x => x.id === _selectedOrderId);
+        if (o) { o.status = 'done'; o.renderedFile = downloadURL; }
+
+        if (status) status.textContent = '✅ Upload complete!';
+        if (success) {
+          success.classList.add('show');
+          if (sub) sub.textContent = `Video delivered to ${order.clientName||order.userName||'client'}. The order has been marked as complete.`;
+        }
+        btn.innerHTML = '✅ Delivered!';
+
+        // Update stats
+        const done = _adminOrders.filter(x => x.status === 'done').length;
+        const pending = _adminOrders.filter(x => x.status === 'pending').length;
+        document.getElementById('ast-done').textContent    = done;
+        document.getElementById('ast-pending').textContent = pending;
+        document.getElementById('ast-awaiting').textContent = pending;
+
+        // Refresh dropdowns
+        setTimeout(() => {
+          admClearFile();
+          _selectedOrderId = null;
+          const sel = document.getElementById('adm-order-select');
+          if (sel) { sel.value = ''; admOnOrderSelect(''); }
+          admPopulateOrderSelect();
+          admRenderPendingQuickList();
+          renderDashboard();
+        }, 3000);
+      } catch(e) {
+        if (status) status.textContent = 'Save error: ' + e.message;
+      }
+    }
+  );
+};
+
+/* keep old alias for compatibility */
+window.switchAdminMain = function(tab) { admGo(tab); };
 window.checkAdminAccess = function() {
   let attempts = 0;
   const check = setInterval(() => {
@@ -4721,7 +5505,7 @@ window.checkAdminAccess = function() {
       clearInterval(check);
       document.getElementById('admin-loading').style.display = 'none';
       document.getElementById('admin-denied').style.display = 'none';
-      document.getElementById('admin-main').style.display = 'block';
+      document.getElementById('admin-main').style.display = 'flex';
       window.loadAdminOrders();
       startAdminClock();
     } else if (u || attempts > 20) {
@@ -6480,7 +7264,7 @@ async function submitReview() {
         }
         imgObs.unobserve(img);
       });
-    }, { rootMargin: '500px' }); // start loading 500px before visible
+    }, { rootMargin: '300px' }); // start loading 300px before visible
   }
 
   window.observeLazyImg = function(img) {
@@ -6506,7 +7290,6 @@ async function submitReview() {
             if (source) {
               source.src = source.dataset.src;
               delete source.dataset.src;
-              video.preload = 'auto';
               video.load();
             }
             video.dataset.loaded = '1';
@@ -6517,27 +7300,18 @@ async function submitReview() {
           video.pause();
         }
       });
-    }, { rootMargin: '400px', threshold: 0.1 });
+    }, { rootMargin: '150px', threshold: 0.1 });
   }
 
   window.observeLazyVideo = function(video) {
     if (!video || !videoObs) return;
+    // Skip the hero — it loads eagerly above the fold
     if (video.classList.contains('hero-video')) return;
     var source = video.querySelector('source');
     if (source && source.src && !source.dataset.src) {
       source.dataset.src = source.src;
       source.removeAttribute('src');
-      video.load();
-    }
-    var rect = video.getBoundingClientRect();
-    var inView = rect.top < window.innerHeight + 400 && rect.bottom > -400;
-    if (inView && !video.dataset.loaded) {
-      var src = video.querySelector('source[data-src]');
-      if (src) { src.src = src.dataset.src; delete src.dataset.src; }
-      video.preload = 'auto';
-      video.load();
-      video.play().catch(function(){});
-      video.dataset.loaded = '1';
+      video.load(); // flushes any buffered data
     }
     videoObs.observe(video);
   };
