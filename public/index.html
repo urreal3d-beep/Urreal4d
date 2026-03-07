@@ -2913,9 +2913,14 @@ async function loadProfileData() {
                        : isRej  ? '<span class="pf-order-status pf-st-reject">Rejected</span>'
                                 : '<span class="pf-order-status pf-st-pending">In Progress</span>';
 
+      // Store urls on a global map keyed by order id to avoid JSON/quote issues in onclick
+      if (hasOutputs) {
+        window._pfRenderUrls = window._pfRenderUrls || {};
+        window._pfRenderUrls[order.id] = order.renderOutputs;
+      }
       const footHtml   = isDone
         ? (hasOutputs
-            ? '<button onclick="pfOpenRenderGallery(' + JSON.stringify(order.renderOutputs) + ')" class="pf-render-link" style="background:none;border:none;cursor:pointer;padding:0;font-size:inherit;">View All ' + order.renderOutputs.length + ' Renders \u2192</button>'
+            ? '<button onclick="pfOpenRenderGallery(window._pfRenderUrls[\'' + order.id + '\'])" class="pf-render-link" style="background:none;border:none;cursor:pointer;padding:0;font-size:inherit;color:inherit;">View All ' + order.renderOutputs.length + ' Renders \u2192</button>'
             : '<a href="' + order.renderedFile + '" target="_blank" class="pf-render-link">View Render \u2192</a>')
         : isRej  ? '<span class="pf-rejected-note">Not accepted — contact us on WhatsApp.</span>'
                  : '<span class="pf-eta">Ready within ' + (isVideo ? '6' : '2') + ' hours</span>';
@@ -2962,11 +2967,17 @@ async function loadProfileData() {
 // ════════════════════════════════════
 window.pfOpenRenderGallery = function(urls) {
   if (!urls || !urls.length) return;
-  const imgs = urls.map((url, i) => `
+
+  // Handle both plain URL strings and objects {url, angle, label}
+  const normalized = urls.map((item, i) =>
+    typeof item === 'string' ? { url: item, label: 'Angle ' + (i + 1) } : { url: item.url, label: item.label || ('Angle ' + (i + 1)) }
+  );
+
+  const imgs = normalized.map(item => `
     <div style="flex:1;min-width:260px;max-width:320px;">
-      <img src="${url}" style="width:100%;border-radius:10px;cursor:pointer;border:1px solid rgba(124,58,237,0.25);"
-        onclick="window.open('${url}','_blank')" title="Click to open full size">
-      <div style="text-align:center;font-size:11px;color:rgba(255,255,255,0.4);margin-top:6px;">Angle ${i + 1}</div>
+      <img src="${item.url}" style="width:100%;border-radius:10px;cursor:pointer;border:1px solid rgba(124,58,237,0.25);"
+        onclick="window.open('${item.url}','_blank')" title="Click to open full size">
+      <div style="text-align:center;font-size:11px;color:rgba(255,255,255,0.4);margin-top:6px;">${item.label}</div>
     </div>`).join('');
 
   const overlay = document.createElement('div');
@@ -5607,10 +5618,16 @@ window.openRenderGallery = function(orderId) {
   const order = _adminOrders.find(x => x.id === orderId);
   if (!order?.renderOutputs?.length) return;
 
-  const imgs = order.renderOutputs.map(url => `
+  // renderOutputs can be plain URL strings OR objects {url, angle, label, sequenceName}
+  const normalized = order.renderOutputs.map((item, i) =>
+    typeof item === 'string' ? { url: item, label: 'Angle ' + (i + 1) } : { url: item.url, label: item.label || ('Angle ' + (i + 1)) }
+  );
+
+  const imgs = normalized.map(item => `
     <div style="flex:1;min-width:280px;max-width:340px;">
-      <img src="${url}" style="width:100%;border-radius:10px;cursor:pointer;border:1px solid rgba(124,58,237,0.2);"
-        onclick="window.open('${url}','_blank')">
+      <img src="${item.url}" style="width:100%;border-radius:10px;cursor:pointer;border:1px solid rgba(124,58,237,0.2);"
+        onclick="window.open('${item.url}','_blank')">
+      <div style="text-align:center;font-size:11px;color:rgba(255,255,255,0.4);margin-top:6px;">${item.label}</div>
     </div>`).join('');
 
   const overlay = document.createElement('div');
