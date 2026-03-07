@@ -2963,6 +2963,25 @@ async function loadProfileData() {
 }
 
 // ════════════════════════════════════
+// BLOB DOWNLOAD HELPER
+// Forces a real file download across cross-origin URLs
+// ════════════════════════════════════
+window.downloadRenderImage = async function(url, filename) {
+  try {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+  } catch(e) {
+    window.open(url, '_blank');
+  }
+};
+
+// ════════════════════════════════════
 // CLIENT RENDER GALLERY POPUP
 // ════════════════════════════════════
 window.pfOpenRenderGallery = function(urls) {
@@ -2985,11 +3004,11 @@ window.pfOpenRenderGallery = function(urls) {
             onmouseover="this.style.background='rgba(167,139,250,0.1)'" onmouseout="this.style.background='transparent'">
             Open ↗
           </a>
-          <a href="${item.url}" download="render-angle-${i + 1}.png"
-            style="font-size:11px;font-weight:700;color:#fff;text-decoration:none;padding:5px 12px;background:rgba(124,58,237,0.7);border:1px solid rgba(124,58,237,0.5);border-radius:6px;transition:all 0.2s;"
+          <button onclick="downloadRenderImage('${item.url}','render-angle-${i + 1}.png')"
+            style="font-size:11px;font-weight:700;color:#fff;padding:5px 12px;background:rgba(124,58,237,0.7);border:1px solid rgba(124,58,237,0.5);border-radius:6px;cursor:pointer;transition:all 0.2s;"
             onmouseover="this.style.background='rgba(124,58,237,1)'" onmouseout="this.style.background='rgba(124,58,237,0.7)'">
             ↓ Download
-          </a>
+          </button>
         </div>
       </div>
     </div>`).join('');
@@ -5654,10 +5673,10 @@ window.openRenderGallery = function(orderId) {
             style="font-size:11px;font-weight:700;color:#a78bfa;text-decoration:none;padding:5px 12px;border:1px solid rgba(167,139,250,0.3);border-radius:6px;">
             Open ↗
           </a>
-          <a href="${item.url}" download="render-angle-${i + 1}.png"
-            style="font-size:11px;font-weight:700;color:#fff;text-decoration:none;padding:5px 12px;background:rgba(124,58,237,0.7);border:1px solid rgba(124,58,237,0.5);border-radius:6px;">
+          <button onclick="downloadRenderImage('${item.url}','render-angle-${i + 1}.png')"
+            style="font-size:11px;font-weight:700;color:#fff;padding:5px 12px;background:rgba(124,58,237,0.7);border:1px solid rgba(124,58,237,0.5);border-radius:6px;cursor:pointer;">
             ↓ Download
-          </a>
+          </button>
         </div>
       </div>
     </div>`).join('');
