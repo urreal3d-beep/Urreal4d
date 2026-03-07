@@ -4708,10 +4708,10 @@ async function onCartPaymentSuccess(rzpResponse, brand) {
 
       // Helper: upload a single File object
       const uploadOne = (file, path) => new Promise((resolve, reject) => {
-        const storageRef = ref(stoInst, path);
-        const task = uploadBytesResumable(storageRef, file);
+        const storageRef = window._fbRef(stoInst, path);
+        const task = window._fbUploadBytesResumable(storageRef, file);
         task.on('state_changed', null, reject, async () => {
-          try { resolve(await getDownloadURL(task.snapshot.ref)); }
+          try { resolve(await window._fbGetDownloadURL(task.snapshot.ref)); }
           catch(e) { reject(e); }
         });
       });
@@ -4850,6 +4850,9 @@ const sto  = getStorage(app);
 // ── Expose auth instance so OTP controller (plain <script>) can use it ──
 window._firebaseAuth = auth;
 window._firebaseSto  = sto;
+window._fbRef = ref;
+window._fbUploadBytesResumable = uploadBytesResumable;
+window._fbGetDownloadURL = getDownloadURL;
 
 // ── Save / update user profile in Firestore users collection ──
 window._saveUserProfile = async function(user, overrideName) {
