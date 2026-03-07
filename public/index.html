@@ -4653,7 +4653,7 @@ async function onCartPaymentSuccess(rzpResponse, brand) {
     }
 
     // Upload client files to Firebase Storage and attach URLs to each order
-    const stoInst = sto || window._firebaseSto;
+    const stoInst = window._firebaseSto;
     for (let i = 0; i < window._cart.length; i++) {
       const item = window._cart[i];
       const oid  = orderIds[i];
