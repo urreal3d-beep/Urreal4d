@@ -5005,7 +5005,7 @@ window.saveOrderToFirestore = async function(orderData) {
         type: 'text',
         text: { body: waMsg }
       })
-    }).catch(e => console.log('WA notify failed:', e));
+    }).then(r => r.json()).then(d => console.log('WA RESPONSE:', JSON.stringify(d))).catch(e => console.log('WA notify failed:', e));
   } catch(waErr) {
     console.log('WA notify failed:', waErr);
   }
