@@ -5161,7 +5161,7 @@ function renderDashboard() {
         <td><span style="font-size:12px;">${type}</span></td>
         <td><span class="adm-td-mono">${date}</span></td>
         <td><div class="adm-td-amount">${o.price||'—'}</div></td>
-        <td><button onclick="admGo('orders');setTimeout(()=>{const cc=document.getElementById('cc-orders-${o.id}');if(cc){cc.classList.add('open');}},300);" style="background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.25);color:var(--pl);padding:6px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">→ Open</button></td>
+        <td><button onclick="admGo('orders')" style="background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.25);color:var(--pl);padding:6px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">→ Open</button></td>
       </tr>`;
     }).join('') +
     '</tbody></table></div>';
@@ -5409,14 +5409,15 @@ function renderAdminClients() {
   const clientMap = {};
   orders.forEach(order => {
     const key = order.userEmail || 'unknown';
-    if (!clientMap[key]) clientMap[key] = { name: order.userName || order.clientName || 'Unknown', email: order.userEmail || '—', orders: [] };
+    if (!clientMap[key]) clientMap[key] = { name: order.userName || order.clientName || 'Unknown', email: order.userEmail || '\u2014', orders: [] };
     clientMap[key].orders.push(order);
   });
   const clients = Object.values(clientMap);
-  document.getElementById('admin-count').textContent = clients.length + ' client' + (clients.length !== 1 ? 's' : '') + ' · ' + orders.length + ' orders';
-  if (clients.length === 0) { list.innerHTML = '<div class="adm-empty"><span class="adm-empty-icon">📭</span>No orders match this filter.</div>'; return; }
+  document.getElementById('admin-count').textContent = clients.length + ' client' + (clients.length !== 1 ? 's' : '') + ' \u00b7 ' + orders.length + ' orders';
+  if (clients.length === 0) { list.innerHTML = '<div class="adm-empty"><span class="adm-empty-icon">\ud83d\udced</span>No orders match this filter.</div>'; return; }
 
   list.innerHTML = clients.map((client, ci) => {
+    const safeKey = 'c' + ci + 'x' + (client.email||'x').replace(/[^a-z0-9]/gi,'').substring(0,12);
     const initials     = client.name.charAt(0).toUpperCase();
     const pendingCount = client.orders.filter(o => o.status === 'pending').length;
     const doneCount    = client.orders.filter(o => o.status === 'done').length;
@@ -5425,55 +5426,57 @@ function renderAdminClients() {
       return sum + p;
     }, 0);
 
-    // Tabs — one per order
     const tabs = client.orders.map((order, oi) => {
       const isPending = order.status === 'pending';
-      const badge = isPending ? `<span class="adm-order-tab-badge">!</span>` : '';
-      return `<button class="adm-order-tab ${oi===0?'active':''}" onclick="admSwitchTab(event,'${ci}','${oi}')">#${oi+1} ${order.templateName ? order.templateName.split('—')[0].trim() : 'Order'}${badge}</button>`;
+      const badge = isPending ? '<span class="adm-order-tab-badge">!</span>' : '';
+      const shortName = (order.templateName||'Order').split('\u2014')[0].trim().substring(0,14);
+      return '<button class="adm-order-tab ' + (oi===0?'active':'') + '" onclick="admSwitchTab(event,\'' + safeKey + '\',\'' + oi + '\')">#' + (oi+1) + ' ' + shortName + badge + '</button>';
     }).join('');
 
-    // Panels — one per order
     const panels = client.orders.map((order, oi) =>
-      `<div class="adm-order-panel ${oi===0?'active':''}" id="adm-panel-${ci}-${oi}">
-        ${buildOrderCard(order, oi)}
-      </div>`
+      '<div class="adm-order-panel ' + (oi===0?'active':'') + '" id="adm-panel-' + safeKey + '-' + oi + '">' +
+        buildOrderCard(order, oi) +
+      '</div>'
     ).join('');
 
-    return `<div class="adm-client-card" id="cc-${ci}">
-      <div class="adm-client-header" onclick="toggleAdmClient(${ci})">
-        <div class="adm-client-avatar">${initials}</div>
-        <div class="adm-client-info">
-          <div class="adm-client-name">${client.name}</div>
-          <div class="adm-client-meta">
-            <span>${client.email}</span>
-            <span style="color:rgba(124,58,237,0.4);">·</span>
-            <span>${client.orders.length} order${client.orders.length>1?'s':''}</span>
-            ${pendingCount>0?`<span style="color:rgba(124,58,237,0.4);">·</span><span style="color:var(--yellow);">${pendingCount} pending</span>`:''}
-            ${doneCount>0?`<span style="color:rgba(124,58,237,0.4);">·</span><span style="color:var(--green);">${doneCount} done</span>`:''}
-          </div>
-        </div>
-        <div class="adm-client-right">
-          ${totalSpend>0?`<div style="font-size:12px;font-weight:800;color:var(--gold);">₹${totalSpend.toLocaleString('en-IN')}</div>`:''}
-          <div class="adm-client-order-count">${client.orders.length}</div>
-          <div class="adm-chevron"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div>
-        </div>
-      </div>
-      <div class="adm-client-orders">
-        ${client.orders.length > 1 ? `<div class="adm-order-tabs">${tabs}</div>` : ''}
-        ${panels}
-      </div>
-    </div>`;
+    return '<div class="adm-client-card" id="cc-' + safeKey + '">' +
+      '<div class="adm-client-header" onclick="toggleAdmClient(\'' + safeKey + '\')">' +
+        '<div class="adm-client-avatar">' + initials + '</div>' +
+        '<div class="adm-client-info">' +
+          '<div class="adm-client-name">' + client.name + '</div>' +
+          '<div class="adm-client-meta">' +
+            '<span>' + client.email + '</span>' +
+            (pendingCount>0 ? '<span style="color:var(--yellow);margin-left:6px;">' + pendingCount + ' pending</span>' : '') +
+            (doneCount>0 ? '<span style="color:var(--green);margin-left:6px;">' + doneCount + ' done</span>' : '') +
+          '</div>' +
+        '</div>' +
+        '<div class="adm-client-right">' +
+          (totalSpend>0 ? '<div style="font-size:12px;font-weight:800;color:var(--gold);">\u20b9' + totalSpend.toLocaleString('en-IN') + '</div>' : '') +
+          '<div class="adm-client-order-count">' + client.orders.length + '</div>' +
+          '<div class="adm-chevron"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="adm-client-orders">' +
+        (client.orders.length > 1 ? '<div class="adm-order-tabs">' + tabs + '</div>' : '') +
+        panels +
+      '</div>' +
+    '</div>';
   }).join('');
 }
 
-window.admSwitchTab = function(e, ci, oi) {
+window.toggleAdmClient = function(safeKey) {
+  const card = document.getElementById('cc-' + safeKey);
+  if (card) card.classList.toggle('open');
+};
+
+window.admSwitchTab = function(e, safeKey, oi) {
   e.stopPropagation();
-  const card = document.getElementById('cc-' + ci);
+  const card = document.getElementById('cc-' + safeKey);
   if (!card) return;
   card.querySelectorAll('.adm-order-tab').forEach(t => t.classList.remove('active'));
   card.querySelectorAll('.adm-order-panel').forEach(p => p.classList.remove('active'));
   e.currentTarget.classList.add('active');
-  const panel = document.getElementById(`adm-panel-${ci}-${oi}`);
+  const panel = document.getElementById('adm-panel-' + safeKey + '-' + oi);
   if (panel) panel.classList.add('active');
 };
 
