@@ -4742,11 +4742,12 @@ async function onCartPaymentSuccess(rzpResponse, brand) {
       // Save URLs back into the order document
       if (refUrls.length || designUrls.length) {
         try {
-          await updateDoc(doc(db, 'orders', oid), {
+          await window._fbUpdateDoc(window._fbDoc(window._fbDb, 'orders', oid), {
             clientRefFiles:    refUrls,
             clientDesignFiles: designUrls,
           });
-        } catch(e) { /* attach skipped */ }
+          console.log('Files saved to order:', oid, refUrls.length, designUrls.length);
+        } catch(e) { console.error('File attach failed:', e.message); }
       }
     }
 
@@ -4853,6 +4854,9 @@ window._firebaseSto  = sto;
 window._fbRef = ref;
 window._fbUploadBytesResumable = uploadBytesResumable;
 window._fbGetDownloadURL = getDownloadURL;
+window._fbDb = db;
+window._fbDoc = doc;
+window._fbUpdateDoc = updateDoc;
 
 // ── Save / update user profile in Firestore users collection ──
 window._saveUserProfile = async function(user, overrideName) {
