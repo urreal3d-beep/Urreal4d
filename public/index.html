@@ -5955,6 +5955,7 @@ window.renderAnalytics = function() {
 
   const kpiEl = document.getElementById('analytics-kpi');
   if (!kpiEl) return;
+  const kpiData = [
     { label:'Total Revenue',  value:'₹'+totalRev.toLocaleString('en-IN'), color:'#a78bfa' },
     { label:'Total Orders',   value:confirmed.length,                      color:'#60a5fa' },
     { label:'Unique Clients', value:clients,                               color:'#34d399' },
