@@ -3661,6 +3661,27 @@ function pfSetMsg(id, text, type) {
   border-color:rgba(124,58,237,0.5);background:rgba(124,58,237,0.08);
 }
 
+/* ── RENDER SECTION ── */
+.rs-dropzone{
+  flex:1;border:1.5px dashed rgba(124,58,237,0.22);border-radius:8px;
+  padding:10px 14px;cursor:pointer;background:rgba(124,58,237,0.03);
+  transition:all 0.2s;display:flex;align-items:center;gap:8px;
+}
+.rs-dropzone:hover,.rs-dz-over{
+  border-color:rgba(124,58,237,0.5);background:rgba(124,58,237,0.08);
+}
+.rs-dropzone.rs-dz-ready{
+  border-color:rgba(34,197,94,0.4);background:rgba(34,197,94,0.05);
+}
+.rs-badge{
+  font-size:11px;font-weight:700;padding:6px 12px;border-radius:7px;
+  margin-bottom:10px;display:inline-block;
+}
+.rs-queued  {background:rgba(234,179,8,0.1); border:1px solid rgba(234,179,8,0.3); color:#fbbf24;}
+.rs-running {background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);color:var(--pl);}
+.rs-done    {background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.3); color:var(--green);}
+.rs-error   {background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#f87171;}
+
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
   .adm-sidebar{width:200px;}
@@ -4434,7 +4455,7 @@ function cartQtyChange(title, src, price, type, btn, delta) { _cartQtyStep(title
 // ════════════════════════════════════════════════════════
 // CART CHECKOUT — RAZORPAY
 // ════════════════════════════════════════════════════════
-const RAZORPAY_KEY = 'rzp_live_SNEKjhQYXtiBNs';
+const RAZORPAY_KEY = 'rzp_test_SNGES9Kh3I7cSx';
 const DISCOUNT_THRESHOLD = 5000;
 const DISCOUNT_RATE      = 0.20;
 const COUPON_CODES       = { 'URREAL10': 0.10, 'LAUNCH20': 0.20 };
@@ -4900,8 +4921,8 @@ window.loadUserOrders = async function() {
 <!-- ═══ ADMIN SCRIPT ═══ -->
 <script type="module">
 import { getApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, query, where, orderBy, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytesResumable, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
 
 const adminDb  = getFirestore(getApp());
 const adminSto = getStorage(getApp());
@@ -4954,6 +4975,9 @@ window.loadAdminOrders = async function() {
     renderDashboard();
     renderPaymentsList();
     renderAdminClients();
+
+    // Start live listeners for any in-progress render jobs
+    rsAttachListeners();
   } catch(e) {
     alert('Admin load error: ' + e.message);
   }
@@ -5035,6 +5059,84 @@ function buildFileSection(files, label, icon) {
           ⬇ ${f.label||f.name||'File'}
         </a>`).join('')}
     </div>
+  </div>`;
+}
+
+function buildRenderSection(order) {
+  const rs = order.renderStatus || null;
+  const hasOutputs = order.renderOutputs && order.renderOutputs.length > 0;
+
+  // Status badge
+  let statusHtml = '';
+  if (rs === 'queued')           statusHtml = `<div class="rs-badge rs-queued">⏳ Queued</div>`;
+  else if (rs === 'downloading') statusHtml = `<div class="rs-badge rs-running">⬇️ Downloading UV files…</div>`;
+  else if (rs === 'swapping_texture') statusHtml = `<div class="rs-badge rs-running">🔄 Swapping textures…</div>`;
+  else if (rs === 'rendering')   statusHtml = `<div class="rs-badge rs-running">🎨 Rendering in UE5…</div>`;
+  else if (rs === 'uploading')   statusHtml = `<div class="rs-badge rs-running">☁️ Uploading renders…</div>`;
+  else if (rs === 'done')        statusHtml = `<div class="rs-badge rs-done">✅ Render Complete</div>`;
+  else if (rs === 'error')       statusHtml = `<div class="rs-badge rs-error">❌ Render Failed</div>`;
+
+  // View renders button (only when done and outputs exist)
+  const viewBtn = (rs === 'done' && hasOutputs)
+    ? `<button onclick="openRenderGallery('${order.id}')"
+        style="width:100%;margin-top:8px;background:linear-gradient(135deg,#059669,#047857);color:#fff;
+          padding:10px;border-radius:8px;border:none;font-family:'Plus Jakarta Sans',sans-serif;
+          font-size:12px;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;cursor:pointer;">
+        🖼 View Renders
+      </button>` : '';
+
+  return `
+  <div style="margin-top:12px;border-top:1px solid rgba(124,58,237,0.08);padding-top:12px;">
+    <div style="font-size:9.5px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--gdim);margin-bottom:10px;">
+      🎨 UE5 Auto Render
+    </div>
+
+    ${statusHtml}
+
+    <!-- Hoodie UV -->
+    <div style="margin-bottom:8px;">
+      <div style="font-size:10.5px;font-weight:700;color:var(--gray);margin-bottom:5px;">Hoodie UV Map <span style="color:#f87171;">*</span></div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="rs-dropzone" id="rs-dz-hoodie-${order.id}"
+          onclick="document.getElementById('rs-inp-hoodie-${order.id}').click()"
+          ondragover="event.preventDefault();this.classList.add('rs-dz-over')"
+          ondragleave="this.classList.remove('rs-dz-over')"
+          ondrop="event.preventDefault();this.classList.remove('rs-dz-over');rsSetFile('${order.id}','hoodie',event.dataTransfer.files[0])">
+          <span style="font-size:16px;">🗺</span>
+          <span id="rs-dz-hoodie-label-${order.id}" style="font-size:11px;color:var(--gdim);">Click or drop PNG</span>
+        </div>
+        <input type="file" id="rs-inp-hoodie-${order.id}" accept="image/png" style="display:none"
+          onchange="rsSetFile('${order.id}','hoodie',this.files[0])">
+      </div>
+    </div>
+
+    <!-- Pant UV -->
+    <div style="margin-bottom:10px;">
+      <div style="font-size:10.5px;font-weight:700;color:var(--gray);margin-bottom:5px;">Pant UV Map <span style="color:#f87171;">*</span></div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="rs-dropzone" id="rs-dz-pant-${order.id}"
+          onclick="document.getElementById('rs-inp-pant-${order.id}').click()"
+          ondragover="event.preventDefault();this.classList.add('rs-dz-over')"
+          ondragleave="this.classList.remove('rs-dz-over')"
+          ondrop="event.preventDefault();this.classList.remove('rs-dz-over');rsSetFile('${order.id}','pant',event.dataTransfer.files[0])">
+          <span style="font-size:16px;">🗺</span>
+          <span id="rs-dz-pant-label-${order.id}" style="font-size:11px;color:var(--gdim);">Click or drop PNG</span>
+        </div>
+        <input type="file" id="rs-inp-pant-${order.id}" accept="image/png" style="display:none"
+          onchange="rsSetFile('${order.id}','pant',this.files[0])">
+      </div>
+    </div>
+
+    <!-- Start Render button -->
+    <button id="rs-btn-${order.id}" onclick="rsStartRender('${order.id}','${order.templateName||''}')" disabled
+      style="width:100%;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;
+        padding:10px;border-radius:8px;border:none;font-family:'Plus Jakarta Sans',sans-serif;
+        font-size:12px;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;cursor:pointer;
+        opacity:0.4;transition:opacity 0.2s;box-shadow:0 2px 14px rgba(124,58,237,0.3);">
+      🚀 Start Render
+    </button>
+
+    ${viewBtn}
   </div>`;
 }
 
@@ -5139,6 +5241,7 @@ function buildOrderCard(order, oi) {
     ${hasClientFiles ? `<div style="background:rgba(0,0,0,0.18);border:1px solid rgba(124,58,237,0.1);border-radius:8px;padding:12px 14px;margin-bottom:10px;">${refSection}${designSection}</div>` : ''}
     ${deliveredLink}
     ${uploadSection}
+    ${order.templateName === 'Lookbook — Silk Wrap' ? buildRenderSection(order) : ''}
   </div>`;
 }
 
@@ -5305,6 +5408,192 @@ window.admInlineUpload = async function(orderId) {
       }
     }
   );
+};
+
+/* ────────────────────────────────────────
+   RENDER SECTION — UV upload helpers
+──────────────────────────────────────── */
+const _rsFiles = {}; // { orderId: { hoodie: File|null, pant: File|null } }
+
+window.rsSetFile = function(orderId, slot, file) {
+  if (!file) return;
+  if (!_rsFiles[orderId]) _rsFiles[orderId] = { hoodie: null, pant: null };
+  _rsFiles[orderId][slot] = file;
+
+  const label = document.getElementById(`rs-dz-${slot}-label-${orderId}`);
+  const dz    = document.getElementById(`rs-dz-${slot}-${orderId}`);
+  if (label) label.textContent = file.name;
+  if (dz)    dz.classList.add('rs-dz-ready');
+
+  const both = _rsFiles[orderId].hoodie && _rsFiles[orderId].pant;
+  const btn  = document.getElementById(`rs-btn-${orderId}`);
+  if (btn) { btn.disabled = !both; btn.style.opacity = both ? '1' : '0.4'; }
+};
+
+window.rsStartRender = async function(orderId, templateName) {
+  const files = _rsFiles[orderId];
+  if (!files?.hoodie || !files?.pant) return;
+
+  const btn = document.getElementById(`rs-btn-${orderId}`);
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Uploading UV files…'; btn.style.opacity = '0.7'; }
+
+  try {
+    const hoodieRef = ref(adminSto, `uvmaps/${orderId}/HOODI-UV.png`);
+    await uploadBytes(hoodieRef, files.hoodie);
+    const hoodieUrl = await getDownloadURL(hoodieRef);
+
+    const pantRef = ref(adminSto, `uvmaps/${orderId}/PNT-UV.png`);
+    await uploadBytes(pantRef, files.pant);
+    const pantUrl = await getDownloadURL(pantRef);
+
+    await addDoc(collection(adminDb, 'render_queue'), {
+      orderId,
+      templateName,
+      hoodieUvUrl: hoodieUrl,
+      pantUvUrl:   pantUrl,
+      status:      'queued',
+      createdAt:   new Date()
+    });
+
+    await updateDoc(doc(adminDb, 'orders', orderId), { renderStatus: 'queued' });
+
+    const o = _adminOrders.find(x => x.id === orderId);
+    if (o) o.renderStatus = 'queued';
+
+    if (btn) { btn.textContent = '✅ Job Queued!'; btn.style.opacity = '0.6'; }
+
+    // Start live listener for this job
+    rsAttachListener(orderId);
+
+    const card = document.getElementById(`oi-${orderId}`);
+    const existingBadge = card?.querySelector('.rs-badge');
+    if (existingBadge) {
+      existingBadge.className = 'rs-badge rs-queued';
+      existingBadge.textContent = '⏳ Queued';
+    }
+
+  } catch(e) {
+    console.error('Render start error:', e);
+    if (btn) { btn.disabled = false; btn.textContent = '❌ Error — Retry'; btn.style.opacity = '1'; }
+  }
+};
+
+/* ────────────────────────────────────────
+   RENDER — Live status listeners
+──────────────────────────────────────── */
+const _rsUnsubscribers = {}; // track active listeners per orderId
+
+const RS_LABELS = {
+  queued:           { cls: 'rs-queued',  text: '⏳ Queued' },
+  downloading:      { cls: 'rs-running', text: '⬇️ Downloading UV files…' },
+  swapping_texture: { cls: 'rs-running', text: '🔄 Swapping textures…' },
+  rendering:        { cls: 'rs-running', text: '🎨 Rendering in UE5…' },
+  uploading:        { cls: 'rs-running', text: '☁️ Uploading renders…' },
+  done:             { cls: 'rs-done',    text: '✅ Render Complete' },
+  error:            { cls: 'rs-error',   text: '❌ Render Failed' },
+};
+
+function rsAttachListener(orderId) {
+  // Don't attach duplicate listeners
+  if (_rsUnsubscribers[orderId]) return;
+
+  const queueQuery = query(
+    collection(adminDb, 'render_queue'),
+    where('orderId', '==', orderId),
+    orderBy('createdAt', 'desc')
+  );
+
+  const unsub = onSnapshot(queueQuery, snap => {
+    if (snap.empty) return;
+    const jobDoc = snap.docs[0];
+    const status = jobDoc.data().status;
+    const renderOutputs = jobDoc.data().renderOutputs || [];
+
+    // Update local order cache
+    const o = _adminOrders.find(x => x.id === orderId);
+    if (o) {
+      o.renderStatus = status;
+      if (renderOutputs.length) o.renderOutputs = renderOutputs;
+    }
+
+    // Update status badge in card
+    const card = document.getElementById('oi-' + orderId);
+    if (!card) return;
+
+    const badge = card.querySelector('.rs-badge');
+    const label = RS_LABELS[status];
+    if (badge && label) {
+      badge.className = 'rs-badge ' + label.cls;
+      badge.textContent = label.text;
+    }
+
+    // When done — update button + show View Renders button
+    if (status === 'done') {
+      const btn = document.getElementById('rs-btn-' + orderId);
+      if (btn) { btn.textContent = '✅ Job Queued!'; btn.style.opacity = '0.6'; }
+
+      // Inject View Renders button if not already there
+      if (renderOutputs.length && !card.querySelector('.rs-view-btn')) {
+        const renderSection = card.querySelector('#rs-btn-' + orderId)?.parentElement;
+        if (renderSection) {
+          const viewBtn = document.createElement('button');
+          viewBtn.className = 'rs-view-btn';
+          viewBtn.textContent = '🖼 View Renders';
+          viewBtn.onclick = () => openRenderGallery(orderId);
+          viewBtn.style.cssText = 'width:100%;margin-top:8px;background:linear-gradient(135deg,#059669,#047857);color:#fff;padding:10px;border-radius:8px;border:none;font-family:Plus Jakarta Sans,sans-serif;font-size:12px;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;cursor:pointer;';
+          renderSection.appendChild(viewBtn);
+        }
+      }
+
+      // Stop listening once done
+      unsub();
+      delete _rsUnsubscribers[orderId];
+    }
+
+    // On error — stop listening too
+    if (status === 'error') {
+      unsub();
+      delete _rsUnsubscribers[orderId];
+    }
+  });
+
+  _rsUnsubscribers[orderId] = unsub;
+}
+
+// Called after orders load — attach listeners to any active render jobs
+function rsAttachListeners() {
+  const activeStatuses = ['queued','downloading','swapping_texture','rendering','uploading'];
+  _adminOrders.forEach(order => {
+    if (order.templateName === 'Lookbook — Silk Wrap' && activeStatuses.includes(order.renderStatus)) {
+      rsAttachListener(order.id);
+    }
+  });
+}
+
+window.openRenderGallery = function(orderId) {
+  const order = _adminOrders.find(x => x.id === orderId);
+  if (!order?.renderOutputs?.length) return;
+
+  const imgs = order.renderOutputs.map(url => `
+    <div style="flex:1;min-width:280px;max-width:340px;">
+      <img src="${url}" style="width:100%;border-radius:10px;cursor:pointer;border:1px solid rgba(124,58,237,0.2);"
+        onclick="window.open('${url}','_blank')">
+    </div>`).join('');
+
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;padding:40px 20px;';
+  overlay.innerHTML = `
+    <div style="width:100%;max-width:900px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <div style="font-size:16px;font-weight:800;color:#fff;">🖼 Render Outputs — ${order.templateName}</div>
+        <button onclick="this.closest('div[style*=fixed]').remove()"
+          style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;
+            width:34px;height:34px;border-radius:8px;cursor:pointer;font-size:16px;">✕</button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;">${imgs}</div>
+    </div>`;
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
 };
 
 /* ────────────────────────────────────────
