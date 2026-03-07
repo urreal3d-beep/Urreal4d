@@ -4982,6 +4982,33 @@ window.saveOrderToFirestore = async function(orderData) {
       razorpayPaymentId: orderData.razorpayPaymentId || null,
       renderedFile: null
     });
+
+    // Notify admin on WhatsApp
+    try {
+      const waMsg = `🛎 New Order Received!\n` +
+        `Client: ${user.displayName || profile.name || 'Unknown'}\n` +
+        `Email: ${user.email || profile.email || '—'}\n` +
+        `Template: ${orderData.templateName || '—'}\n` +
+        `Price: ${orderData.price || '—'}\n` +
+        `Payment: ${orderData.razorpayPaymentId || 'confirmed'}`;
+
+      await fetch(`https://graph.facebook.com/v22.0/975515268986741/messages`, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer EAAnTpVtp5kwBQ79zj61REJgS5z0U2KrKtRzZBXjZCqdxyy0xsdlIxFg0ELhxiMhR2GUoAZA1xF8WGrezg8zPAsM1YZBBYNB2LSXW5FKvifqGyV3jDbXs4Bi77ZBFrzp3hearb71EiOTFr7XpJFJlcuwGd8WMSwTBZBxAEZAucUjTFopSh70ZB47SNKa2jKV81QoyTAZDZD',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          messaging_product: 'whatsapp',
+          to:   '919016535681',
+          type: 'text',
+          text: { body: waMsg }
+        })
+      });
+    } catch(waErr) {
+      console.log('WA notify failed:', waErr);
+    }
+
     return docRef.id;
   } catch(e) { console.log('Order save failed:', e); }
 }
