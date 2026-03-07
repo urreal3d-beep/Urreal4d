@@ -5944,10 +5944,14 @@ function buildRenderVideoCard(item, admin) {
   </div>`;
 }
 
+// Store image URLs by item id so onclick attrs don't get corrupted by special chars
+window._riUrls = {};
+
 function buildRenderImageCard(item, admin) {
   const mainUrl = fbUrl(item.file);
   const allFiles = [item.file, ...(item.extraFiles||[])];
   const allUrls  = allFiles.map(fbUrl);
+  window._riUrls[item.id] = allUrls; // store for safe onclick reference
   const imgs = allUrls.map((u,i) => `<img src="${u}" class="rt-carousel-img${i===0?' active':''}" loading="lazy">`).join('');
   const dots = allUrls.map((_,i) => `<span class="rt-dot${i===0?' active':''}"></span>`).join('');
   const adminBar = admin ? `
@@ -5966,7 +5970,7 @@ function buildRenderImageCard(item, admin) {
         Delete
       </button>
     </div>` : '';
-  const panelClick = admin ? '' : `onclick="openRenderPanel('image','${item.title.replace(/'/g,"\\'")}','${item.fullDesc.replace(/'/g,"\\'")}',${JSON.stringify(allUrls)},'${item.price}')"`;
+  const panelClick = admin ? '' : `onclick="openRenderPanel('image','${item.title.replace(/'/g,"\\'")}','${item.fullDesc.replace(/'/g,"\\'")}',window._riUrls['${item.id}'],'${item.price}')"`;
   return `<div class="rt-card${admin?' admin-mode':''}" id="rc-${item.id}" ${panelClick}>
     ${adminBar}
     <div class="rt-media">
@@ -5982,7 +5986,7 @@ function buildRenderImageCard(item, admin) {
     <div class="rt-info">
       <h4>${item.title}</h4><p>${item.shortDesc}</p>
       <div class="rt-info-row">
-        <button class="rt-quick-cart" onclick="event.stopPropagation();quickAddToCart('image','${item.title.replace(/'/g,"\\'")}','${item.fullDesc.replace(/'/g,"\\'")}',${JSON.stringify(allUrls)},'${item.price}',this)">
+        <button class="rt-quick-cart" onclick="event.stopPropagation();quickAddToCart('image','${item.title.replace(/'/g,"\\'")}','${item.fullDesc.replace(/'/g,"\\'")}',window._riUrls['${item.id}'],'${item.price}',this)">
           ${CART_SVG} Add to Cart
         </button>
       </div>
