@@ -2968,7 +2968,8 @@ async function loadProfileData() {
 // ════════════════════════════════════
 window.downloadRenderImage = async function(url, filename) {
   try {
-    const res = await fetch(url);
+    const res = await fetch(url, { mode: 'cors' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const blob = await res.blob();
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -2977,6 +2978,7 @@ window.downloadRenderImage = async function(url, filename) {
     a.click();
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
   } catch(e) {
+    console.error('[DOWNLOAD ERROR]', e.message, url);
     window.open(url, '_blank');
   }
 };
