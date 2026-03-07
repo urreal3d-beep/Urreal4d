@@ -2905,16 +2905,20 @@ async function loadProfileData() {
       const date     = order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'}) : '—';
       const time     = order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'}) : '';
       const isVideo  = order.templateType === 'video';
-      const isDone   = order.status === 'done' && order.renderedFile;
+      const hasOutputs = order.renderOutputs && order.renderOutputs.length > 0;
+      const isDone   = order.status === 'done' && (order.renderedFile || hasOutputs);
       const isRej    = order.status === 'rejected';
 
       const statusHtml = isDone ? '<span class="pf-order-status pf-st-done">Completed</span>'
                        : isRej  ? '<span class="pf-order-status pf-st-reject">Rejected</span>'
                                 : '<span class="pf-order-status pf-st-pending">In Progress</span>';
 
-      const footHtml   = isDone ? '<a href="' + order.renderedFile + '" target="_blank" class="pf-render-link">View Render →</a>'
-                       : isRej  ? '<span class="pf-rejected-note">Not accepted — contact us on WhatsApp.</span>'
-                                : '<span class="pf-eta">Ready within ' + (isVideo ? '6' : '2') + ' hours</span>';
+      const footHtml   = isDone
+        ? (hasOutputs
+            ? '<button onclick="pfOpenRenderGallery(' + JSON.stringify(order.renderOutputs) + ')" class="pf-render-link" style="background:none;border:none;cursor:pointer;padding:0;font-size:inherit;">View All ' + order.renderOutputs.length + ' Renders \u2192</button>'
+            : '<a href="' + order.renderedFile + '" target="_blank" class="pf-render-link">View Render \u2192</a>')
+        : isRej  ? '<span class="pf-rejected-note">Not accepted — contact us on WhatsApp.</span>'
+                 : '<span class="pf-eta">Ready within ' + (isVideo ? '6' : '2') + ' hours</span>';
 
       return '<div class="pf-order">'
         + '<div class="pf-order-head">'
@@ -2952,6 +2956,35 @@ async function loadProfileData() {
       + '</tr></thead><tbody>' + rows + '</tbody></table></div>';
   }
 }
+
+// ════════════════════════════════════
+// CLIENT RENDER GALLERY POPUP
+// ════════════════════════════════════
+window.pfOpenRenderGallery = function(urls) {
+  if (!urls || !urls.length) return;
+  const imgs = urls.map((url, i) => `
+    <div style="flex:1;min-width:260px;max-width:320px;">
+      <img src="${url}" style="width:100%;border-radius:10px;cursor:pointer;border:1px solid rgba(124,58,237,0.25);"
+        onclick="window.open('${url}','_blank')" title="Click to open full size">
+      <div style="text-align:center;font-size:11px;color:rgba(255,255,255,0.4);margin-top:6px;">Angle ${i + 1}</div>
+    </div>`).join('');
+
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;padding:40px 20px;';
+  overlay.innerHTML = `
+    <div style="width:100%;max-width:900px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <div style="font-size:15px;font-weight:800;color:#fff;">🖼 Your Renders (${urls.length} angles)</div>
+        <button onclick="this.closest('div[style*=fixed]').remove()"
+          style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;
+            width:34px;height:34px;border-radius:8px;cursor:pointer;font-size:16px;">✕</button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;">${imgs}</div>
+      <p style="text-align:center;color:rgba(255,255,255,0.35);font-size:12px;margin-top:20px;">Click any image to open full size</p>
+    </div>`;
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+};
 
 // ════════════════════════════════════
 // ACCOUNT SECTION — EDIT NAME
