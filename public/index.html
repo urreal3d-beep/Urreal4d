@@ -4724,7 +4724,7 @@ async function onCartPaymentSuccess(rzpResponse, brand) {
         try {
           const url = await uploadOne(f, `client-uploads/${oid}/ref_${j}_${f.name}`);
           refUrls.push({ name: f.name, url, label: 'Reference ' + (j+1) });
-        } catch(e) { /* ref upload skipped */ }
+        } catch(e) { console.error('Ref upload failed:', e.message); }
       }
 
       // Upload design files (Front, Back, Sleeves, Logo)
@@ -4736,7 +4736,7 @@ async function onCartPaymentSuccess(rzpResponse, brand) {
         try {
           const url = await uploadOne(f, `client-uploads/${oid}/design_${designLabels[j] || j}_${f.name}`);
           designUrls.push({ name: f.name, url, label: designLabels[j] || ('File ' + (j+1)) });
-        } catch(e) { /* design upload skipped */ }
+        } catch(e) { console.error('Design upload failed:', e.message); }
       }
 
       // Save URLs back into the order document
