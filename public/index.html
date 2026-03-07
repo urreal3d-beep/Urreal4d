@@ -5151,16 +5151,25 @@ function renderDashboard() {
     list.innerHTML = '<div class="adm-empty"><span class="adm-empty-icon">🎉</span>All clear — no pending renders!</div>';
     return;
   }
-  list.innerHTML = '<div class="adm-table-wrap"><table class="adm-table"><thead><tr><th>Client</th><th>Template</th><th>Type</th><th>Date</th><th>Amount</th><th>Action</th></tr></thead><tbody>' +
-    pending.map(o => {
-      const date = o.createdAt ? new Date(o.createdAt.seconds*1000).toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : '—';
-      const type = o.templateType === 'video' ? '🎬 Video' : '🖼 Image';
+
+  // Group by client
+  const clientMap = {};
+  pending.forEach(o => {
+    const key = o.userEmail || 'unknown';
+    if (!clientMap[key]) clientMap[key] = { name: o.clientName||o.userName||'Unknown', email: o.userEmail||'—', orders: [] };
+    clientMap[key].orders.push(o);
+  });
+  const clients = Object.values(clientMap);
+
+  list.innerHTML = '<div class="adm-table-wrap"><table class="adm-table"><thead><tr><th>Client</th><th>Orders</th><th>Templates</th><th>Total</th><th>Action</th></tr></thead><tbody>' +
+    clients.map(client => {
+      const total = client.orders.reduce((sum, o) => sum + (parseInt((o.price||'0').replace(/[^0-9]/g,''))||0), 0);
+      const templates = [...new Set(client.orders.map(o => o.templateName||'Custom'))].join(', ');
       return `<tr>
-        <td><div class="adm-td-name">${o.clientName||o.userName||'Unknown'}</div><div class="adm-td-sub">${o.userEmail||o.whatsapp||'—'}</div></td>
-        <td>${o.templateName||'Custom'}</td>
-        <td><span style="font-size:12px;">${type}</span></td>
-        <td><span class="adm-td-mono">${date}</span></td>
-        <td><div class="adm-td-amount">${o.price||'—'}</div></td>
+        <td><div class="adm-td-name">${client.name}</div><div class="adm-td-sub">${client.email}</div></td>
+        <td><span style="background:rgba(234,179,8,0.15);color:var(--yellow);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800;">${client.orders.length} order${client.orders.length>1?'s':''}</span></td>
+        <td style="font-size:12px;color:var(--gray);max-width:200px;">${templates}</td>
+        <td><div class="adm-td-amount">₹${total.toLocaleString('en-IN')}</div></td>
         <td><button onclick="admGo('orders')" style="background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.25);color:var(--pl);padding:6px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">→ Open</button></td>
       </tr>`;
     }).join('') +
